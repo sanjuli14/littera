@@ -26,7 +26,7 @@ App **100 % local** para leer y escribir libros. Flutter (Android primero, Web d
 | PDF | `pdfrx` | Rápido, funciona en Android y Web |
 | DOCX | `archive` + `xml` (parser propio a texto/párrafos) | No hay lector maduro; `.docx` es un ZIP con XML |
 | Backup | `archive` + `share_plus` | Exportar/importar un `.littera` (ZIP) |
-| Editor | `flutter_quill` | Texto enriquecido para escritura |
+| Editor | `flutter_quill` 11 | Texto enriquecido para escritura (contenido guardado como Delta JSON) |
 
 > **Nota sobre `.doc`:** el formato antiguo de Word (binario, anterior a 2007) no tiene soporte fiable en Dart.
 > Se soportará **`.docx`**; para `.doc` se mostrará un aviso pidiendo convertirlo. Se puede revisar más adelante.
@@ -138,15 +138,16 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Incluidos en la copia de seguridad (se reasignan al libro local al fusionar); se borran con su libro
 - [ ] Limitaciones: un subrayado no puede abarcar varios párrafos; en PDF la cita no se pinta sobre la página
 
-### Fase 5 — Escritura
-- [ ] Crear manuscrito con carátula, sinopsis y meta
-- [ ] Capítulos: crear, renombrar, reordenar (arrastrar), eliminar
-- [ ] Editor sin distracciones (modo pantalla completa)
-- [ ] Autoguardado (debounce ~2 s) + indicador "Guardado"
-- [ ] Contador de palabras por capítulo y total; meta diaria
-- [ ] Versiones: instantánea automática por sesión + manual; ver y restaurar
-- [ ] Fichas de personajes y lugares en panel lateral
-- [ ] Incluido en el backup de la Fase 3
+### Fase 5 — Escritura ✅
+- [x] Obras (manuscritos) con título, autor/seudónimo, sinopsis, carátula y meta diaria de palabras
+- [x] Capítulos: crear, renombrar, reordenar arrastrando, eliminar
+- [x] Editor de texto enriquecido (`flutter_quill`): negrita, cursiva, títulos, citas, listas, deshacer/rehacer
+- [x] Modo sin distracciones (oculta barras y la interfaz del sistema)
+- [x] Guardado automático (1,5 s tras dejar de escribir), al salir y al pasar a segundo plano; indicador Guardado / Sin guardar
+- [x] Contador de palabras del capítulo y de la obra; palabras escritas hoy frente a la meta
+- [x] Versiones: automática al empezar cada sesión (estado previo), manuales con nombre; vista previa y restaurar (guarda antes lo actual); máx. 30 automáticas por capítulo
+- [x] Fichas de personajes, lugares, objetos y apuntes; accesibles desde el editor
+- [x] Incluido en la copia de seguridad (completa y "solo datos"); al fusionar gana lo editado más recientemente y lo local se guarda como versión
 
 ### Fase 6 — Exportar obra
 - [ ] Exportar manuscrito a **EPUB** (generado con `archive` + plantillas XHTML)

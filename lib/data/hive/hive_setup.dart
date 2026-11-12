@@ -4,6 +4,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import '../models/app_settings.dart';
 import '../models/book.dart';
 import '../models/highlight.dart';
+import '../models/manuscript.dart';
 import '../models/shelf.dart';
 import 'hive_registrar.g.dart';
 
@@ -14,6 +15,11 @@ abstract final class HiveBoxes {
   static const books = 'books';
   static const shelves = 'shelves';
   static const highlights = 'highlights';
+  static const manuscripts = 'manuscripts';
+  static const chapters = 'chapters';
+  static const versions = 'chapter_versions';
+  static const entities = 'story_entities';
+  static const writingLog = 'writing_log';
 
   /// Solo en Web: bytes de libros y carátulas.
   static const files = 'files';
@@ -46,6 +52,11 @@ Future<void> openBoxes() async {
   await Hive.openBox<Book>(HiveBoxes.books);
   await Hive.openBox<Shelf>(HiveBoxes.shelves);
   await Hive.openBox<Highlight>(HiveBoxes.highlights);
+  await Hive.openBox<Manuscript>(HiveBoxes.manuscripts);
+  await Hive.openBox<Chapter>(HiveBoxes.chapters);
+  await Hive.openBox<ChapterVersion>(HiveBoxes.versions);
+  await Hive.openBox<StoryEntity>(HiveBoxes.entities);
+  await Hive.openBox<dynamic>(HiveBoxes.writingLog);
   if (kIsWeb) await Hive.openBox<Uint8List>(HiveBoxes.files);
   await _migrate(meta);
 }

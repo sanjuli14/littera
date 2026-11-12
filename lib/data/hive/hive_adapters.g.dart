@@ -520,3 +520,265 @@ class HighlightAdapter extends TypeAdapter<Highlight> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class ManuscriptAdapter extends TypeAdapter<Manuscript> {
+  @override
+  final typeId = 10;
+
+  @override
+  Manuscript read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Manuscript(
+      id: fields[0] as String,
+      title: fields[1] as String,
+      createdAt: fields[6] as DateTime,
+      updatedAt: fields[7] as DateTime,
+      synopsis: fields[2] == null ? '' : fields[2] as String,
+      coverRef: fields[4] as String?,
+      dailyWordGoal: fields[5] == null ? 500 : (fields[5] as num).toInt(),
+      author: fields[3] == null ? '' : fields[3] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Manuscript obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.title)
+      ..writeByte(2)
+      ..write(obj.synopsis)
+      ..writeByte(3)
+      ..write(obj.author)
+      ..writeByte(4)
+      ..write(obj.coverRef)
+      ..writeByte(5)
+      ..write(obj.dailyWordGoal)
+      ..writeByte(6)
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ManuscriptAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ChapterAdapter extends TypeAdapter<Chapter> {
+  @override
+  final typeId = 11;
+
+  @override
+  Chapter read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Chapter(
+      id: fields[0] as String,
+      manuscriptId: fields[1] as String,
+      title: fields[2] as String,
+      order: (fields[3] as num).toInt(),
+      createdAt: fields[6] as DateTime,
+      updatedAt: fields[7] as DateTime,
+      content: fields[4] == null ? '' : fields[4] as String,
+      wordCount: fields[5] == null ? 0 : (fields[5] as num).toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Chapter obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.manuscriptId)
+      ..writeByte(2)
+      ..write(obj.title)
+      ..writeByte(3)
+      ..write(obj.order)
+      ..writeByte(4)
+      ..write(obj.content)
+      ..writeByte(5)
+      ..write(obj.wordCount)
+      ..writeByte(6)
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChapterAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ChapterVersionAdapter extends TypeAdapter<ChapterVersion> {
+  @override
+  final typeId = 12;
+
+  @override
+  ChapterVersion read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ChapterVersion(
+      id: fields[0] as String,
+      chapterId: fields[1] as String,
+      manuscriptId: fields[2] as String,
+      content: fields[3] as String,
+      wordCount: (fields[4] as num).toInt(),
+      createdAt: fields[5] as DateTime,
+      manual: fields[6] == null ? false : fields[6] as bool,
+      label: fields[7] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ChapterVersion obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.chapterId)
+      ..writeByte(2)
+      ..write(obj.manuscriptId)
+      ..writeByte(3)
+      ..write(obj.content)
+      ..writeByte(4)
+      ..write(obj.wordCount)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.manual)
+      ..writeByte(7)
+      ..write(obj.label);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChapterVersionAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class EntityKindAdapter extends TypeAdapter<EntityKind> {
+  @override
+  final typeId = 13;
+
+  @override
+  EntityKind read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return EntityKind.character;
+      case 1:
+        return EntityKind.place;
+      case 2:
+        return EntityKind.object;
+      case 3:
+        return EntityKind.note;
+      default:
+        return EntityKind.character;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, EntityKind obj) {
+    switch (obj) {
+      case EntityKind.character:
+        writer.writeByte(0);
+      case EntityKind.place:
+        writer.writeByte(1);
+      case EntityKind.object:
+        writer.writeByte(2);
+      case EntityKind.note:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EntityKindAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StoryEntityAdapter extends TypeAdapter<StoryEntity> {
+  @override
+  final typeId = 14;
+
+  @override
+  StoryEntity read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return StoryEntity(
+      id: fields[0] as String,
+      manuscriptId: fields[1] as String,
+      kind: fields[2] as EntityKind,
+      name: fields[3] as String,
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
+      description: fields[4] == null ? '' : fields[4] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, StoryEntity obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.manuscriptId)
+      ..writeByte(2)
+      ..write(obj.kind)
+      ..writeByte(3)
+      ..write(obj.name)
+      ..writeByte(4)
+      ..write(obj.description)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StoryEntityAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

@@ -29,6 +29,7 @@ class Device {
     meta: meta,
     files: env.files,
     highlights: env.highlights,
+    writing: env.writingRepository,
   );
 
   Future<void> addBook(Book book, {bool withCover = false}) async {

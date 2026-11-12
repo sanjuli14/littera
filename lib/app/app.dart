@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/app_settings.dart';
@@ -28,7 +29,10 @@ class LitteraApp extends ConsumerWidget {
       },
       locale: const Locale('es'),
       supportedLocales: const [Locale('es')],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      localizationsDelegates: const [
+        ...GlobalMaterialLocalizations.delegates,
+        FlutterQuillLocalizations.delegate,
+      ],
       routerConfig: ref.watch(routerProvider),
     );
   }

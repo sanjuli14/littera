@@ -12,10 +12,12 @@ import 'package:littera/data/hive/hive_setup.dart';
 import 'package:littera/data/models/app_settings.dart';
 import 'package:littera/data/models/book.dart';
 import 'package:littera/data/models/highlight.dart';
+import 'package:littera/data/models/manuscript.dart';
 import 'package:littera/data/models/shelf.dart';
 import 'package:littera/data/repositories/highlights_repository.dart';
 import 'package:littera/data/repositories/library_repository.dart';
 import 'package:littera/data/repositories/settings_repository.dart';
+import 'package:littera/data/repositories/writing_repository.dart';
 import 'package:littera/features/backup/backup_service.dart';
 import 'package:littera/features/library/import/pdf_cover_renderer.dart';
 
@@ -77,6 +79,11 @@ class TestEnv {
     this.files,
     this.meta,
     this.highlights,
+    this.manuscripts,
+    this.chapters,
+    this.versions,
+    this.entities,
+    this.writingLog,
   );
 
   final Box<AppSettings> settings;
@@ -85,6 +92,11 @@ class TestEnv {
   final MemoryFileStore files;
   final Box<dynamic> meta;
   final Box<Highlight> highlights;
+  final Box<Manuscript> manuscripts;
+  final Box<Chapter> chapters;
+  final Box<ChapterVersion> versions;
+  final Box<StoryEntity> entities;
+  final Box<dynamic> writingLog;
 
   static Future<TestEnv> create() async => TestEnv._(
     await memoryBox<AppSettings>(),
@@ -93,6 +105,20 @@ class TestEnv {
     MemoryFileStore(),
     await memoryBox<dynamic>(),
     await memoryBox<Highlight>(),
+    await memoryBox<Manuscript>(),
+    await memoryBox<Chapter>(),
+    await memoryBox<ChapterVersion>(),
+    await memoryBox<StoryEntity>(),
+    await memoryBox<dynamic>(),
+  );
+
+  WritingRepository get writingRepository => WritingRepository(
+    manuscripts: manuscripts,
+    chapters: chapters,
+    versions: versions,
+    entities: entities,
+    log: writingLog,
+    files: files,
   );
 
   LibraryRepository get repository => LibraryRepository(
@@ -112,6 +138,11 @@ class TestEnv {
     fileStoreProvider.overrideWithValue(files),
     metaBoxProvider.overrideWithValue(meta),
     highlightsBoxProvider.overrideWithValue(highlights),
+    manuscriptsBoxProvider.overrideWithValue(manuscripts),
+    chaptersBoxProvider.overrideWithValue(chapters),
+    versionsBoxProvider.overrideWithValue(versions),
+    entitiesBoxProvider.overrideWithValue(entities),
+    writingLogBoxProvider.overrideWithValue(writingLog),
     pdfCoverRendererProvider.overrideWithValue(FakePdfCoverRenderer()),
   ];
 }

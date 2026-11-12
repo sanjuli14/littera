@@ -11,12 +11,17 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(AppThemePreferenceAdapter());
     registerAdapter(BookAdapter());
     registerAdapter(BookFormatAdapter());
+    registerAdapter(ChapterAdapter());
+    registerAdapter(ChapterVersionAdapter());
+    registerAdapter(EntityKindAdapter());
     registerAdapter(HighlightAdapter());
     registerAdapter(HighlightColorAdapter());
     registerAdapter(LibrarySortAdapter());
+    registerAdapter(ManuscriptAdapter());
     registerAdapter(ReaderThemeAdapter());
     registerAdapter(ReadingStatusAdapter());
     registerAdapter(ShelfAdapter());
+    registerAdapter(StoryEntityAdapter());
   }
 }
 
@@ -26,11 +31,16 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(AppThemePreferenceAdapter());
     registerAdapter(BookAdapter());
     registerAdapter(BookFormatAdapter());
+    registerAdapter(ChapterAdapter());
+    registerAdapter(ChapterVersionAdapter());
+    registerAdapter(EntityKindAdapter());
     registerAdapter(HighlightAdapter());
     registerAdapter(HighlightColorAdapter());
     registerAdapter(LibrarySortAdapter());
+    registerAdapter(ManuscriptAdapter());
     registerAdapter(ReaderThemeAdapter());
     registerAdapter(ReadingStatusAdapter());
     registerAdapter(ShelfAdapter());
+    registerAdapter(StoryEntityAdapter());
   }
 }

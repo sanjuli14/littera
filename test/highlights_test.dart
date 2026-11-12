@@ -190,6 +190,7 @@ void main() {
         meta: e.meta,
         files: e.files,
         highlights: e.highlights,
+        writing: e.writingRepository,
       );
       final bytes = await service(phone).create(includeBookFiles: false);
 

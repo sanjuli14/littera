@@ -7,6 +7,7 @@ import '../../app/theme/littera_colors.dart';
 import '../../core/utils/text_utils.dart';
 import '../../core/widgets/dialogs.dart';
 import '../../data/repositories/library_repository.dart';
+import '../../data/repositories/writing_repository.dart';
 import 'backup_service.dart';
 
 class BackupScreen extends ConsumerWidget {
@@ -19,7 +20,8 @@ class BackupScreen extends ConsumerWidget {
     final shelves = ref.watch(shelvesProvider).value ?? const [];
     final lastBackup = ref.watch(lastBackupProvider);
     final totalSize = books.fold<int>(0, (sum, b) => sum + b.fileSize);
-    final hasBooks = books.isNotEmpty;
+    final manuscripts = ref.watch(manuscriptsProvider).value ?? const [];
+    final hasBooks = books.isNotEmpty || manuscripts.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Copia de seguridad')),
@@ -64,6 +66,8 @@ class BackupScreen extends ConsumerWidget {
                     '${books.length} ${books.length == 1 ? 'libro' : 'libros'}'
                     ' · ${shelves.length} '
                     '${shelves.length == 1 ? 'estante' : 'estantes'}'
+                    ' · ${manuscripts.length} '
+                    '${manuscripts.length == 1 ? 'obra' : 'obras'}'
                     ' · ${formatFileSize(totalSize)}',
                     style: theme.textTheme.labelLarge,
                   ),
@@ -82,7 +86,8 @@ class BackupScreen extends ConsumerWidget {
             label: const Text('Exportar copia completa'),
           ),
           const _Hint(
-            'Libros, carátulas, progreso, estantes y ajustes. '
+            'Libros, carátulas, progreso, estantes, citas, tus obras y '
+            'ajustes. '
             'Con esto puedes recuperarlo todo.',
           ),
           const SizedBox(height: 12),
@@ -94,9 +99,10 @@ class BackupScreen extends ConsumerWidget {
             label: const Text('Exportar solo datos'),
           ),
           const _Hint(
-            'Progreso, estantes, carátulas y ajustes, sin los archivos de los '
-            'libros. Muy ligera; sirve para pasar tu progreso a otro '
-            'dispositivo que ya tenga los libros.',
+            'Todo menos los archivos de los libros: progreso, estantes, '
+            'citas, tus obras y ajustes. Muy ligera; sirve para guardar tus '
+            'obras o pasar tu progreso a otro dispositivo que ya tenga los '
+            'libros.',
           ),
           const SizedBox(height: 28),
           _SectionTitle('Restaurar'),
@@ -295,6 +301,10 @@ String restoreSummary(RestoreResult r) {
       '${r.added} ${r.added == 1 ? 'libro añadido' : 'libros añadidos'}',
     if (r.updated > 0)
       '${r.updated} ${r.updated == 1 ? 'libro actualizado' : 'libros actualizados'}',
+    if (r.manuscriptsAdded > 0)
+      '${r.manuscriptsAdded} ${r.manuscriptsAdded == 1 ? 'obra añadida' : 'obras añadidas'}',
+    if (r.manuscriptsUpdated > 0)
+      '${r.manuscriptsUpdated} ${r.manuscriptsUpdated == 1 ? 'obra actualizada' : 'obras actualizadas'}',
     if (r.highlightsAdded > 0)
       '${r.highlightsAdded} ${r.highlightsAdded == 1 ? 'subrayado' : 'subrayados'}',
     if (r.shelvesAdded > 0)
@@ -342,7 +352,8 @@ class _RestoreDialogState extends State<_RestoreDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              '${m.bookCount} libros · ${m.shelfCount} estantes'
+              '${m.bookCount} libros · ${m.shelfCount} estantes · '
+              '${m.manuscriptCount} obras'
               '${m.includesBookFiles ? '' : ' · solo datos'}',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,

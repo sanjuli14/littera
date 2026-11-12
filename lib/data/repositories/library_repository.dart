@@ -43,11 +43,14 @@ class LibraryRepository {
 
   Future<void> saveBook(Book book) => books.put(book.id, book);
 
+  /// Versión más reciente guardada (la que recibe la UI puede estar vieja).
+  Book _latest(Book book) => books.get(book.id) ?? book;
+
   Future<void> updateDetails(Book book, {String? title, String? author}) =>
-      saveBook(book.copyWith(title: title, author: author));
+      saveBook(_latest(book).copyWith(title: title, author: author));
 
   Future<void> setStatus(Book book, ReadingStatus status) =>
-      saveBook(book.copyWith(status: status));
+      saveBook(_latest(book).copyWith(status: status));
 
   /// Al abrir un libro: fecha de última lectura y, si estaba
   /// "Por leer", pasa a "Leyendo".
@@ -81,9 +84,10 @@ class LibraryRepository {
   }
 
   Future<void> toggleShelf(Book book, String shelfId) {
-    final ids = [...book.shelfIds];
+    final current = _latest(book);
+    final ids = [...current.shelfIds];
     ids.contains(shelfId) ? ids.remove(shelfId) : ids.add(shelfId);
-    return saveBook(book.copyWith(shelfIds: ids));
+    return saveBook(current.copyWith(shelfIds: ids));
   }
 
   /// Guarda una carátula nueva (ya recortada o no). Devuelve `false` si la
@@ -101,16 +105,18 @@ class LibraryRepository {
       '${book.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
       processed,
     );
-    final old = book.coverRef;
-    await saveBook(book.copyWith(coverRef: ref, hasCustomCover: custom));
+    final current = _latest(book);
+    final old = current.coverRef;
+    await saveBook(current.copyWith(coverRef: ref, hasCustomCover: custom));
     if (old != null && old != ref) await files.delete(old);
     return true;
   }
 
   /// Quita la carátula: se mostrará la generada.
   Future<void> removeCover(Book book) async {
-    final old = book.coverRef;
-    await saveBook(book.copyWith(clearCover: true, hasCustomCover: false));
+    final current = _latest(book);
+    final old = current.coverRef;
+    await saveBook(current.copyWith(clearCover: true, hasCustomCover: false));
     if (old != null) await files.delete(old);
   }
 

@@ -37,14 +37,72 @@ class BookCover extends ConsumerWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(compact ? 4 : 8),
           child: image == null
-              ? GeneratedCover(book: book, compact: compact)
+              ? GeneratedCover.forBook(book, compact: compact)
               : Image(
                   image: image,
                   fit: BoxFit.cover,
                   gaplessPlayback: true,
                   semanticLabel: 'Carátula de ${book.title}',
                   errorBuilder: (_, _, _) =>
-                      GeneratedCover(book: book, compact: compact),
+                      GeneratedCover.forBook(book, compact: compact),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Carátula genérica 2:3: imagen guardada o, si no hay, una generada.
+class CoverImage extends ConsumerWidget {
+  const CoverImage({
+    super.key,
+    required this.coverRef,
+    required this.title,
+    this.author = '',
+    this.label = '',
+    this.compact = false,
+  });
+
+  final String? coverRef;
+  final String title;
+  final String author;
+  final String label;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cover = coverRef;
+    final image = cover == null
+        ? null
+        : ref.watch(fileStoreProvider).image(cover);
+    final generated = GeneratedCover(
+      title: title,
+      author: author,
+      label: label,
+      compact: compact,
+    );
+    return AspectRatio(
+      aspectRatio: 2 / 3,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(compact ? 4 : 8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: compact ? 3 : 8,
+              offset: Offset(0, compact ? 1 : 3),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(compact ? 4 : 8),
+          child: image == null
+              ? generated
+              : Image(
+                  image: image,
+                  fit: BoxFit.cover,
+                  gaplessPlayback: true,
+                  errorBuilder: (_, _, _) => generated,
                 ),
         ),
       ),
@@ -54,9 +112,24 @@ class BookCover extends ConsumerWidget {
 
 /// Carátula dibujada con la paleta de Littera: tinta, marco oro y título.
 class GeneratedCover extends StatelessWidget {
-  const GeneratedCover({super.key, required this.book, this.compact = false});
+  const GeneratedCover({
+    super.key,
+    required this.title,
+    this.author = '',
+    this.label = '',
+    this.compact = false,
+  });
 
-  final Book book;
+  GeneratedCover.forBook(Book book, {super.key, this.compact = false})
+    : title = book.title,
+      author = book.author,
+      label = book.format.label;
+
+  final String title;
+  final String author;
+
+  /// Texto pequeño arriba (formato del libro, "MANUSCRITO"…).
+  final String label;
   final bool compact;
 
   @override
@@ -82,7 +155,8 @@ class GeneratedCover extends StatelessWidget {
             child: compact
                 ? Center(
                     child: Text(
-                      book.title.characters.first.toUpperCase(),
+                      (title.isEmpty ? '?' : title.characters.first)
+                          .toUpperCase(),
                       style: TextStyle(
                         color: LitteraColors.pergamino,
                         fontSize: w * 0.4,
@@ -93,7 +167,7 @@ class GeneratedCover extends StatelessWidget {
                 : Column(
                     children: [
                       Text(
-                        book.format.label,
+                        label,
                         style: TextStyle(
                           color: LitteraColors.oro,
                           fontSize: w * 0.065,
@@ -103,7 +177,7 @@ class GeneratedCover extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        book.title,
+                        title,
                         textAlign: TextAlign.center,
                         maxLines: 5,
                         overflow: TextOverflow.ellipsis,
@@ -121,9 +195,9 @@ class GeneratedCover extends StatelessWidget {
                         color: LitteraColors.oro,
                       ),
                       SizedBox(height: w * 0.05),
-                      if (book.author.isNotEmpty)
+                      if (author.isNotEmpty)
                         Text(
-                          book.author,
+                          author,
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

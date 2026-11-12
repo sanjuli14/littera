@@ -1,6 +1,7 @@
 import '../../data/models/app_settings.dart';
 import '../../data/models/book.dart';
 import '../../data/models/highlight.dart';
+import '../../data/models/manuscript.dart';
 import '../../data/models/shelf.dart';
 
 /// Conversión de modelos a JSON para el backup.
@@ -160,3 +161,95 @@ Highlight highlightFromJson(Map<String, Object?> j) {
     updatedAt: _date(j['updatedAt']),
   );
 }
+
+String _requireString(Map<String, Object?> j, String key) {
+  final v = j[key];
+  if (v is! String) throw FormatException('Falta "$key"');
+  return v;
+}
+
+Map<String, Object?> manuscriptToJson(Manuscript m) => {
+  'id': m.id,
+  'title': m.title,
+  'synopsis': m.synopsis,
+  'author': m.author,
+  'coverRef': m.coverRef,
+  'dailyWordGoal': m.dailyWordGoal,
+  'createdAt': m.createdAt.toIso8601String(),
+  'updatedAt': m.updatedAt.toIso8601String(),
+};
+
+Manuscript manuscriptFromJson(Map<String, Object?> j) => Manuscript(
+  id: _requireString(j, 'id'),
+  title: (j['title'] as String?) ?? 'Sin título',
+  synopsis: (j['synopsis'] as String?) ?? '',
+  author: (j['author'] as String?) ?? '',
+  coverRef: j['coverRef'] as String?,
+  dailyWordGoal: (j['dailyWordGoal'] as num?)?.toInt() ?? 500,
+  createdAt: _date(j['createdAt']) ?? DateTime.now(),
+  updatedAt: _date(j['updatedAt']) ?? DateTime.now(),
+);
+
+Map<String, Object?> chapterToJson(Chapter c) => {
+  'id': c.id,
+  'manuscriptId': c.manuscriptId,
+  'title': c.title,
+  'order': c.order,
+  'content': c.content,
+  'wordCount': c.wordCount,
+  'createdAt': c.createdAt.toIso8601String(),
+  'updatedAt': c.updatedAt.toIso8601String(),
+};
+
+Chapter chapterFromJson(Map<String, Object?> j) => Chapter(
+  id: _requireString(j, 'id'),
+  manuscriptId: _requireString(j, 'manuscriptId'),
+  title: (j['title'] as String?) ?? 'Capítulo',
+  order: (j['order'] as num?)?.toInt() ?? 0,
+  content: (j['content'] as String?) ?? '',
+  wordCount: (j['wordCount'] as num?)?.toInt() ?? 0,
+  createdAt: _date(j['createdAt']) ?? DateTime.now(),
+  updatedAt: _date(j['updatedAt']) ?? DateTime.now(),
+);
+
+Map<String, Object?> versionToJson(ChapterVersion v) => {
+  'id': v.id,
+  'chapterId': v.chapterId,
+  'manuscriptId': v.manuscriptId,
+  'content': v.content,
+  'wordCount': v.wordCount,
+  'createdAt': v.createdAt.toIso8601String(),
+  'manual': v.manual,
+  'label': v.label,
+};
+
+ChapterVersion versionFromJson(Map<String, Object?> j) => ChapterVersion(
+  id: _requireString(j, 'id'),
+  chapterId: _requireString(j, 'chapterId'),
+  manuscriptId: _requireString(j, 'manuscriptId'),
+  content: (j['content'] as String?) ?? '',
+  wordCount: (j['wordCount'] as num?)?.toInt() ?? 0,
+  createdAt: _date(j['createdAt']) ?? DateTime.now(),
+  manual: j['manual'] == true,
+  label: j['label'] as String?,
+);
+
+Map<String, Object?> entityToJson(StoryEntity e) => {
+  'id': e.id,
+  'manuscriptId': e.manuscriptId,
+  'kind': e.kind.name,
+  'name': e.name,
+  'description': e.description,
+  'createdAt': e.createdAt.toIso8601String(),
+  'updatedAt': e.updatedAt.toIso8601String(),
+};
+
+StoryEntity entityFromJson(Map<String, Object?> j) => StoryEntity(
+  id: _requireString(j, 'id'),
+  manuscriptId: _requireString(j, 'manuscriptId'),
+  kind: _enum(EntityKind.values, j['kind'], EntityKind.note),
+  name: (j['name'] as String?) ?? 'Sin nombre',
+  description: (j['description'] as String?) ?? '',
+  createdAt: _date(j['createdAt']) ?? DateTime.now(),
+  updatedAt: _date(j['updatedAt']) ?? DateTime.now(),
+);

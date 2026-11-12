@@ -102,4 +102,17 @@ void main() {
     expect(env.books.isEmpty, isTrue);
     expect(env.files.files, isEmpty);
   });
+
+  test('cambios con una copia vieja del libro no pisan otros datos', () async {
+    final stale = testBook();
+    await repo.saveBook(stale);
+    await repo.saveProgress('b1', 'b:50', 0.5); // p. ej. desde el lector
+    await repo.setStatus(stale, ReadingStatus.finished);
+    await repo.updateDetails(stale, title: 'Nuevo');
+    final book = repo.getBook('b1')!;
+    expect(book.position, 'b:50');
+    expect(book.progress, 0.5);
+    expect(book.status, ReadingStatus.finished);
+    expect(book.title, 'Nuevo');
+  });
 }

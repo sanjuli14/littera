@@ -7,6 +7,8 @@ import '../features/library/library_screen.dart';
 import '../features/quotes/quotes_screen.dart';
 import '../features/reader/reader_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/writing/chapter_editor_screen.dart';
+import '../features/writing/manuscript_screen.dart';
 import '../features/writing/writing_screen.dart';
 import 'home_shell.dart';
 import 'routes.dart';
@@ -22,6 +24,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           bookId: state.pathParameters['id']!,
           target: int.tryParse(state.uri.queryParameters['en'] ?? ''),
         ),
+      ),
+      // Editor de capítulo a pantalla completa.
+      GoRoute(
+        path: '/editor/:chapterId',
+        builder: (context, state) =>
+            ChapterEditorScreen(chapterId: state.pathParameters['chapterId']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => HomeShell(navigationShell: shell),
@@ -54,6 +62,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.writing,
                 builder: (context, state) => const WritingScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'obra/:id',
+                    builder: (context, state) => ManuscriptScreen(
+                      manuscriptId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
