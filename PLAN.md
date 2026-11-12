@@ -117,16 +117,16 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] "Por leer" → "Leyendo" al abrir; al llegar al final, ofrece marcar como terminado
 - [ ] Pendiente menor: probar el visor PDF en un dispositivo real (no se compiló la app en esta fase)
 
-### Fase 3 — Backup y restauración (prioritaria: protege los datos)
-- [ ] Exportar todo a un archivo `littera-backup-AAAA-MM-DD.littera` (ZIP con):
-  - `manifest.json` (versión de app, versión de esquema, fecha, conteos)
-  - `data/*.json` (cada box de Hive serializada a JSON, no binario, para que sea legible y migrable)
-  - `books/` (archivos originales) y `covers/`
-- [ ] Guardar en Descargas o compartir (Drive, correo, Telegram…) con `share_plus`
-- [ ] Opción de exportar **solo datos** (sin archivos de libros) para backups ligeros
-- [ ] Restaurar: elegir `.littera`, validar manifest, previsualizar contenido, y elegir **reemplazar** o **fusionar** (sin duplicar por id)
-- [ ] Recordatorio opcional: "Hace X días que no haces copia"
-- [ ] Prueba de ida y vuelta: exportar → borrar app → reinstalar → restaurar → todo idéntico
+### Fase 3 — Backup y restauración ✅
+- [x] Archivo `.littera` (ZIP): `manifest.json`, `data/*.json` (JSON legible, no binario de Hive), `files/books/` y `files/covers/`
+- [x] Copia completa o "solo datos" (sin archivos de libros; incluye carátulas)
+- [x] Guardar donde el usuario elija (Drive, Descargas…) con el diálogo del sistema; en Web se descarga
+- [x] Restaurar con vista previa (fecha, conteos) y modo **Fusionar** (no borra nada; progreso más reciente gana; estantes se unen por nombre) o **Reemplazar** (con confirmación; solo con copia completa)
+- [x] Validación: rechaza archivos ajenos, dañados o de versiones más nuevas; ignora rutas peligrosas y registros inválidos
+- [x] Seguridad al reemplazar: primero se escriben los archivos nuevos, luego se cambian los datos, al final se borran huérfanos
+- [x] Fecha de última copia en Ajustes y aviso en la biblioteca (3+ libros y 14+ días sin copia)
+- [x] Prueba de ida y vuelta automatizada: exportar → app vacía → restaurar → todo idéntico
+- [ ] Mejora futura: generar el ZIP por streaming para bibliotecas muy grandes (hoy se arma en memoria)
 
 ### Fase 4 — Subrayados y notas
 - [ ] Seleccionar texto → subrayar (colores) y añadir nota

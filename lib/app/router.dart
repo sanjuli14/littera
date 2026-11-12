@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/backup/backup_screen.dart';
 import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/reader/reader_screen.dart';
@@ -50,6 +51,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.settings,
                 builder: (context, state) => const SettingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'copia',
+                    builder: (context, state) => const BackupScreen(),
+                  ),
+                ],
               ),
             ],
           ),

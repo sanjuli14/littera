@@ -14,6 +14,7 @@ import 'package:littera/data/models/book.dart';
 import 'package:littera/data/models/shelf.dart';
 import 'package:littera/data/repositories/library_repository.dart';
 import 'package:littera/data/repositories/settings_repository.dart';
+import 'package:littera/features/backup/backup_service.dart';
 import 'package:littera/features/library/import/pdf_cover_renderer.dart';
 
 /// Inicializa Hive en una carpeta temporal (una vez por archivo de test).
@@ -67,18 +68,20 @@ class FakePdfCoverRenderer implements PdfCoverRenderer {
 
 /// Todo lo necesario para montar la app en un test.
 class TestEnv {
-  TestEnv._(this.settings, this.books, this.shelves, this.files);
+  TestEnv._(this.settings, this.books, this.shelves, this.files, this.meta);
 
   final Box<AppSettings> settings;
   final Box<Book> books;
   final Box<Shelf> shelves;
   final MemoryFileStore files;
+  final Box<dynamic> meta;
 
   static Future<TestEnv> create() async => TestEnv._(
     await memoryBox<AppSettings>(),
     await memoryBox<Book>(),
     await memoryBox<Shelf>(),
     MemoryFileStore(),
+    await memoryBox<dynamic>(),
   );
 
   LibraryRepository get repository =>
@@ -89,6 +92,7 @@ class TestEnv {
     booksBoxProvider.overrideWithValue(books),
     shelvesBoxProvider.overrideWithValue(shelves),
     fileStoreProvider.overrideWithValue(files),
+    metaBoxProvider.overrideWithValue(meta),
     pdfCoverRendererProvider.overrideWithValue(FakePdfCoverRenderer()),
   ];
 }

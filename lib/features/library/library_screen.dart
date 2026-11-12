@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../core/widgets/empty_state.dart';
+import '../backup/backup_reminder.dart';
 import '../../core/widgets/littera_logo.dart';
 import '../../data/models/app_settings.dart';
 import '../../data/models/book.dart';
@@ -49,6 +50,7 @@ class LibraryScreen extends ConsumerWidget {
               )
             : const Column(
                 children: [
+                  BackupReminder(),
                   ShelfFilterBar(),
                   Expanded(child: _BookCollection()),
                 ],
