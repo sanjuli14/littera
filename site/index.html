@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Littera · Lee, subraya y escribe</title>
+  <meta name="description" content="Littera es una app para Android para leer EPUB, PDF y DOCX, subrayar, guardar citas y escribir tus propias obras. Todo se queda en tu móvil.">
+  <meta name="theme-color" content="#1C2540">
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <meta property="og:title" content="Littera">
+  <meta property="og:description" content="Lee, subraya y escribe. Todo se queda en tu móvil.">
+  <meta property="og:image" content="img/home_light.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --tinta: #1C2540;
+      --tinta-suave: #2B3656;
+      --pergamino: #F2E8D2;
+      --pergamino-claro: #FAF5EA;
+      --oro: #C9A45C;
+      --oro-oscuro: #9C7A36;
+      --bg: #FFFDF8;
+      --surface: #FFFFFF;
+      --text: #1C2540;
+      --muted: #5B6178;
+      --border: #ECE3CF;
+      --shadow: 0 18px 40px -18px rgba(28, 37, 64, .28);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #121110;
+        --surface: #1D1B19;
+        --text: #F2E8D2;
+        --muted: #B8AF9C;
+        --border: #3B3833;
+        --pergamino-claro: #1D1B19;
+        --shadow: 0 18px 40px -18px rgba(0, 0, 0, .7);
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #121110; --surface: #1D1B19; --text: #F2E8D2; --muted: #B8AF9C;
+      --border: #3B3833; --pergamino-claro: #1D1B19; --shadow: 0 18px 40px -18px rgba(0,0,0,.7);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Montserrat, system-ui, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    /* ---------- Cabecera ---------- */
+    header.top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 20px; }
+    .brand img { width: 36px; height: 36px; border-radius: 10px; }
+    .top nav a { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--muted); margin-left: 20px; }
+    .top nav a:hover { color: var(--text); }
+
+    /* ---------- Portada ---------- */
+    .hero {
+      position: relative;
+      display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center;
+      padding: 40px 0 72px;
+    }
+    .hero::before {
+      content: ""; position: absolute; z-index: -1;
+      width: 520px; height: 520px; right: -120px; top: -60px;
+      background: radial-gradient(circle at 40% 40%, var(--pergamino) 0%, transparent 68%);
+      border-radius: 50%; opacity: .9;
+    }
+    .eyebrow {
+      display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .14em;
+      color: var(--oro-oscuro); text-transform: uppercase; margin-bottom: 14px;
+    }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .eyebrow { color: var(--oro); } }
+    h1 {
+      font-family: Lora, Georgia, serif; font-weight: 600;
+      font-size: clamp(38px, 6vw, 60px); line-height: 1.08; margin: 0 0 18px;
+      letter-spacing: -.01em;
+    }
+    h1 em { color: var(--oro); font-style: italic; }
+    .lead { font-size: 18px; color: var(--muted); max-width: 30em; margin: 0 0 30px; }
+
+    .download {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--tinta); color: var(--pergamino);
+      padding: 16px 28px; border-radius: 999px; text-decoration: none;
+      font-weight: 700; font-size: 17px;
+      box-shadow: var(--shadow); transition: transform .15s ease, box-shadow .15s ease;
+    }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .download { background: var(--oro); color: var(--tinta); } }
+    :root[data-theme="dark"] .download { background: var(--oro); color: var(--tinta); }
+    .download:hover { transform: translateY(-2px); }
+    .download:focus-visible { outline: 3px solid var(--oro); outline-offset: 3px; }
+    .download svg { width: 22px; height: 22px; flex: none; }
+    .meta { margin-top: 14px; font-size: 13px; color: var(--muted); }
+    .meta a { font-weight: 600; }
+
+    .phones { position: relative; height: 560px; }
+    .phone {
+      position: absolute; width: 250px; border-radius: 34px; overflow: hidden;
+      border: 8px solid var(--tinta); background: var(--tinta);
+      box-shadow: var(--shadow);
+    }
+    .phone img { display: block; width: 100%; height: auto; }
+    .phone.front { left: 50%; top: 0; transform: translateX(-62%) rotate(-3deg); z-index: 2; }
+    .phone.back { left: 50%; top: 50px; transform: translateX(10%) rotate(5deg); border-color: #000; }
+
+    /* ---------- Funciones ---------- */
+    section { padding: 64px 0; }
+    h2 {
+      font-family: Lora, Georgia, serif; font-weight: 600;
+      font-size: clamp(28px, 4vw, 38px); margin: 0 0 10px; line-height: 1.15;
+    }
+    .section-lead { color: var(--muted); margin: 0 0 36px; max-width: 36em; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 22px; padding: 24px; box-shadow: 0 8px 24px -16px rgba(28,37,64,.18);
+    }
+    .card .icon {
+      width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center;
+      background: var(--pergamino); color: var(--tinta); margin-bottom: 14px;
+    }
+    .card .icon svg { width: 22px; height: 22px; }
+    .card h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+    /* ---------- Capturas ---------- */
+    .shots { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; }
+    .shots figure { margin: 0; width: 230px; text-align: center; }
+    .shots .phone { position: static; width: 100%; transform: none; }
+    .shots figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); font-weight: 600; }
+
+    /* ---------- Instalar ---------- */
+    .install {
+      background: var(--tinta); color: var(--pergamino); border-radius: 28px;
+      padding: 44px; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center;
+    }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .install { background: #1D1B19; border: 1px solid #3B3833; } }
+    :root[data-theme="dark"] .install { background: #1D1B19; border: 1px solid #3B3833; }
+    .install h2 { color: var(--pergamino); }
+    .install p { color: #D9D1BE; margin: 0 0 24px; }
+    .install .download { background: var(--oro); color: var(--tinta); }
+    .install ol { list-style: none; padding: 0; margin: 0; counter-reset: paso; }
+    .install li { counter-increment: paso; display: flex; gap: 14px; margin-bottom: 18px; color: #E8E0CC; }
+    .install li::before {
+      content: counter(paso); flex: none; width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center; background: var(--oro); color: var(--tinta);
+      font-weight: 800; font-size: 14px;
+    }
+    .install li strong { color: var(--pergamino); }
+
+    .privacy {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--pergamino-claro); border: 1px solid var(--border);
+      border-radius: 22px; padding: 22px 24px; margin-top: 28px;
+    }
+    .privacy svg { flex: none; width: 26px; height: 26px; color: var(--oro); margin-top: 2px; }
+    .privacy p { margin: 0; color: var(--muted); }
+    .privacy strong { color: var(--text); }
+
+    footer { padding: 40px 0 56px; color: var(--muted); font-size: 14px; text-align: center; }
+    footer a { font-weight: 600; }
+
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; text-align: center; padding-top: 16px; }
+      .lead { margin-left: auto; margin-right: auto; }
+      .hero::before { right: -220px; }
+      .phones { height: 470px; }
+      .phone { width: 210px; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .install { grid-template-columns: 1fr; padding: 32px 24px; }
+      .top nav { display: none; }
+    }
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      .phones { height: 400px; }
+      .phone { width: 180px; border-width: 6px; border-radius: 28px; }
+      .download { padding: 15px 22px; font-size: 16px; }
+      section { padding: 48px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="#"><img src="img/logo.svg" alt="">Littera</a>
+      <nav>
+        <a href="#funciones">Funciones</a>
+        <a href="#capturas">Capturas</a>
+        <a href="#instalar">Instalar</a>
+        <a href="https://github.com/sanjuli14/littera">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div>
+          <span class="eyebrow">App gratuita para Android</span>
+          <h1>Cada página es un <em>pequeño viaje</em>.</h1>
+          <p class="lead">Lee tus libros EPUB, PDF y DOCX, subraya lo que te emociona, guarda tus citas y escribe tus propias historias. Todo se queda en tu móvil.</p>
+          <a class="download js-download" href="https://github.com/sanjuli14/littera/releases/latest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            <span class="js-label">Descargar para Android</span>
+          </a>
+          <div class="meta js-meta">Archivo APK · se actualiza desde la propia app</div>
+        </div>
+        <div class="phones" aria-hidden="true">
+          <div class="phone back"><img src="img/home_dark.webp" alt="" width="600" height="1298"></div>
+          <div class="phone front"><img src="img/home_light.webp" alt="" width="600" height="1298"></div>
+        </div>
+      </div>
+
+      <section id="funciones">
+        <h2>Todo lo que necesita un lector</h2>
+        <p class="section-lead">Pensada para que siempre te apetezca volver a leer, sin anuncios, sin cuentas y sin distracciones.</p>
+        <div class="grid">
+          <div class="card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5v0A2.5 2.5 0 0 0 6.5 24"/><path d="M8 7h8"/></svg></div>
+            <h3>Tu biblioteca</h3>
+            <p>Importa EPUB, PDF y DOCX con su carátula. Estanterías, búsqueda, estrellas y "Sigue leyendo".</p>
+          </div>
+          <div class="card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div>
+            <h3>Lectura a tu gusto</h3>
+            <p>Letra clásica o moderna, tamaño, interlineado y temas claro, sepia y oscuro.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></div>
+            <h3>Subrayados y citas</h3>
+            <p>Subraya en cuatro colores, añade notas y reúne tus frases favoritas en un solo lugar.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+            <h3>Escribe tus obras</h3>
+            <p>Capítulos con guardado automático, versiones y fichas de personajes. Exporta a EPUB o PDF.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+            <h3>Recordatorios</h3>
+            <p>Un aviso diario a tu hora de leer y un empujoncito para terminar los libros a medias.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg></div>
+            <h3>Tus datos, tuyos</h3>
+            <p>Sin cuentas ni nube. Copia de seguridad en un archivo para llevarlo todo a otro móvil.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="capturas">
+        <h2>Así se ve</h2>
+        <p class="section-lead">Tinta, pergamino y oro: un rincón tranquilo para tus lecturas, de día y de noche.</p>
+        <div class="shots">
+          <figure><div class="phone"><img src="img/home_light.webp" alt="Inicio de Littera con el libro en curso" width="600" height="1298" loading="lazy"></div><figcaption>Inicio</figcaption></figure>
+          <figure><div class="phone"><img src="img/list_light.webp" alt="Lista de libros que estás leyendo, con estrellas y progreso" width="600" height="1298" loading="lazy"></div><figcaption>Tu biblioteca</figcaption></figure>
+          <figure><div class="phone" style="border-color:#000"><img src="img/home_dark.webp" alt="Inicio de Littera en modo oscuro" width="600" height="1298" loading="lazy"></div><figcaption>Modo oscuro</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="instalar">
+        <div class="install">
+          <div>
+            <h2>Instálala en un minuto</h2>
+            <p>Littera aún no está en Google Play: se instala con su archivo APK. Las versiones nuevas llegan solas, desde la propia app.</p>
+            <a class="download js-download" href="https://github.com/sanjuli14/littera/releases/latest">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+              <span class="js-label">Descargar para Android</span>
+            </a>
+          </div>
+          <ol>
+            <li><span><strong>Descarga el APK</strong> desde el móvil con el botón.</span></li>
+            <li><span><strong>Ábrelo</strong> desde las notificaciones o la carpeta de descargas.</span></li>
+            <li><span>Si Android lo pide, <strong>permite instalar apps</strong> de tu navegador.</span></li>
+            <li><span><strong>¡Listo!</strong> Importa tu primer libro y empieza a leer.</span></li>
+          </ol>
+        </div>
+        <div class="privacy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <p><strong>Privada de verdad.</strong> Tus libros, subrayados y escritos nunca salen de tu móvil. Littera solo se conecta para comprobar si hay una versión nueva, sin enviar ningún dato tuyo.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      Littera · Hecha con cariño para quienes leen y escriben ·
+      <a href="https://github.com/sanjuli14/littera/releases">Todas las versiones</a>
+    </footer>
+  </div>
+
+  <script>
+    // Enlaza el botón directamente al APK de la última versión publicada.
+    (async () => {
+      try {
+        const res = await fetch('https://api.github.com/repos/sanjuli14/littera/releases/latest', {
+          headers: { Accept: 'application/vnd.github+json' },
+        });
+        if (!res.ok) return;
+        const release = await res.json();
+        const apk = (release.assets || []).find(a => a.name.toLowerCase().endsWith('.apk'));
+        if (!apk) return;
+        const version = release.tag_name.replace(/^v/i, '');
+        const mb = (apk.size / 1048576).toFixed(1).replace('.', ',');
+        document.querySelectorAll('.js-download').forEach(a => {
+          a.href = apk.browser_download_url;
+          a.setAttribute('download', '');
+        });
+        document.querySelectorAll('.js-label').forEach(s => { s.textContent = 'Descargar Littera ' + version; });
+        const date = new Date(release.published_at).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' });
+        const meta = document.querySelector('.js-meta');
+        meta.innerHTML = '';
+        meta.append(`APK · ${mb} MB · ${date} · `);
+        const link = document.createElement('a');
+        link.href = release.html_url;
+        link.textContent = 'Novedades';
+        meta.append(link);
+      } catch (_) { /* sin conexión con la API: queda el enlace a las versiones */ }
+    })();
+  </script>
+</body>
+</html>

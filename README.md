@@ -50,6 +50,8 @@ La app busca versiones en las [Releases de GitHub](https://github.com/sanjuli14/
 - **CI** (`.github/workflows/ci.yml`): en cada push a `main` y pull request, análisis, tests y APK de prueba (descargable como artefacto 7 días).
 - **Release** (`.github/workflows/release.yml`): al subir una etiqueta `v*`.
 
+- **Página web** (`.github/workflows/pages.yml`): publica `site/` en https://sanjuli14.github.io/littera/ al cambiarla. El botón de descarga apunta siempre al APK de la última Release.
+
 ### Clave de firma
 
 Android solo instala una actualización si está firmada con la **misma clave** que la versión instalada.
