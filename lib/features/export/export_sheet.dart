@@ -138,7 +138,7 @@ class _ExportSheetState extends State<_ExportSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../../../app/theme/littera_colors.dart';
 import '../../../data/models/highlight.dart';
@@ -140,6 +141,7 @@ class BlockView extends StatelessWidget {
         child: _text(
           context,
           runs,
+          header: true,
           textAlign: level <= 2 ? TextAlign.center : TextAlign.start,
           textStyle: body.copyWith(
             fontSize:
@@ -196,12 +198,17 @@ class BlockView extends StatelessWidget {
     List<TextRun> runs, {
     required TextAlign textAlign,
     required TextStyle textStyle,
+    bool header = false,
   }) {
     final span = TextSpan(children: highlightedSpans(runs, highlights));
     final a = actions;
     if (a == null) {
-      return Text.rich(span, textAlign: textAlign, style: textStyle);
+      return Semantics(
+        header: header,
+        child: Text.rich(span, textAlign: textAlign, style: textStyle),
+      );
     }
+    final plain = runs.map((r) => r.text).join();
 
     final withNotes = highlights.where((h) => h.hasNote).toList();
     final text = SelectableText.rich(
@@ -264,11 +271,29 @@ class BlockView extends StatelessWidget {
       },
     );
 
-    if (withNotes.isEmpty) return text;
+    // Para lectores de pantalla: el párrafo se anuncia como texto (no como
+    // campo de edición, que es lo que expone SelectableText) y, como no se
+    // puede seleccionar con gestos, ofrece subrayar o anotar el párrafo entero.
+    final accessible = Semantics(
+      label: plain,
+      header: header,
+      customSemanticsActions: {
+        const CustomSemanticsAction(label: 'Subrayar párrafo'): () =>
+            a.onHighlight(0, plain.length),
+        const CustomSemanticsAction(label: 'Añadir nota al párrafo'): () =>
+            a.onNote(0, plain.length),
+        if (withNotes.isNotEmpty)
+          const CustomSemanticsAction(label: 'Ver nota'): () =>
+              a.onEdit(withNotes.first),
+      },
+      child: ExcludeSemantics(child: text),
+    );
+
+    if (withNotes.isEmpty) return accessible;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        text,
+        accessible,
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(

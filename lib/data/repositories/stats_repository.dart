@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive_ce.dart';
 
+import '../../core/utils/box_stream.dart';
 import '../../features/writing/word_count.dart';
 import '../hive/hive_setup.dart';
 import '../models/book.dart';
@@ -126,8 +127,7 @@ final statsRepositoryProvider = Provider<StatsRepository>(
 );
 
 /// Cambia cada vez que se registra lectura (para refrescar la pantalla).
-final readingLogProvider = StreamProvider<int>((ref) async* {
+final readingLogProvider = StreamProvider<int>((ref) {
   final box = ref.watch(readingLogBoxProvider);
-  yield box.length;
-  yield* box.watch().map((_) => box.length);
+  return watchBox(box, () => box.length);
 });

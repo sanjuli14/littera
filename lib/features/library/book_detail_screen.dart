@@ -300,22 +300,24 @@ class _EditDetailsDialogState extends State<_EditDetailsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Editar datos'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _title,
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(labelText: 'Título'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _author,
-            textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Autor'),
-          ),
-        ],
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _title,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(labelText: 'Título'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _author,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(labelText: 'Autor'),
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(

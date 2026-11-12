@@ -784,6 +784,15 @@ class LastBackupNotifier extends Notifier<DateTime?> {
     await ref.read(backupServiceProvider).markBackedUp(now);
     state = now;
   }
+
+  /// Tras restaurar una copia: existe una copia de esa fecha, así que el
+  /// aviso no debe decir "nunca". Solo avanza, nunca retrocede.
+  Future<void> markAtLeast(DateTime at) async {
+    final current = state;
+    if (current != null && !at.isAfter(current)) return;
+    await ref.read(backupServiceProvider).markBackedUp(at);
+    state = at;
+  }
 }
 
 final lastBackupProvider = NotifierProvider<LastBackupNotifier, DateTime?>(

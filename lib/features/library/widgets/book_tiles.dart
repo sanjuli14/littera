@@ -11,49 +11,85 @@ class BookGridTile extends StatelessWidget {
   final Book book;
   final VoidCallback onTap;
 
+  /// Alto de una tarjeta para el ancho disponible de la cuadrícula.
+  static double extentFor(BuildContext context, double gridWidth) {
+    const maxExtent = 160.0, spacing = 8.0;
+    final columns = (gridWidth / (maxExtent + spacing)).ceil().clamp(1, 99);
+    final tileWidth = (gridWidth - spacing * (columns - 1)) / columns;
+    final coverHeight = (tileWidth - 8) * 1.5;
+    final theme = Theme.of(context).textTheme;
+    final scaler = MediaQuery.textScalerOf(context);
+    double line(TextStyle? s, double height) =>
+        scaler.scale(s?.fontSize ?? 14) * height;
+    final text =
+        line(theme.bodyMedium, 1.25) * 2 + // título (2 líneas)
+        line(theme.bodySmall, 1.45) + // autor
+        9; // progreso
+    return 8 + coverHeight + 8 + text + 8;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
+    return Semantics(
+      button: true,
+      label: bookSemanticsLabel(book),
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Hero(
-              tag: 'cover-${book.id}',
-              child: BookCover(book: book),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              book.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                height: 1.25,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Hero(
+                tag: 'cover-${book.id}',
+                child: BookCover(book: book),
               ),
-            ),
-            if (book.author.isNotEmpty)
+              const SizedBox(height: 8),
               Text(
-                book.author,
-                maxLines: 1,
+                book.title,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
                 ),
               ),
-            if (book.status == ReadingStatus.reading) ...[
-              const SizedBox(height: 6),
-              ReadingProgressBar(progress: book.progress),
+              if (book.author.isNotEmpty)
+                Text(
+                  book.author,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              if (book.status == ReadingStatus.reading) ...[
+                const SizedBox(height: 6),
+                ReadingProgressBar(progress: book.progress),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
   }
+}
+
+/// Lo que lee un lector de pantalla al llegar a un libro.
+String bookSemanticsLabel(Book book) {
+  final parts = [
+    book.title,
+    if (book.author.isNotEmpty) 'de ${book.author}',
+    book.status.label,
+    if (book.status == ReadingStatus.reading && book.progress > 0)
+      '${(book.progress * 100).round()} % leído',
+    if (book.isOwnWork) 'obra propia',
+  ];
+  return parts.join(', ');
 }
 
 /// Libro en la vista de lista.
@@ -66,64 +102,71 @@ class BookListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
+    return Semantics(
+      button: true,
+      label: bookSemanticsLabel(book),
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 52,
-              child: Hero(
-                tag: 'cover-${book.id}',
-                child: BookCover(book: book, compact: true),
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 52,
+                child: Hero(
+                  tag: 'cover-${book.id}',
+                  child: BookCover(book: book, compact: true),
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    book.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (book.author.isNotEmpty)
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      book.author,
-                      maxLines: 1,
+                      book.title,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      FormatBadge(format: book.format),
-                      const SizedBox(width: 8),
+                    if (book.author.isNotEmpty)
                       Text(
-                        book.status.label,
-                        style: theme.textTheme.labelSmall?.copyWith(
+                        book.author,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      if (book.status == ReadingStatus.reading) ...[
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ReadingProgressBar(progress: book.progress),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        FormatBadge(format: book.format),
+                        Text(
+                          book.status.label,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
+                        if (book.status == ReadingStatus.reading)
+                          SizedBox(
+                            width: 96,
+                            child: ReadingProgressBar(progress: book.progress),
+                          ),
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -210,6 +210,9 @@ mixin ReaderStateMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   void readingActivity() => _tracker.activity();
 
   void setChromeVisible(bool visible) {
+    // Con lector de pantalla (TalkBack, VoiceOver) las barras no se ocultan:
+    // no hay forma de "tocar el centro" para recuperarlas.
+    if (!visible && MediaQuery.accessibleNavigationOf(context)) return;
     if (visible == chromeVisible) return;
     setState(() => chromeVisible = visible);
     SystemChrome.setEnabledSystemUIMode(
@@ -245,7 +248,7 @@ mixin ReaderStateMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         content: const Text('¿Terminaste el libro?'),
         duration: const Duration(seconds: 6),
         action: SnackBarAction(
-          label: 'Marcar terminado',
+          label: 'Sí',
           onPressed: () => repo.markFinished(bookId),
         ),
       ),

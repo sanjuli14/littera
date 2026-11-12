@@ -169,11 +169,15 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Registro de lectura en la copia de seguridad (al fusionar no se duplican minutos)
 - [x] Corrige: reexportar una obra sin cambios ya no reinicia la posición (EPUB determinista y versión de la obra guardada en el libro)
 
-### Fase 8 — Pulido y Web
-- [ ] Validar todo en Web (almacenamiento en IndexedDB, límites de tamaño)
-- [ ] Animaciones, estados vacíos con ilustración, accesibilidad (contraste, tamaños)
-- [ ] Rendimiento con bibliotecas grandes (lazy loading de carátulas)
-- [ ] Tests de repositorios y del backup
+### Fase 8 — Pulido y Web ✅
+- [x] Compilación Web y pruebas de punta a punta en Chrome (Playwright): importar EPUB/PDF/DOCX/.doc, leer los tres formatos, tema y letra, índice, recargar y conservar datos, crear y escribir una obra, exportar EPUB (descarga válida), estadísticas, copia completa y restauración en un navegador vacío — sin errores de consola
+- [x] Barrido de accesibilidad: todas las pantallas a 360 px con texto al 150 % y 200 % sin desbordamientos (corregidos aviso de copia, barra de estantes, tarjetas, carátulas, hojas y diálogos)
+- [x] Lector de pantalla: libros anunciados como un botón con título, autor, estado y progreso; párrafos leídos como texto y títulos como encabezados; acciones "Subrayar párrafo" y "Añadir nota al párrafo"; las barras del lector no se ocultan con navegación accesible
+- [x] Rendimiento: carátulas decodificadas al tamaño en pantalla (no a 600×900)
+- [x] Corrige: condición de carrera al escuchar Hive (una obra nueva aparecía sin su capítulo hasta recargar)
+- [x] Corrige: al saltar desde el índice el título quedaba tapado por la barra; carátulas tinta invisibles en modo oscuro; plurales; fecha de última copia tras restaurar
+- [ ] Limitación conocida: en **Web con lector de pantalla** no se consigue escribir en el editor (flutter_quill no conecta con el campo accesible del navegador); con ratón/teclado en Web y en el móvil funciona
+- [ ] Pendiente: probar en un Android real (no se compiló el APK en estas fases)
 
 ### Más adelante (fuera del alcance local)
 - Asistente de IA opcional (títulos, ortografía, resúmenes) — requeriría conexión y consentimiento explícito

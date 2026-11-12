@@ -128,9 +128,19 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
       scrollController: _scroll,
       alignment: 0,
     );
+    // Deja el bloque debajo de la barra superior, no tapado por ella.
+    final position = _scroll.position;
+    final adjusted = (position.pixels - _chromeOffset).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    _scroll.jumpTo(adjusted);
     setState(() => _current = index.clamp(0, _lastIndex));
     saveNow();
   }
+
+  /// Alto de la barra superior + un margen.
+  static const _chromeOffset = 72.0;
 
   int _indexFor(double fraction) => (fraction * _lastIndex).round();
 

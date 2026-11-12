@@ -190,7 +190,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('¿Terminaste el libro?'), findsOneWidget);
-    await tester.tap(find.text('Marcar terminado'));
+    await tester.tap(find.text('Sí'));
     await tester.pumpAndSettle();
     final book = env.books.get('b1')!;
     expect(book.status, ReadingStatus.finished);
@@ -309,4 +309,23 @@ void main() {
     expect(find.textContaining('Capítulo 1, párrafo 5.'), findsOneWidget);
     expect(find.textContaining('Capítulo 1, párrafo 1.'), findsNothing);
   });
+
+  testWidgets(
+    'con lector de pantalla las barras no se ocultan al desplazarse',
+    (tester) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(accessibleNavigation: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      await openReader(tester);
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -1500));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Índice'));
+      await tester.pumpAndSettle();
+      expect(find.text('Índice'), findsWidgets);
+      expect(find.widgetWithText(ListTile, 'Capítulo 3'), findsOneWidget);
+    },
+  );
 }

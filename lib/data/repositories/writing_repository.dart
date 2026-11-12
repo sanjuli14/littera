@@ -4,6 +4,7 @@ import 'package:hive_ce/hive_ce.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/storage/file_store.dart';
+import '../../core/utils/box_stream.dart';
 import '../../features/library/import/cover_processor.dart';
 import '../../features/writing/word_count.dart';
 import '../hive/hive_setup.dart';
@@ -309,10 +310,8 @@ final writingRepositoryProvider = Provider<WritingRepository>(
   ),
 );
 
-Stream<List<T>> _watch<T>(Box<T> box) async* {
-  yield box.values.toList();
-  yield* box.watch().map((_) => box.values.toList());
-}
+Stream<List<T>> _watch<T>(Box<T> box) =>
+    watchBox(box, () => box.values.toList());
 
 final manuscriptsProvider = StreamProvider<List<Manuscript>>(
   (ref) => _watch(ref.watch(manuscriptsBoxProvider))

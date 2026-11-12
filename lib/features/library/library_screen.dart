@@ -210,17 +210,24 @@ class _BookCollection extends ConsumerWidget {
             BookListTile(book: books[i], onTap: () => open(books[i])),
       );
     }
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, bottomPadding),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 160,
-        childAspectRatio: 0.48,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+    return LayoutBuilder(
+      builder: (context, constraints) => GridView.builder(
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, bottomPadding),
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 160,
+          // Alto según el tamaño de letra del sistema, para que el título
+          // y el autor quepan también con texto grande.
+          mainAxisExtent: BookGridTile.extentFor(
+            context,
+            constraints.maxWidth - 24,
+          ),
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemCount: books.length,
+        itemBuilder: (_, i) =>
+            BookGridTile(book: books[i], onTap: () => open(books[i])),
       ),
-      itemCount: books.length,
-      itemBuilder: (_, i) =>
-          BookGridTile(book: books[i], onTap: () => open(books[i])),
     );
   }
 }

@@ -21,7 +21,7 @@ Future<Uint8List> renderGeneratedCover(String title, String author) async {
     Paint()
       ..color = LitteraColors.oro
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3,
+      ..strokeWidth = 8, // visible también en miniatura
   );
 
   TextPainter painter(String text, TextStyle style, int maxLines) =>

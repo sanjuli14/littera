@@ -33,11 +33,11 @@ class ShelfFilterBar extends ConsumerWidget {
       );
     }
 
-    return SizedBox(
-      height: 48,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+    // Sin altura fija: con texto grande los chips crecen y no se cortan.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
         children: [
           chip(const AllBooks(), 'Todos'),
           for (final status in [

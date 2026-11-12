@@ -54,7 +54,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.byTooltip('Ahora no'));
+    await tester.tap(find.text('Ahora no'));
     await tester.pumpAndSettle();
     expect(
       find.text('Haz una copia para no perder tu biblioteca'),
@@ -155,6 +155,38 @@ void main() {
     expect(
       restoreSummary(const RestoreResult(skipped: 3)),
       contains('3 libros no se restauraron'),
+    );
+  });
+
+  test('plurales', () {
+    expect(plural(1, 'obra', 'obras'), '1 obra');
+    expect(plural(0, 'obra', 'obras'), '0 obras');
+    expect(plural(5, 'libro', 'libros'), '5 libros');
+  });
+
+  testWidgets('restaurar una copia actualiza la fecha de última copia', (
+    tester,
+  ) async {
+    final env = await pumpApp(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MaterialApp)),
+    );
+    await tester.runAsync(
+      () => container
+          .read(lastBackupProvider.notifier)
+          .markAtLeast(DateTime(2026, 11, 1)),
+    );
+    expect(container.read(lastBackupProvider), DateTime(2026, 11, 1));
+    // Una copia más antigua no hace retroceder la fecha.
+    await tester.runAsync(
+      () => container
+          .read(lastBackupProvider.notifier)
+          .markAtLeast(DateTime(2026, 10, 1)),
+    );
+    expect(container.read(lastBackupProvider), DateTime(2026, 11, 1));
+    expect(
+      env.meta.get('lastBackupAt'),
+      DateTime(2026, 11, 1).toIso8601String(),
     );
   });
 }

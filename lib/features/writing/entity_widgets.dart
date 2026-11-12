@@ -200,7 +200,7 @@ class EntityList extends ConsumerWidget {
     final entities = ref.watch(entitiesOfProvider(manuscriptId));
     if (entities.isEmpty) {
       return Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,

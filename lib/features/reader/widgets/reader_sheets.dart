@@ -16,6 +16,7 @@ Future<void> showReaderSettings(
     context: context,
     backgroundColor: palette.chrome,
     showDragHandle: true,
+    isScrollControlled: true,
     builder: (_) => _ReaderSettingsSheet(textOptions: textOptions),
   );
 }
@@ -37,7 +38,7 @@ class _ReaderSettingsSheet extends ConsumerWidget {
     final value = TextStyle(color: palette.text, fontWeight: FontWeight.w600);
 
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,

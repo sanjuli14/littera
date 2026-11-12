@@ -15,41 +15,14 @@ class BookCover extends ConsumerWidget {
   final bool compact;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final coverRef = book.coverRef;
-    final image = coverRef == null
-        ? null
-        : ref.watch(fileStoreProvider).image(coverRef);
-
-    return AspectRatio(
-      aspectRatio: 2 / 3,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(compact ? 4 : 8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
-              blurRadius: compact ? 3 : 8,
-              offset: Offset(0, compact ? 1 : 3),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(compact ? 4 : 8),
-          child: image == null
-              ? GeneratedCover.forBook(book, compact: compact)
-              : Image(
-                  image: image,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
-                  semanticLabel: 'Carátula de ${book.title}',
-                  errorBuilder: (_, _, _) =>
-                      GeneratedCover.forBook(book, compact: compact),
-                ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => CoverImage(
+    coverRef: book.coverRef,
+    title: book.title,
+    author: book.author,
+    label: book.format.label,
+    compact: compact,
+    semanticLabel: 'Carátula de ${book.title}',
+  );
 }
 
 /// Carátula genérica 2:3: imagen guardada o, si no hay, una generada.
@@ -61,6 +34,7 @@ class CoverImage extends ConsumerWidget {
     this.author = '',
     this.label = '',
     this.compact = false,
+    this.semanticLabel,
   });
 
   final String? coverRef;
@@ -68,11 +42,12 @@ class CoverImage extends ConsumerWidget {
   final String author;
   final String label;
   final bool compact;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cover = coverRef;
-    final image = cover == null
+    final provider = cover == null
         ? null
         : ref.watch(fileStoreProvider).image(cover);
     final generated = GeneratedCover(
@@ -81,29 +56,57 @@ class CoverImage extends ConsumerWidget {
       label: label,
       compact: compact,
     );
+    final radius = BorderRadius.circular(compact ? 4 : 8);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return AspectRatio(
       aspectRatio: 2 / 3,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(compact ? 4 : 8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
-              blurRadius: compact ? 3 : 8,
-              offset: Offset(0, compact ? 1 : 3),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(compact ? 4 : 8),
-          child: image == null
-              ? generated
-              : Image(
-                  image: image,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
-                  errorBuilder: (_, _, _) => generated,
-                ),
+      child: Container(
+        // En oscuro, las carátulas color tinta se confunden con el fondo:
+        // un borde claro y fino las separa.
+        foregroundDecoration: dark
+            ? BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+              )
+            : null,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: compact ? 3 : 8,
+                offset: Offset(0, compact ? 1 : 3),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: radius,
+            child: provider == null
+                ? generated
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      // Se decodifica al tamaño en pantalla, no a 600×900:
+                      // con muchos libros ahorra mucha memoria.
+                      final dpr = MediaQuery.devicePixelRatioOf(context);
+                      final width = constraints.maxWidth.isFinite
+                          ? (constraints.maxWidth * dpr).ceil()
+                          : null;
+                      return Image(
+                        image: ResizeImage.resizeIfNeeded(
+                          width,
+                          null,
+                          provider,
+                        ),
+                        fit: BoxFit.cover,
+                        gaplessPlayback: true,
+                        semanticLabel: semanticLabel,
+                        errorBuilder: (_, _, _) => generated,
+                      );
+                    },
+                  ),
+          ),
         ),
       ),
     );
@@ -134,6 +137,12 @@ class GeneratedCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Es un dibujo: su texto se escala con el ancho, no con el tamaño de
+    // letra del sistema (si no, no cabría en la carátula).
+    return MediaQuery.withNoTextScaling(child: _build(context));
+  }
+
+  Widget _build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;

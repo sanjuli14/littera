@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/utils/box_stream.dart';
+
 import '../hive/hive_setup.dart';
 import '../models/highlight.dart';
 
@@ -11,10 +13,8 @@ class HighlightsRepository {
   final Box<Highlight> box;
   static const _uuid = Uuid();
 
-  Stream<List<Highlight>> watchAll() async* {
-    yield box.values.toList();
-    yield* box.watch().map((_) => box.values.toList());
-  }
+  Stream<List<Highlight>> watchAll() =>
+      watchBox(box, () => box.values.toList());
 
   List<Highlight> forBook(String bookId) =>
       box.values.where((h) => h.bookId == bookId).toList()

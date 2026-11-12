@@ -5,6 +5,7 @@ import 'package:hive_ce/hive_ce.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/storage/file_store.dart';
+import '../../core/utils/box_stream.dart';
 import '../../features/library/import/cover_processor.dart';
 import '../hive/hive_setup.dart';
 import '../models/book.dart';
@@ -31,10 +32,8 @@ class LibraryRepository {
 
   // ---------------------------------------------------------------- Libros
 
-  Stream<List<Book>> watchBooks() async* {
-    yield books.values.toList();
-    yield* books.watch().map((_) => books.values.toList());
-  }
+  Stream<List<Book>> watchBooks() =>
+      watchBox(books, () => books.values.toList());
 
   Book? getBook(String id) => books.get(id);
 
@@ -144,10 +143,7 @@ class LibraryRepository {
 
   // -------------------------------------------------------------- Estantes
 
-  Stream<List<Shelf>> watchShelves() async* {
-    yield _sortedShelves();
-    yield* shelves.watch().map((_) => _sortedShelves());
-  }
+  Stream<List<Shelf>> watchShelves() => watchBox(shelves, _sortedShelves);
 
   List<Shelf> _sortedShelves() =>
       shelves.values.toList()..sort((a, b) => a.order.compareTo(b.order));

@@ -51,26 +51,45 @@ class BackupReminder extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 6, 4, 6),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.shield_outlined, color: LitteraColors.oro),
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Icon(Icons.shield_outlined, color: LitteraColors.oro),
+              ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  last == null
-                      ? 'Haz una copia para no perder tu biblioteca'
-                      : 'Hace ${DateTime.now().difference(last).inDays} días '
-                            'de tu última copia',
-                  style: theme.textTheme.bodyMedium,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, right: 8),
+                      child: Text(
+                        last == null
+                            ? 'Haz una copia para no perder tu biblioteca'
+                            : 'Hace ${DateTime.now().difference(last).inDays} '
+                                  'días de tu última copia',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                    // Botones debajo: con texto grande no caben en la fila.
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: ref
+                              .read(_dismissedProvider.notifier)
+                              .dismiss,
+                          child: const Text('Ahora no'),
+                        ),
+                        TextButton(
+                          onPressed: () => context.go(Routes.backup),
+                          child: const Text('Hacer copia'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-              TextButton(
-                onPressed: () => context.go(Routes.backup),
-                child: const Text('Hacer copia'),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close, size: 18),
-                tooltip: 'Ahora no',
-                onPressed: ref.read(_dismissedProvider.notifier).dismiss,
               ),
             ],
           ),

@@ -210,6 +210,10 @@ class BackupScreen extends ConsumerWidget {
       return;
     }
     if (result == null || !context.mounted) return;
+    await ref
+        .read(lastBackupProvider.notifier)
+        .markAtLeast(contents.manifest.createdAt);
+    if (!context.mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -283,6 +287,9 @@ class BackupScreen extends ConsumerWidget {
   }
 }
 
+/// `1 obra`, `3 obras`.
+String plural(int n, String one, String many) => '$n ${n == 1 ? one : many}';
+
 /// "Última copia: 12 nov 2026 (hace 3 días)".
 String lastBackupLabel(DateTime? last, {DateTime? now}) {
   if (last == null) return 'Aún no has hecho ninguna copia';
@@ -352,8 +359,9 @@ class _RestoreDialogState extends State<_RestoreDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              '${m.bookCount} libros · ${m.shelfCount} estantes · '
-              '${m.manuscriptCount} obras'
+              '${plural(m.bookCount, 'libro', 'libros')} · '
+              '${plural(m.shelfCount, 'estante', 'estantes')} · '
+              '${plural(m.manuscriptCount, 'obra', 'obras')}'
               '${m.includesBookFiles ? '' : ' · solo datos'}',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,

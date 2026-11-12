@@ -370,27 +370,29 @@ class _GoalsDialogState extends ConsumerState<_GoalsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Metas'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _books,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Libros al año',
-              helperText: '0 = sin meta',
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _books,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Libros al año',
+                helperText: '0 = sin meta',
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _minutes,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Minutos de lectura al día',
-              helperText: 'La meta de palabras se fija en cada obra',
+            const SizedBox(height: 12),
+            TextField(
+              controller: _minutes,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Minutos de lectura al día',
+                helperText: 'La meta de palabras se fija en cada obra',
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(

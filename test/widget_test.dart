@@ -202,4 +202,27 @@ void main() {
       currentSchemaVersion,
     );
   });
+
+  testWidgets('cada libro se anuncia como un botón con sus datos', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpApp(
+      tester,
+      books: [
+        testBook(
+          id: 'a',
+          title: 'Rayuela',
+          author: 'Julio Cortázar',
+          status: ReadingStatus.reading,
+          progress: 0.42,
+        ),
+      ],
+    );
+    expect(
+      find.bySemanticsLabel('Rayuela, de Julio Cortázar, Leyendo, 42 % leído'),
+      findsOneWidget,
+    );
+    handle.dispose();
+  });
 }

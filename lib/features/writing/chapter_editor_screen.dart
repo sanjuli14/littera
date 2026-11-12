@@ -77,6 +77,7 @@ class _ChapterEditorScreenState extends ConsumerState<ChapterEditorScreen> {
     _chapter = _repo.chapters.get(widget.chapterId);
     _sessionStart = _chapter?.content ?? '';
     if (_chapter != null) _attach(documentFromContent(_sessionStart));
+    _focusNode.addListener(_onFocusChanged);
     _lifecycle = AppLifecycleListener(
       onHide: _saveNow,
       onPause: _saveNow,
@@ -96,6 +97,10 @@ class _ChapterEditorScreenState extends ConsumerState<ChapterEditorScreen> {
     }
     _words = countWords(doc.toPlainText());
     _changes = doc.changes.listen((_) => _onChanged());
+  }
+
+  void _onFocusChanged() {
+    if (mounted) setState(() {}); // refleja el foco en la semántica
   }
 
   @override
@@ -351,21 +356,34 @@ class _ChapterEditorScreenState extends ConsumerState<ChapterEditorScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  QuillEditor(
-                    controller: controller,
-                    focusNode: _focusNode,
-                    scrollController: _scroll,
-                    config: QuillEditorConfig(
-                      placeholder: 'Empieza a escribir…',
-                      padding: EdgeInsets.fromLTRB(
-                        24,
-                        _focusMode ? 32 : 16,
-                        24,
-                        120,
+                  // Quill no se declara como campo de texto: con lector de
+                  // pantalla (y en Web con accesibilidad activa, donde el
+                  // navegador solo crea el campo de entrada para un campo de
+                  // texto semántico enfocado) no se podría escribir.
+                  Semantics(
+                    container: true,
+                    textField: true,
+                    multiline: true,
+                    focused: _focusNode.hasFocus,
+                    label: 'Texto del capítulo',
+                    onTap: _focusNode.requestFocus,
+                    onFocus: _focusNode.requestFocus,
+                    child: QuillEditor(
+                      controller: controller,
+                      focusNode: _focusNode,
+                      scrollController: _scroll,
+                      config: QuillEditorConfig(
+                        placeholder: 'Empieza a escribir…',
+                        padding: EdgeInsets.fromLTRB(
+                          24,
+                          _focusMode ? 32 : 16,
+                          24,
+                          120,
+                        ),
+                        maxContentWidth: 720,
+                        expands: true,
+                        autoFocus: chapter.content.isEmpty,
                       ),
-                      maxContentWidth: 720,
-                      expands: true,
-                      autoFocus: chapter.content.isEmpty,
                     ),
                   ),
                   if (_focusMode)
