@@ -8,6 +8,7 @@ import 'package:hive_ce/hive_ce.dart';
 import 'package:littera/app/app.dart';
 import 'package:littera/data/hive/hive_setup.dart';
 import 'package:littera/data/models/book.dart';
+import 'package:littera/data/models/highlight.dart';
 import 'package:littera/features/reader/document/docx_parser.dart';
 import 'package:littera/features/reader/document/epub_parser.dart';
 import 'package:littera/features/reader/reader_providers.dart';
@@ -41,6 +42,9 @@ Uint8List _longEpub() {
   }
   return buildZip(files);
 }
+
+const paragraph1Text =
+    'Capítulo 1, párrafo 1. Texto de relleno para que la línea ocupe espacio.';
 
 void main() {
   late Directory dir;
@@ -155,10 +159,19 @@ void main() {
     expect(settings.readerFontSize, 20);
     expect(settings.readerTheme.name, 'sepia');
 
-    final paragraph = tester.widget<Text>(
-      find.textContaining('Capítulo 1, párrafo 1.'),
+    final paragraph = tester.widget<EditableText>(
+      find.descendant(
+        of: find.byWidgetPredicate(
+          (w) =>
+              w is SelectableText &&
+              (w.textSpan?.toPlainText() ?? '').startsWith(
+                'Capítulo 1, párrafo 1.',
+              ),
+        ),
+        matching: find.byType(EditableText),
+      ),
     );
-    expect(paragraph.style?.fontSize, 20);
+    expect(paragraph.style.fontSize, 20);
   });
 
   testWidgets('al llegar al final ofrece marcarlo como terminado', (
@@ -182,5 +195,118 @@ void main() {
     final book = env.books.get('b1')!;
     expect(book.status, ReadingStatus.finished);
     expect(book.progress, 1);
+  });
+
+  /// Párrafo 1 del capítulo 1 = bloque 1.
+  Finder paragraph1() => find.byWidgetPredicate(
+    (w) =>
+        w is SelectableText &&
+        (w.textSpan?.toPlainText() ?? '').startsWith('Capítulo 1, párrafo 1.'),
+  );
+
+  testWidgets('un subrayado guardado se pinta sobre el texto', (tester) async {
+    final env = await openReader(tester);
+    await tester.runAsync(
+      () => env.highlightsRepository.addBlockHighlight(
+        bookId: 'b1',
+        blockIndex: 1,
+        start: 0,
+        end: 10,
+        blockText: paragraph1Text,
+        color: HighlightColor.verde,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final widget = tester.widget<SelectableText>(paragraph1());
+    final spans = widget.textSpan!.children!.cast<TextSpan>();
+    expect(spans.first.text, 'Capítulo 1');
+    expect(spans.first.style?.backgroundColor, isNotNull);
+    expect(spans[1].style?.backgroundColor, isNull);
+  });
+
+  testWidgets('seleccionar texto y pulsar "Subrayar" lo guarda', (
+    tester,
+  ) async {
+    final env = await openReader(tester);
+    await tester.longPress(paragraph1());
+    await tester.pumpAndSettle();
+    expect(find.text('Subrayar'), findsOneWidget);
+    expect(find.text('Nota'), findsOneWidget);
+
+    await tester.tap(find.text('Subrayar'));
+    await tester.pumpAndSettle();
+    final saved = env.highlights.values.single;
+    expect(saved.bookId, 'b1');
+    expect(saved.blockIndex, 1);
+    expect(saved.text, isNotEmpty);
+    expect(paragraph1Text, contains(saved.text));
+  });
+
+  testWidgets('panel de notas: lista y salta al subrayado', (tester) async {
+    final env = await openReader(tester);
+    await tester.runAsync(() async {
+      final h = await env.highlightsRepository.addBlockHighlight(
+        bookId: 'b1',
+        blockIndex: 100, // capítulo 3
+        start: 0,
+        end: 10,
+        blockText: 'Capítulo 3, párrafo 18. Texto',
+      );
+      await env.highlightsRepository.update(h.copyWith(note: 'Volver aquí'));
+    });
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Notas'));
+    await tester.pumpAndSettle();
+    expect(find.text('Volver aquí'), findsOneWidget);
+    expect(find.textContaining('Capítulo 3 ·'), findsOneWidget);
+
+    await tester.tap(find.text('Volver aquí'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Capítulo 1, párrafo 1.'), findsNothing);
+    expect(find.textContaining('Capítulo 3, párrafo 18.'), findsOneWidget);
+  });
+
+  testWidgets('"Mis citas": agrupa, busca y abre el libro en la cita', (
+    tester,
+  ) async {
+    final env = await openReader(tester);
+    await tester.runAsync(() async {
+      final repo = env.highlightsRepository;
+      await repo.addBlockHighlight(
+        bookId: 'b1',
+        blockIndex: 60,
+        start: 0,
+        end: 10,
+        blockText: 'Capítulo 2, párrafo 19. Texto',
+      );
+      final second = await repo.addBlockHighlight(
+        bookId: 'b1',
+        blockIndex: 5,
+        start: 0,
+        end: 10,
+        blockText: 'Capítulo 1, párrafo 5. Texto',
+      );
+      await repo.update(second.copyWith(note: 'Idea para mi novela'));
+    });
+    await tester.tap(find.byTooltip('Volver'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Citas'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mis citas'), findsOneWidget);
+    expect(find.text('2 citas'), findsOneWidget);
+    expect(find.text('“Capítulo 2”'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'novela');
+    await tester.pumpAndSettle();
+    expect(find.text('“Capítulo 2”'), findsNothing);
+    expect(find.text('Idea para mi novela'), findsOneWidget);
+
+    await tester.tap(find.text('Idea para mi novela'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Capítulo 1, párrafo 5.'), findsOneWidget);
+    expect(find.textContaining('Capítulo 1, párrafo 1.'), findsNothing);
   });
 }

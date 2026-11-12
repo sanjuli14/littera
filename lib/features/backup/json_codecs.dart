@@ -1,5 +1,6 @@
 import '../../data/models/app_settings.dart';
 import '../../data/models/book.dart';
+import '../../data/models/highlight.dart';
 import '../../data/models/shelf.dart';
 
 /// Conversión de modelos a JSON para el backup.
@@ -121,5 +122,41 @@ AppSettings settingsFromJson(Map<String, Object?> j) {
       d.readerLineHeight,
     ).clamp(ReaderLimits.minLineHeight, ReaderLimits.maxLineHeight),
     readerJustify: (j['readerJustify'] as bool?) ?? d.readerJustify,
+  );
+}
+
+Map<String, Object?> highlightToJson(Highlight h) => {
+  'id': h.id,
+  'bookId': h.bookId,
+  'text': h.text,
+  'blockIndex': h.blockIndex,
+  'start': h.start,
+  'end': h.end,
+  'page': h.page,
+  'note': h.note,
+  'color': h.color.name,
+  'createdAt': h.createdAt.toIso8601String(),
+  'updatedAt': h.updatedAt?.toIso8601String(),
+};
+
+Highlight highlightFromJson(Map<String, Object?> j) {
+  final id = j['id'];
+  final bookId = j['bookId'];
+  if (id is! String || bookId is! String) {
+    throw const FormatException('Subrayado sin id o libro');
+  }
+  int? integer(String key) => (j[key] as num?)?.toInt();
+  return Highlight(
+    id: id,
+    bookId: bookId,
+    text: (j['text'] as String?) ?? '',
+    blockIndex: integer('blockIndex'),
+    start: integer('start'),
+    end: integer('end'),
+    page: integer('page'),
+    note: j['note'] as String?,
+    color: _enum(HighlightColor.values, j['color'], HighlightColor.oro),
+    createdAt: _date(j['createdAt']) ?? DateTime.now(),
+    updatedAt: _date(j['updatedAt']),
   );
 }

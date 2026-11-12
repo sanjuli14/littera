@@ -5,21 +5,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import '../../data/models/book.dart';
+import '../../data/models/highlight.dart';
+import '../../data/repositories/highlights_repository.dart';
 import '../../data/repositories/settings_repository.dart';
 import 'document/reader_document.dart';
 import 'reader_palette.dart';
 import 'reader_providers.dart';
 import 'reader_screen.dart';
 import 'widgets/block_view.dart';
+import 'widgets/highlight_sheets.dart';
 import 'widgets/reader_chrome.dart';
 import 'widgets/reader_sheets.dart';
 
 /// Lector de EPUB y DOCX: lista continua de bloques.
 class FlowReaderView extends ConsumerStatefulWidget {
-  const FlowReaderView({super.key, required this.book, required this.document});
+  const FlowReaderView({
+    super.key,
+    required this.book,
+    required this.document,
+    this.initialBlock,
+  });
 
   final Book book;
   final ReaderDocument document;
+
+  /// Abrir en este bloque (p. ej. desde "Mis citas") en vez de la posición
+  /// guardada.
+  final int? initialBlock;
 
   @override
   ConsumerState<FlowReaderView> createState() => _FlowReaderViewState();
@@ -47,7 +59,9 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
   void initState() {
     super.initState();
     final saved = ReadingPosition.parse(widget.book.position);
-    if (saved is BlockPosition) {
+    if (widget.initialBlock != null) {
+      _current = widget.initialBlock!.clamp(0, _lastIndex);
+    } else if (saved is BlockPosition) {
       _current = saved.index.clamp(0, _lastIndex);
     }
     _scroll.addListener(_onScroll);
@@ -133,9 +147,109 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
     if (target != null) _jumpTo(target);
   }
 
+  // ------------------------------------------------------------ Subrayados
+
+  HighlightsRepository get _highlights =>
+      ref.read(highlightsRepositoryProvider);
+
+  String _blockText(int index) => switch (_blocks[index]) {
+    ParagraphBlock(:final text) || HeadingBlock(:final text) => text,
+    _ => '',
+  };
+
+  String _locationOf(Highlight h) {
+    final chapter = h.blockIndex == null
+        ? null
+        : widget.document.tocEntryFor(h.blockIndex!)?.title;
+    final percent = h.blockIndex == null || _lastIndex <= 0
+        ? 0
+        : (h.blockIndex! / _lastIndex * 100).round();
+    return chapter == null ? '$percent %' : '$chapter · $percent %';
+  }
+
+  BlockActions _actionsFor(int index, ReaderPalette palette) => BlockActions(
+    onTapText: toggleChrome,
+    onHighlight: (start, end) => _highlights.addBlockHighlight(
+      bookId: bookId,
+      blockIndex: index,
+      start: start,
+      end: end,
+      blockText: _blockText(index),
+    ),
+    onNote: (start, end) async {
+      final text = _blockText(index);
+      final result = await showHighlightEditor(
+        context,
+        palette: palette,
+        quote: text.substring(start, end).trim(),
+        location: _locationOf(
+          Highlight(
+            id: '',
+            bookId: bookId,
+            text: '',
+            blockIndex: index,
+            createdAt: DateTime.now(),
+          ),
+        ),
+      );
+      if (result is SaveHighlight) {
+        await _highlights.addBlockHighlight(
+          bookId: bookId,
+          blockIndex: index,
+          start: start,
+          end: end,
+          blockText: text,
+          color: result.color,
+          note: result.note,
+        );
+      }
+    },
+    onEdit: (h) => _edit(h, palette),
+    onRemove: (list) async {
+      for (final h in list) {
+        await _highlights.delete(h.id);
+      }
+    },
+  );
+
+  Future<void> _edit(Highlight h, ReaderPalette palette) async {
+    final result = await showHighlightEditor(
+      context,
+      palette: palette,
+      quote: h.text,
+      existing: h,
+      location: _locationOf(h),
+    );
+    switch (result) {
+      case SaveHighlight(:final color, :final note):
+        await _highlights.update(
+          h.copyWith(color: color, note: note, clearNote: note == null),
+        );
+      case DeleteHighlight():
+        await _highlights.delete(h.id);
+      case null:
+        break;
+    }
+  }
+
+  Future<void> _openNotes(ReaderPalette palette) async {
+    final target = await showBookNotesSheet(
+      context,
+      palette: palette,
+      highlights: ref.read(bookHighlightsProvider(bookId)),
+      locationOf: _locationOf,
+      onEdit: (h) => _edit(h, palette),
+    );
+    if (target?.blockIndex != null) _jumpTo(target!.blockIndex!);
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
+    final byBlock = <int, List<Highlight>>{};
+    for (final h in ref.watch(bookHighlightsProvider(bookId))) {
+      if (h.blockIndex != null) (byBlock[h.blockIndex!] ??= []).add(h);
+    }
     final palette = ReaderPalette.resolve(
       settings.readerTheme,
       Theme.of(context),
@@ -169,6 +283,7 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
         _jumpTo(_indexFor(v));
       },
       onToc: widget.document.toc.isEmpty ? null : () => _openToc(palette),
+      onNotes: () => _openNotes(palette),
       onSettings: () => showReaderSettings(context, palette: palette),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -186,7 +301,12 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
                   constraints: const BoxConstraints(maxWidth: 680),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: BlockView(block: _blocks[i], style: style),
+                    child: BlockView(
+                      block: _blocks[i],
+                      style: style,
+                      highlights: byBlock[i] ?? const [],
+                      actions: _actionsFor(i, palette),
+                    ),
                   ),
                 ),
               ),

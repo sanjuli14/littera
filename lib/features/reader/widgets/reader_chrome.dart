@@ -19,6 +19,7 @@ class ReaderChrome extends StatelessWidget {
     required this.child,
     this.onSeekPreview,
     this.onToc,
+    this.onNotes,
   });
 
   final bool visible;
@@ -31,6 +32,7 @@ class ReaderChrome extends StatelessWidget {
   final ValueChanged<double>? onSeekPreview;
   final VoidCallback onSettings;
   final VoidCallback? onToc;
+  final VoidCallback? onNotes;
   final Widget child;
 
   @override
@@ -95,6 +97,13 @@ class ReaderChrome extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (onNotes != null)
+                            IconButton(
+                              icon: const Icon(Icons.bookmarks_outlined),
+                              color: palette.text,
+                              tooltip: 'Notas',
+                              onPressed: onNotes,
+                            ),
                           if (onToc != null)
                             IconButton(
                               icon: const Icon(Icons.toc),

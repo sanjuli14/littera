@@ -409,3 +409,114 @@ class ReaderThemeAdapter extends TypeAdapter<ReaderTheme> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class HighlightColorAdapter extends TypeAdapter<HighlightColor> {
+  @override
+  final typeId = 8;
+
+  @override
+  HighlightColor read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return HighlightColor.oro;
+      case 1:
+        return HighlightColor.verde;
+      case 2:
+        return HighlightColor.azul;
+      case 3:
+        return HighlightColor.rosa;
+      default:
+        return HighlightColor.oro;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, HighlightColor obj) {
+    switch (obj) {
+      case HighlightColor.oro:
+        writer.writeByte(0);
+      case HighlightColor.verde:
+        writer.writeByte(1);
+      case HighlightColor.azul:
+        writer.writeByte(2);
+      case HighlightColor.rosa:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HighlightColorAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class HighlightAdapter extends TypeAdapter<Highlight> {
+  @override
+  final typeId = 9;
+
+  @override
+  Highlight read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Highlight(
+      id: fields[0] as String,
+      bookId: fields[1] as String,
+      text: fields[2] as String,
+      createdAt: fields[9] as DateTime,
+      blockIndex: (fields[3] as num?)?.toInt(),
+      start: (fields[4] as num?)?.toInt(),
+      end: (fields[5] as num?)?.toInt(),
+      page: (fields[6] as num?)?.toInt(),
+      note: fields[7] as String?,
+      color: fields[8] == null
+          ? HighlightColor.oro
+          : fields[8] as HighlightColor,
+      updatedAt: fields[10] as DateTime?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Highlight obj) {
+    writer
+      ..writeByte(11)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.bookId)
+      ..writeByte(2)
+      ..write(obj.text)
+      ..writeByte(3)
+      ..write(obj.blockIndex)
+      ..writeByte(4)
+      ..write(obj.start)
+      ..writeByte(5)
+      ..write(obj.end)
+      ..writeByte(6)
+      ..write(obj.page)
+      ..writeByte(7)
+      ..write(obj.note)
+      ..writeByte(8)
+      ..write(obj.color)
+      ..writeByte(9)
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HighlightAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

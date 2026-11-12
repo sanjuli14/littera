@@ -295,6 +295,8 @@ String restoreSummary(RestoreResult r) {
       '${r.added} ${r.added == 1 ? 'libro añadido' : 'libros añadidos'}',
     if (r.updated > 0)
       '${r.updated} ${r.updated == 1 ? 'libro actualizado' : 'libros actualizados'}',
+    if (r.highlightsAdded > 0)
+      '${r.highlightsAdded} ${r.highlightsAdded == 1 ? 'subrayado' : 'subrayados'}',
     if (r.shelvesAdded > 0)
       '${r.shelvesAdded} ${r.shelvesAdded == 1 ? 'estante nuevo' : 'estantes nuevos'}',
   ];

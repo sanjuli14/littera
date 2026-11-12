@@ -11,9 +11,12 @@ import 'reader_palette.dart';
 import 'reader_providers.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
-  const ReaderScreen({super.key, required this.bookId});
+  const ReaderScreen({super.key, required this.bookId, this.target});
 
   final String bookId;
+
+  /// Bloque o página donde abrir (si no, la posición guardada).
+  final int? target;
 
   @override
   ConsumerState<ReaderScreen> createState() => _ReaderScreenState();
@@ -61,7 +64,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           .when(
             loading: () => _Loading(palette: palette),
             error: (e, _) => _Message(palette: palette, text: '$e'),
-            data: (bytes) => PdfReaderView(book: book, bytes: bytes),
+            data: (bytes) => PdfReaderView(
+              book: book,
+              bytes: bytes,
+              initialPage: widget.target,
+            ),
           );
     } else {
       body = ref
@@ -74,7 +81,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             ),
             data: (doc) => doc.isEmpty
                 ? _Message(palette: palette, text: 'Este libro no tiene texto')
-                : FlowReaderView(book: book, document: doc),
+                : FlowReaderView(
+                    book: book,
+                    document: doc,
+                    initialBlock: widget.target,
+                  ),
           );
     }
 

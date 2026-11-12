@@ -8,7 +8,9 @@ import '../../core/storage/file_store.dart';
 import '../../features/library/import/cover_processor.dart';
 import '../hive/hive_setup.dart';
 import '../models/book.dart';
+import '../models/highlight.dart';
 import '../models/shelf.dart';
+import 'highlights_repository.dart';
 
 /// Acceso a libros y estantes guardados en Hive.
 class LibraryRepository {
@@ -16,7 +18,11 @@ class LibraryRepository {
     required this.books,
     required this.shelves,
     required this.files,
+    this.highlights,
   });
+
+  /// Subrayados (se borran junto con su libro).
+  final Box<Highlight>? highlights;
 
   final Box<Book> books;
   final Box<Shelf> shelves;
@@ -108,9 +114,15 @@ class LibraryRepository {
     if (old != null) await files.delete(old);
   }
 
-  /// Elimina el libro, su archivo y su carátula.
+  /// Elimina el libro, su archivo, su carátula y sus subrayados.
   Future<void> deleteBook(Book book) async {
     await books.delete(book.id);
+    final hl = highlights;
+    if (hl != null) {
+      await hl.deleteAll(
+        hl.values.where((h) => h.bookId == book.id).map((h) => h.id).toList(),
+      );
+    }
     await files.delete(book.fileRef);
     if (book.coverRef != null) await files.delete(book.coverRef!);
   }
@@ -182,6 +194,7 @@ final libraryRepositoryProvider = Provider<LibraryRepository>(
     books: ref.watch(booksBoxProvider),
     shelves: ref.watch(shelvesBoxProvider),
     files: ref.watch(fileStoreProvider),
+    highlights: ref.watch(highlightsBoxProvider),
   ),
 );
 

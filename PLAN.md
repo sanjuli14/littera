@@ -128,11 +128,15 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Prueba de ida y vuelta automatizada: exportar → app vacía → restaurar → todo idéntico
 - [ ] Mejora futura: generar el ZIP por streaming para bibliotecas muy grandes (hoy se arma en memoria)
 
-### Fase 4 — Subrayados y notas
-- [ ] Seleccionar texto → subrayar (colores) y añadir nota
-- [ ] Panel de notas por libro con salto a la posición
-- [ ] Vista global "Mis citas" con búsqueda
-- [ ] Exportar citas a texto / Markdown
+### Fase 4 — Subrayados y notas ✅
+- [x] EPUB/DOCX: mantener pulsado → "Subrayar", "Nota", "Editar", "Quitar", "Copiar"; 4 colores; notas con subrayado punteado y botón "Nota" al pie del párrafo
+- [x] Subrayados solapados se fusionan (conservan la nota)
+- [x] PDF: "Guardar cita" en el menú de selección (texto + página) y "Nota en esta página"
+- [x] Panel "Notas y subrayados" del libro en el lector, con salto a cada uno
+- [x] Pestaña **Citas**: todas las citas agrupadas por libro, búsqueda (sin tildes), filtro por color, abrir el libro justo en la cita
+- [x] Exportar citas a Markdown o copiarlas al portapapeles
+- [x] Incluidos en la copia de seguridad (se reasignan al libro local al fusionar); se borran con su libro
+- [ ] Limitaciones: un subrayado no puede abarcar varios párrafos; en PDF la cita no se pinta sobre la página
 
 ### Fase 5 — Escritura
 - [ ] Crear manuscrito con carátula, sinopsis y meta

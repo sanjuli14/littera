@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/backup/backup_screen.dart';
 import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
+import '../features/quotes/quotes_screen.dart';
 import '../features/reader/reader_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/writing/writing_screen.dart';
@@ -17,8 +18,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Lector a pantalla completa, sin barra de navegación inferior.
       GoRoute(
         path: '/leer/:id',
-        builder: (context, state) =>
-            ReaderScreen(bookId: state.pathParameters['id']!),
+        builder: (context, state) => ReaderScreen(
+          bookId: state.pathParameters['id']!,
+          target: int.tryParse(state.uri.queryParameters['en'] ?? ''),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => HomeShell(navigationShell: shell),
@@ -35,6 +38,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                         BookDetailScreen(bookId: state.pathParameters['id']!),
                   ),
                 ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.quotes,
+                builder: (context, state) => const QuotesScreen(),
               ),
             ],
           ),

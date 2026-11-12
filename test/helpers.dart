@@ -11,7 +11,9 @@ import 'package:littera/core/storage/file_store.dart';
 import 'package:littera/data/hive/hive_setup.dart';
 import 'package:littera/data/models/app_settings.dart';
 import 'package:littera/data/models/book.dart';
+import 'package:littera/data/models/highlight.dart';
 import 'package:littera/data/models/shelf.dart';
+import 'package:littera/data/repositories/highlights_repository.dart';
 import 'package:littera/data/repositories/library_repository.dart';
 import 'package:littera/data/repositories/settings_repository.dart';
 import 'package:littera/features/backup/backup_service.dart';
@@ -68,13 +70,21 @@ class FakePdfCoverRenderer implements PdfCoverRenderer {
 
 /// Todo lo necesario para montar la app en un test.
 class TestEnv {
-  TestEnv._(this.settings, this.books, this.shelves, this.files, this.meta);
+  TestEnv._(
+    this.settings,
+    this.books,
+    this.shelves,
+    this.files,
+    this.meta,
+    this.highlights,
+  );
 
   final Box<AppSettings> settings;
   final Box<Book> books;
   final Box<Shelf> shelves;
   final MemoryFileStore files;
   final Box<dynamic> meta;
+  final Box<Highlight> highlights;
 
   static Future<TestEnv> create() async => TestEnv._(
     await memoryBox<AppSettings>(),
@@ -82,10 +92,18 @@ class TestEnv {
     await memoryBox<Shelf>(),
     MemoryFileStore(),
     await memoryBox<dynamic>(),
+    await memoryBox<Highlight>(),
   );
 
-  LibraryRepository get repository =>
-      LibraryRepository(books: books, shelves: shelves, files: files);
+  LibraryRepository get repository => LibraryRepository(
+    books: books,
+    shelves: shelves,
+    files: files,
+    highlights: highlights,
+  );
+
+  HighlightsRepository get highlightsRepository =>
+      HighlightsRepository(highlights);
 
   List<Override> get overrides => [
     settingsBoxProvider.overrideWithValue(settings),
@@ -93,6 +111,7 @@ class TestEnv {
     shelvesBoxProvider.overrideWithValue(shelves),
     fileStoreProvider.overrideWithValue(files),
     metaBoxProvider.overrideWithValue(meta),
+    highlightsBoxProvider.overrideWithValue(highlights),
     pdfCoverRendererProvider.overrideWithValue(FakePdfCoverRenderer()),
   ];
 }
@@ -105,6 +124,7 @@ Book testBook({
   List<String> shelfIds = const [],
   DateTime? addedAt,
   double progress = 0,
+  String? contentHash,
 }) => Book(
   id: id,
   title: title,
@@ -113,7 +133,7 @@ Book testBook({
   fileRef: 'books/$id.epub',
   originalFileName: '$id.epub',
   fileSize: 1024,
-  contentHash: 'hash-$id',
+  contentHash: contentHash ?? 'hash-$id',
   addedAt: addedAt ?? DateTime(2026, 1, 1),
   status: status,
   shelfIds: shelfIds,

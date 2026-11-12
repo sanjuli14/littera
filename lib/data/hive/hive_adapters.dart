@@ -2,6 +2,7 @@ import 'package:hive_ce/hive_ce.dart';
 
 import '../models/app_settings.dart';
 import '../models/book.dart';
+import '../models/highlight.dart';
 import '../models/shelf.dart';
 
 part 'hive_adapters.g.dart';
@@ -20,6 +21,8 @@ part 'hive_adapters.g.dart';
   AdapterSpec<Book>(),
   AdapterSpec<Shelf>(),
   AdapterSpec<ReaderTheme>(),
+  AdapterSpec<HighlightColor>(),
+  AdapterSpec<Highlight>(),
 ])
 // ignore: unused_element
 void _() {}

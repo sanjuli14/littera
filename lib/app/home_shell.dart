@@ -24,6 +24,11 @@ class HomeShell extends StatelessWidget {
             label: 'Biblioteca',
           ),
           NavigationDestination(
+            icon: Icon(Icons.format_quote_outlined),
+            selectedIcon: Icon(Icons.format_quote),
+            label: 'Citas',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.edit_outlined),
             selectedIcon: Icon(Icons.edit),
             label: 'Escribir',

@@ -10,7 +10,9 @@ import '../../core/storage/file_store.dart';
 import '../../data/hive/hive_setup.dart';
 import '../../data/models/app_settings.dart';
 import '../../data/models/book.dart';
+import '../../data/models/highlight.dart';
 import '../../data/models/shelf.dart';
+import '../../data/repositories/highlights_repository.dart';
 import '../../data/repositories/library_repository.dart';
 import '../../data/repositories/settings_repository.dart';
 import 'json_codecs.dart';
@@ -22,6 +24,7 @@ import 'json_codecs.dart';
 /// data/books.json        libros (JSON)
 /// data/shelves.json      estantes
 /// data/settings.json     ajustes
+/// data/highlights.json   subrayados y notas
 /// files/books/…          archivos de libros (solo en copia completa)
 /// files/covers/…         carátulas
 /// ```
@@ -78,9 +81,11 @@ class BackupContents {
     required this.shelves,
     required this.settings,
     required this.files,
+    this.highlights = const [],
   });
 
   final BackupManifest manifest;
+  final List<Highlight> highlights;
   final List<Book> books;
   final List<Shelf> shelves;
   final AppSettings? settings;
@@ -101,7 +106,10 @@ class RestoreResult {
     this.updated = 0,
     this.skipped = 0,
     this.shelvesAdded = 0,
+    this.highlightsAdded = 0,
   });
+
+  final int highlightsAdded;
 
   /// Libros nuevos añadidos.
   final int added;
@@ -121,8 +129,10 @@ class BackupService {
     required this.settings,
     required this.meta,
     required this.files,
+    required this.highlights,
   });
 
+  final Box<Highlight> highlights;
   final Box<Book> books;
   final Box<Shelf> shelves;
   final Box<AppSettings> settings;
@@ -188,6 +198,10 @@ class BackupService {
     addJson('manifest.json', manifest.toJson());
     addJson('data/books.json', allBooks.map(bookToJson).toList());
     addJson('data/shelves.json', allShelves.map(shelfToJson).toList());
+    addJson(
+      'data/highlights.json',
+      highlights.values.map(highlightToJson).toList(),
+    );
     addJson(
       'data/settings.json',
       settingsToJson(settings.get(HiveKeys.appSettings) ?? const AppSettings()),
@@ -283,6 +297,7 @@ class BackupService {
       ),
       books: bookList,
       shelves: shelfList,
+      highlights: list('data/highlights.json', highlightFromJson),
       settings: rawSettings is Map
           ? settingsFromJson(rawSettings.cast<String, Object?>())
           : null,
@@ -333,6 +348,12 @@ class BackupService {
     await shelves.clear();
     await books.putAll({for (final b in restorable) b.id: b});
     await shelves.putAll({for (final s in backup.shelves) s.id: s});
+    final restoredIds = {for (final b in restorable) b.id};
+    final restoredHighlights = backup.highlights
+        .where((h) => restoredIds.contains(h.bookId))
+        .toList();
+    await highlights.clear();
+    await highlights.putAll({for (final h in restoredHighlights) h.id: h});
     if (backup.settings != null) {
       await settings.put(HiveKeys.appSettings, backup.settings!);
     }
@@ -348,6 +369,7 @@ class BackupService {
       added: restorable.length,
       skipped: backup.books.length - restorable.length,
       shelvesAdded: backup.shelves.length,
+      highlightsAdded: restoredHighlights.length,
     );
   }
 
@@ -379,6 +401,8 @@ class BackupService {
     ];
 
     var added = 0, updated = 0, skipped = 0;
+    // id del libro en la copia → id local (pueden diferir si coincide por hash).
+    final bookIdMap = <String, String>{};
     for (final incoming in backup.books) {
       final local =
           books.get(incoming.id) ??
@@ -405,9 +429,11 @@ class BackupService {
           book = book.copyWith(clearCover: true, hasCustomCover: false);
         }
         await books.put(book.id, book);
+        bookIdMap[incoming.id] = book.id;
         added++;
         continue;
       }
+      bookIdMap[incoming.id] = local.id;
 
       // Ya existe: se combina.
       var merged = local;
@@ -456,11 +482,36 @@ class BackupService {
       }
     }
 
+    // Subrayados: se añaden los que no existan, apuntando al libro local.
+    var highlightsAdded = 0;
+    for (final h in backup.highlights) {
+      final localBookId = bookIdMap[h.bookId];
+      if (localBookId == null || highlights.containsKey(h.id)) continue;
+      await highlights.put(
+        h.id,
+        Highlight(
+          id: h.id,
+          bookId: localBookId,
+          text: h.text,
+          blockIndex: h.blockIndex,
+          start: h.start,
+          end: h.end,
+          page: h.page,
+          note: h.note,
+          color: h.color,
+          createdAt: h.createdAt,
+          updatedAt: h.updatedAt,
+        ),
+      );
+      highlightsAdded++;
+    }
+
     return RestoreResult(
       added: added,
       updated: updated,
       skipped: skipped,
       shelvesAdded: shelvesAdded,
+      highlightsAdded: highlightsAdded,
     );
   }
 
@@ -482,6 +533,7 @@ final backupServiceProvider = Provider<BackupService>(
     settings: ref.watch(settingsBoxProvider),
     meta: ref.watch(metaBoxProvider),
     files: ref.watch(fileStoreProvider),
+    highlights: ref.watch(highlightsBoxProvider),
   ),
 );
 

@@ -11,6 +11,8 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(AppThemePreferenceAdapter());
     registerAdapter(BookAdapter());
     registerAdapter(BookFormatAdapter());
+    registerAdapter(HighlightAdapter());
+    registerAdapter(HighlightColorAdapter());
     registerAdapter(LibrarySortAdapter());
     registerAdapter(ReaderThemeAdapter());
     registerAdapter(ReadingStatusAdapter());
@@ -24,6 +26,8 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(AppThemePreferenceAdapter());
     registerAdapter(BookAdapter());
     registerAdapter(BookFormatAdapter());
+    registerAdapter(HighlightAdapter());
+    registerAdapter(HighlightColorAdapter());
     registerAdapter(LibrarySortAdapter());
     registerAdapter(ReaderThemeAdapter());
     registerAdapter(ReadingStatusAdapter());

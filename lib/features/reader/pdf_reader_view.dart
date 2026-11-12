@@ -6,19 +6,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 import '../../data/models/book.dart';
+import '../../data/models/highlight.dart';
+import '../../data/repositories/highlights_repository.dart';
 import '../../data/repositories/settings_repository.dart';
 import 'reader_palette.dart';
 import 'reader_providers.dart';
 import 'reader_screen.dart';
 import 'widgets/reader_chrome.dart';
+import 'widgets/highlight_sheets.dart';
 import 'widgets/reader_sheets.dart';
 
 /// Lector de PDF con pdfrx. La posición es el número de página.
 class PdfReaderView extends ConsumerStatefulWidget {
-  const PdfReaderView({super.key, required this.book, required this.bytes});
+  const PdfReaderView({
+    super.key,
+    required this.book,
+    required this.bytes,
+    this.initialPage,
+  });
 
   final Book book;
   final Uint8List bytes;
+  final int? initialPage;
 
   @override
   ConsumerState<PdfReaderView> createState() => _PdfReaderViewState();
@@ -41,7 +50,11 @@ class _PdfReaderViewState extends ConsumerState<PdfReaderView>
   void initState() {
     super.initState();
     final saved = ReadingPosition.parse(widget.book.position);
-    _initialPage = saved is PagePosition && saved.page > 0 ? saved.page : 1;
+    _initialPage = widget.initialPage != null && widget.initialPage! > 0
+        ? widget.initialPage!
+        : saved is PagePosition && saved.page > 0
+        ? saved.page
+        : 1;
     _page = _initialPage;
   }
 
@@ -97,6 +110,95 @@ class _PdfReaderViewState extends ConsumerState<PdfReaderView>
     await _controller.goToPage(pageNumber: page);
   }
 
+  // ------------------------------------------------------- Citas y notas
+
+  HighlightsRepository get _highlights =>
+      ref.read(highlightsRepositoryProvider);
+
+  String _locationOf(Highlight h) => 'Página ${h.page ?? '?'}';
+
+  /// "Guardar cita" desde el menú de selección del PDF.
+  Future<void> _saveSelection(
+    PdfTextSelectionDelegate selection,
+    ReaderPalette palette,
+  ) async {
+    final text = (await selection.getSelectedText()).trim();
+    if (text.isEmpty) return;
+    final ranges = await selection.getSelectedTextRanges();
+    final page = ranges.isEmpty ? _page : ranges.first.pageNumber;
+    await selection.clearTextSelection();
+    if (!mounted) return;
+    final result = await showHighlightEditor(
+      context,
+      palette: palette,
+      quote: text,
+      location: 'Página $page',
+    );
+    if (result is SaveHighlight) {
+      await _highlights.addPageHighlight(
+        bookId: bookId,
+        page: page,
+        text: text,
+        note: result.note,
+        color: result.color,
+      );
+    }
+  }
+
+  Future<void> _addPageNote(ReaderPalette palette) async {
+    final page = _page;
+    final result = await showHighlightEditor(
+      context,
+      palette: palette,
+      quote: '',
+      location: 'Nota en la página $page',
+    );
+    if (result is SaveHighlight && result.note != null) {
+      await _highlights.addPageHighlight(
+        bookId: bookId,
+        page: page,
+        note: result.note,
+        color: result.color,
+      );
+    }
+  }
+
+  Future<void> _edit(Highlight h, ReaderPalette palette) async {
+    final result = await showHighlightEditor(
+      context,
+      palette: palette,
+      quote: h.text,
+      existing: h,
+      location: _locationOf(h),
+    );
+    switch (result) {
+      case SaveHighlight(:final color, :final note):
+        if (h.isPageNote && note == null) {
+          await _highlights.delete(h.id); // una nota vacía no tiene sentido
+        } else {
+          await _highlights.update(
+            h.copyWith(color: color, note: note, clearNote: note == null),
+          );
+        }
+      case DeleteHighlight():
+        await _highlights.delete(h.id);
+      case null:
+        break;
+    }
+  }
+
+  Future<void> _openNotes(ReaderPalette palette) async {
+    final target = await showBookNotesSheet(
+      context,
+      palette: palette,
+      highlights: ref.read(bookHighlightsProvider(bookId)),
+      locationOf: _locationOf,
+      onEdit: (h) => _edit(h, palette),
+      onAddPageNote: () => _addPageNote(palette),
+    );
+    if (target?.page != null) await _goTo(target!.page!);
+  }
+
   Future<void> _openToc(ReaderPalette palette) async {
     var currentIndex = -1;
     for (var i = 0; i < _outline.length; i++) {
@@ -141,6 +243,7 @@ class _PdfReaderViewState extends ConsumerState<PdfReaderView>
         if (_pageCount > 0) _goTo(_pageFor(v));
       },
       onToc: _outline.isEmpty ? null : () => _openToc(palette),
+      onNotes: () => _openNotes(palette),
       onSettings: () =>
           showReaderSettings(context, palette: palette, textOptions: false),
       child: SafeArea(
@@ -159,6 +262,19 @@ class _PdfReaderViewState extends ConsumerState<PdfReaderView>
             ),
             onViewerReady: _onReady,
             onPageChanged: _onPageChanged,
+            customizeContextMenuItems: (params, items) {
+              if (!params.textSelectionDelegate.hasSelectedText) return;
+              items.insert(
+                0,
+                ContextMenuButtonItem(
+                  label: 'Guardar cita',
+                  onPressed: () {
+                    params.dismissContextMenu();
+                    _saveSelection(params.textSelectionDelegate, palette);
+                  },
+                ),
+              );
+            },
             onGeneralTap: (context, controller, details) {
               if (details.type == PdfViewerGeneralTapType.tap) {
                 toggleChrome();
