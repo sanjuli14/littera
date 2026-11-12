@@ -204,7 +204,8 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Actualizaciones desde GitHub Releases: comprobación al abrir (máx. una al día), tarjeta en Inicio, notificación una vez por versión
 - [x] Descarga del APK con progreso e instalador de Android; pantalla Ajustes → Novedades con el historial (también sin conexión, desde la copia guardada)
 - [x] Permisos: internet e instalar paquetes; eliminados los de fotos/vídeo/audio que añadía open_filex
-- [ ] Pendiente: crear una clave de firma propia antes de repartir la app (hoy firma con la clave de depuración)
+- [x] Clave de firma propia (RSA 4096, fuera de git) y firma automática en Gradle (local: key.properties; CI: secretos)
+- [x] CI/CD con GitHub Actions: análisis + tests + APK en cada push; Release firmada al subir una etiqueta `v*`, con las novedades de `CHANGELOG.md`
 
 ### Más adelante (fuera del alcance local)
 - Asistente de IA opcional (títulos, ortografía, resúmenes) — requeriría conexión y consentimiento explícito

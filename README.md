@@ -33,13 +33,29 @@ flutter run
 
 ## Publicar una versión nueva
 
-La app busca versiones en las [Releases de GitHub](https://github.com/sanjuli14/littera/releases) al abrirse (una vez al día, con conexión), avisa con una tarjeta en Inicio y una notificación, y descarga e instala el APK desde Ajustes → Novedades.
+La app busca versiones en las [Releases de GitHub](https://github.com/sanjuli14/littera/releases) al abrirse (una vez al día, con conexión), avisa con una tarjeta en Inicio y una notificación, y descarga e instala el APK desde Ajustes → Novedades. Las Releases las crea la CI.
 
-1. Sube la versión en `pubspec.yaml`, por ejemplo de `1.0.0+1` a `1.1.0+2`. El número tras el `+` tiene que **aumentar siempre**: Android no instala una versión con un número menor o igual.
-2. Compila el APK: `flutter build apk --release` (queda en `build/app/outputs/flutter-apk/app-release.apk`).
-3. En GitHub, crea una Release con la etiqueta `v1.1.0` (la misma versión, con "v"). Escribe las novedades en la descripción en Markdown sencillo (`# títulos`, `- viñetas`, `**negrita**`) y adjunta el APK.
-4. No marques la Release como *pre-release* ni la dejes como borrador: esas se ignoran.
+1. Añade las novedades en `CHANGELOG.md` bajo `## [1.1.0] - AAAA-MM-DD` (`### títulos`, `- viñetas`, `**negrita**`): es el texto que verá el usuario.
+2. Sube la versión en `pubspec.yaml`, por ejemplo de `1.0.0+1` a `1.1.0+2`. El número tras el `+` tiene que **aumentar siempre**.
+3. Haz commit y crea la etiqueta:
+   ```bash
+   git commit -am "Versión 1.1.0"
+   git push
+   git tag v1.1.0 && git push origin v1.1.0
+   ```
+4. El flujo **Release** comprueba que la etiqueta coincide con `pubspec.yaml`, pasa los tests, compila el APK firmado y publica la Release con esas novedades.
 
-> **Firma:** Android solo instala una actualización si el APK está firmado con la misma clave que la versión instalada. Ahora mismo el modo *release* usa la clave de depuración de tu ordenador. Compila siempre en el mismo equipo, o crea una clave de firma propia antes de repartir la app.
+### CI/CD
+
+- **CI** (`.github/workflows/ci.yml`): en cada push a `main` y pull request, análisis, tests y APK de prueba (descargable como artefacto 7 días).
+- **Release** (`.github/workflows/release.yml`): al subir una etiqueta `v*`.
+
+### Clave de firma
+
+Android solo instala una actualización si está firmada con la **misma clave** que la versión instalada.
+
+- La clave está en `android/keystore/littera-release.jks` y sus contraseñas en `android/key.properties`. **Ninguno de los dos se sube a git.** Haz una copia de ambos en un lugar seguro: si se pierden, no se podrá actualizar la app y habrá que reinstalarla.
+- Para que la CI pueda firmar, sube la clave como secretos del repositorio una sola vez: `tool/upload_signing_secrets.sh` (usa `gh`).
+- Sin `key.properties` (otro ordenador), la compilación local firma con la clave de depuración.
 
 El plan de trabajo y el estado de cada fase están en [PLAN.md](PLAN.md).

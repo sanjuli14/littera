@@ -1,0 +1,81 @@
+name: Release
+
+# Se publica una versión al subir una etiqueta: git tag v1.2.0 && git push origin v1.2.0
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publicar ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar versión y novedades
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PUBSPEC="$(grep -E '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*//; s/\+.*//')"
+          if [ "$TAG" != "$PUBSPEC" ]; then
+            echo "::error::La etiqueta v$TAG no coincide con la versión de pubspec.yaml ($PUBSPEC)."
+            exit 1
+          fi
+          tool/release_notes.sh "$TAG" > "$RUNNER_TEMP/notes.md"
+          echo "version=$TAG" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.6
+          channel: stable
+          cache: true
+
+      - name: Dependencias
+        run: flutter pub get
+
+      - name: Tests
+        run: flutter test
+
+      - name: Preparar clave de firma
+        env:
+          KEYSTORE_BASE64: ${{ secrets.LITTERA_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Falta el secreto LITTERA_KEYSTORE_BASE64: sin él las actualizaciones no se podrían instalar."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/littera-release.jks"
+
+      - name: Compilar APK firmado
+        env:
+          LITTERA_KEYSTORE_PATH: ${{ runner.temp }}/littera-release.jks
+          LITTERA_KEYSTORE_PASSWORD: ${{ secrets.LITTERA_KEYSTORE_PASSWORD }}
+          LITTERA_KEY_ALIAS: ${{ secrets.LITTERA_KEY_ALIAS }}
+          LITTERA_KEY_PASSWORD: ${{ secrets.LITTERA_KEY_PASSWORD }}
+        run: |
+          flutter build apk --release
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            "littera-${{ steps.version.outputs.version }}.apk"
+
+      - name: Crear la Release en GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "littera-${{ steps.version.outputs.version }}.apk" \
+            --title "Littera ${{ steps.version.outputs.version }}" \
+            --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: Borrar la clave
+        if: always()
+        run: rm -f "$RUNNER_TEMP/littera-release.jks"
