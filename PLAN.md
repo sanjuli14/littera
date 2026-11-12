@@ -62,7 +62,7 @@ lib/
     notes/        # subrayados y notas
     writing/      # manuscritos, capítulos, fichas
     backup/       # exportar / restaurar
-    stats/        # estadísticas y metas
+    stats/        # estadísticas
 ```
 
 ## Modelo de datos (Hive)
@@ -70,12 +70,12 @@ lib/
 - **Book**: id, título, autor, formato (`epub|pdf|docx`), ruta del archivo, ruta de carátula, estantes, progreso (posición + %), fecha de añadido, última lectura, `isOwnWork`.
 - **Shelf**: id, nombre, orden, `isSystem` (Leyendo / Por leer / Terminados).
 - **Highlight**: id, bookId, posición, texto, nota, color, fecha.
-- **Manuscript**: id, título, sinopsis, carátula, meta de palabras, fecha.
+- **Manuscript**: id, título, autor, sinopsis, carátula, fechas.
 - **Chapter**: id, manuscriptId, orden, título, contenido (Delta de Quill), conteo de palabras, actualizado.
 - **ChapterVersion**: id, chapterId, contenido, fecha (instantáneas).
 - **Entity** (ficha): id, manuscriptId, tipo (`personaje|lugar|objeto`), nombre, descripción, imagen.
 - **ReadingSession**: bookId, fecha, páginas/minutos (para estadísticas).
-- **Settings**: tema, tamaño de letra, interlineado, meta anual, meta diaria de palabras.
+- **Settings**: tema, vista y orden de la biblioteca, ajustes del lector (tema, letra, tamaño, interlineado, justificado).
 
 Todos los modelos llevan `schemaVersion` desde el día 1 para poder migrar sin perder datos.
 
@@ -139,12 +139,12 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [ ] Limitaciones: un subrayado no puede abarcar varios párrafos; en PDF la cita no se pinta sobre la página
 
 ### Fase 5 — Escritura ✅
-- [x] Obras (manuscritos) con título, autor/seudónimo, sinopsis, carátula y meta diaria de palabras
+- [x] Obras (manuscritos) con título, autor/seudónimo, sinopsis y carátula
 - [x] Capítulos: crear, renombrar, reordenar arrastrando, eliminar
 - [x] Editor de texto enriquecido (`flutter_quill`): negrita, cursiva, títulos, citas, listas, deshacer/rehacer
 - [x] Modo sin distracciones (oculta barras y la interfaz del sistema)
 - [x] Guardado automático (1,5 s tras dejar de escribir), al salir y al pasar a segundo plano; indicador Guardado / Sin guardar
-- [x] Contador de palabras del capítulo y de la obra; palabras escritas hoy frente a la meta
+- [x] Contador de palabras del capítulo y de la obra
 - [x] Versiones: automática al empezar cada sesión (estado previo), manuales con nombre; vista previa y restaurar (guarda antes lo actual); máx. 30 automáticas por capítulo
 - [x] Fichas de personajes, lugares, objetos y apuntes; accesibles desde el editor
 - [x] Incluido en la copia de seguridad (completa y "solo datos"); al fusionar gana lo editado más recientemente y lo local se guarda como versión
@@ -162,7 +162,7 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 ### Fase 7 — Estadísticas ✅
 - [x] Tiempo de lectura real: cuenta mientras el lector está visible; se detiene tras 5 min sin actividad y en segundo plano; se anota cada minuto
 - [x] Fecha de terminado en cada libro (se borra si se vuelve a leer)
-- [x] Pantalla de estadísticas (desde Biblioteca y Ajustes): minutos de hoy y de la semana frente a la meta diaria, gráfica de 14 días, libros terminados del año con carátulas, horas del año
+- [x] Pantalla de estadísticas (desde Biblioteca y Ajustes): minutos de hoy y de la semana, gráfica de 14 días, libros terminados del año con carátulas, horas del año
 - [x] Escritura: palabras de hoy y de la semana, gráfica de 14 días, palabras del año
 - [x] Gráficas con color validado (contraste ≥ 3:1) en claro, sepia y oscuro; resumen accesible para lectores de pantalla
 - [x] Registro de lectura en la copia de seguridad (al fusionar no se duplican minutos)
