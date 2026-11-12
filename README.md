@@ -9,7 +9,7 @@ Biblioteca y taller de escritura **100 % local**. Lee EPUB, PDF y DOCX, subraya 
 - **Subrayados y notas**: cuatro colores, notas, panel por libro y pestaña "Mis citas" con exportación a Markdown.
 - **Escritura**: obras por capítulos, editor enriquecido sin distracciones, guardado automático, versiones, fichas de personajes y lugares, meta diaria.
 - **Exportar obra** a EPUB 3 o PDF A5 y añadirla a la biblioteca.
-- **Estadísticas**: tiempo de lectura real, rachas, meta anual de libros y palabras escritas.
+- **Estadísticas**: tiempo de lectura real, meta anual de libros y palabras escritas.
 - **Copia de seguridad** en un archivo `.littera` (ZIP con JSON legible) para restaurar en otro dispositivo.
 
 ## Tecnología

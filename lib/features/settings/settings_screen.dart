@@ -62,7 +62,7 @@ class SettingsScreen extends ConsumerWidget {
                     leading: const Icon(Icons.insights_outlined),
                     title: const Text('Estadísticas y metas'),
                     subtitle: const Text(
-                      'Rachas, minutos leídos y palabras escritas',
+                      'Minutos leídos, libros terminados y palabras escritas',
                     ),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => context.push(Routes.stats),

@@ -8,19 +8,6 @@ import '../models/book.dart';
 import 'library_repository.dart';
 import 'writing_repository.dart';
 
-/// Días consecutivos que cumplen [active], terminando hoy o ayer
-/// (si hoy aún no has leído, la racha de ayer sigue viva).
-int streak(bool Function(DateTime day) active, DateTime today) {
-  var day = DateTime(today.year, today.month, today.day);
-  if (!active(day)) day = day.subtract(const Duration(days: 1));
-  var count = 0;
-  while (active(day)) {
-    count++;
-    day = DateTime(day.year, day.month, day.day - 1);
-  }
-  return count;
-}
-
 /// Últimos [count] días, del más antiguo a hoy.
 List<DateTime> lastDays(int count, DateTime today) => [
   for (var i = count - 1; i >= 0; i--)
@@ -73,12 +60,6 @@ class StatsRepository {
       .whereType<int>()
       .fold(0, (a, b) => a + b);
 
-  /// Un día cuenta para la racha con al menos un minuto de lectura.
-  int readingStreak(DateTime today) {
-    final byDay = readingSecondsByDay();
-    return streak((d) => (byDay[dayKey(d)] ?? 0) >= 60, today);
-  }
-
   int readingSecondsInYear(int year) => readingSecondsByDay().entries
       .where((e) => e.key.startsWith('$year-'))
       .fold(0, (a, e) => a + e.value);
@@ -102,11 +83,6 @@ class StatsRepository {
       out[day] = (out[day] ?? 0) + diff;
     }
     return out;
-  }
-
-  int writingStreak(DateTime today) {
-    final byDay = wordsByDay();
-    return streak((d) => (byDay[dayKey(d)] ?? 0) > 0, today);
   }
 
   int wordsInYear(int year) => wordsByDay().entries

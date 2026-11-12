@@ -25,8 +25,6 @@ String formatMinutes(int minutes) {
   return m == 0 ? '$h h' : '$h h $m min';
 }
 
-String _days(int n) => n == 1 ? '1 día' : '$n días';
-
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
 
@@ -88,9 +86,11 @@ class StatsScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _StatTile(
-                    icon: Icons.local_fire_department_outlined,
-                    value: _days(stats.readingStreak(now)),
-                    label: 'Racha de lectura',
+                    icon: Icons.date_range_rounded,
+                    value: formatMinutes(
+                      minutes.skip(chartDays - 7).fold(0, (a, b) => a + b),
+                    ),
+                    label: 'Leído esta semana',
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -144,9 +144,11 @@ class StatsScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _StatTile(
-                    icon: Icons.local_fire_department_outlined,
-                    value: _days(stats.writingStreak(now)),
-                    label: 'Racha de escritura',
+                    icon: Icons.date_range_rounded,
+                    value: formatWordCount(
+                      words.skip(chartDays - 7).fold(0, (a, b) => a + b),
+                    ),
+                    label: 'Escritas esta semana',
                   ),
                 ),
                 const SizedBox(width: 12),

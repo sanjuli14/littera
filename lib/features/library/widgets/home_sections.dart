@@ -303,7 +303,7 @@ class BookCarousel extends StatelessWidget {
   }
 }
 
-/// Cabecera de Inicio: saludo, invitación a leer, racha y meta del día,
+/// Cabecera de Inicio: saludo, invitación a leer y meta del día,
 /// sobre manchas suaves de la paleta.
 class GreetingHeader extends ConsumerWidget {
   const GreetingHeader({super.key});
@@ -314,7 +314,6 @@ class GreetingHeader extends ConsumerWidget {
     ref.watch(readingLogProvider);
     final stats = ref.read(statsRepositoryProvider);
     final now = DateTime.now();
-    final streak = stats.readingStreak(now);
     final minutes = stats.readingSecondsOn(now) ~/ 60;
     final goal = ref.watch(
       settingsProvider.select((s) => s.dailyReadingMinutes),
@@ -346,16 +345,6 @@ class GreetingHeader extends ConsumerWidget {
               spacing: 10,
               runSpacing: 8,
               children: [
-                _InfoPill(
-                  icon: Icons.local_fire_department_rounded,
-                  iconColor: LitteraColors.oro,
-                  text: streak == 0
-                      ? 'Empieza tu racha hoy'
-                      : streak == 1
-                      ? '1 día leyendo'
-                      : '$streak días seguidos',
-                  dark: dark,
-                ),
                 if (goal > 0)
                   _InfoPill(
                     leading: SizedBox(
@@ -383,18 +372,10 @@ class GreetingHeader extends ConsumerWidget {
 }
 
 class _InfoPill extends StatelessWidget {
-  const _InfoPill({
-    required this.text,
-    required this.dark,
-    this.icon,
-    this.iconColor,
-    this.leading,
-  });
+  const _InfoPill({required this.text, required this.dark, this.leading});
 
   final String text;
   final bool dark;
-  final IconData? icon;
-  final Color? iconColor;
   final Widget? leading;
 
   @override
@@ -419,7 +400,6 @@ class _InfoPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ?leading,
-          if (icon != null) Icon(icon, size: 18, color: iconColor),
           const SizedBox(width: 6),
           Flexible(
             child: Text(

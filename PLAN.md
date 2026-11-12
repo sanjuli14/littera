@@ -162,8 +162,8 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 ### Fase 7 — Estadísticas ✅
 - [x] Tiempo de lectura real: cuenta mientras el lector está visible; se detiene tras 5 min sin actividad y en segundo plano; se anota cada minuto
 - [x] Fecha de terminado en cada libro (se borra si se vuelve a leer)
-- [x] Pantalla de estadísticas (desde Biblioteca y Ajustes): racha de lectura, minutos de hoy frente a la meta diaria, gráfica de 14 días, meta anual de libros con carátulas, horas del año
-- [x] Escritura: racha, palabras de hoy, gráfica de 14 días, palabras del año
+- [x] Pantalla de estadísticas (desde Biblioteca y Ajustes): minutos de hoy y de la semana frente a la meta diaria, gráfica de 14 días, meta anual de libros con carátulas, horas del año
+- [x] Escritura: palabras de hoy y de la semana, gráfica de 14 días, palabras del año
 - [x] Metas editables: libros al año y minutos al día (la de palabras va en cada obra)
 - [x] Gráficas con color validado (contraste ≥ 3:1) en claro, sepia y oscuro; resumen accesible para lectores de pantalla
 - [x] Registro de lectura en la copia de seguridad (al fusionar no se duplican minutos)
@@ -191,7 +191,7 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 
 ### Rediseño 2: cálido, "esponjoso" y literario ✅
 - [x] Tipografías: **Montserrat** (la de la referencia) en la interfaz y **Lora** (serif) para leer, citas y títulos de libro; el PDF exportado usa Lora
-- [x] Saludo según la hora con una frase en Lora que cambia cada día, racha 🔥 y anillo de la meta diaria
+- [x] Saludo según la hora con una frase en Lora que cambia cada día, y anillo de la meta diaria
 - [x] **Cita del día**: de tus subrayados (abre el libro en ella) o de clásicos en español de dominio público
 - [x] Carátulas con lomo (esquinas asimétricas, sombra del lomo y brillo) y sombra cálida
 - [x] Barra inferior flotante en píldora con burbuja pergamino en el icono activo
@@ -220,3 +220,5 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 ## Orden recomendado
 
 **0 → 1 → 2 → 3** = MVP (biblioteca + lector + backup). Después 4, 5, 6, 7, 8.
+
+> Las rachas se quitaron a petición (2026-11-12): sin presión, solo el placer de leer.

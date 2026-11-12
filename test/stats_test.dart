@@ -81,30 +81,6 @@ void main() {
     });
   });
 
-  group('rachas', () {
-    final today = DateTime(2026, 11, 12, 10);
-    bool Function(DateTime) on(Set<int> days) =>
-        (d) => d.month == 11 && days.contains(d.day);
-
-    test('cuenta días seguidos hasta hoy', () {
-      expect(streak(on({10, 11, 12}), today), 3);
-    });
-
-    test('si hoy aún no hay actividad, la racha de ayer sigue', () {
-      expect(streak(on({9, 10, 11}), today), 3);
-    });
-
-    test('un hueco la rompe', () {
-      expect(streak(on({8, 9, 11, 12}), today), 2);
-      expect(streak(on({8, 9, 10}), today), 0);
-    });
-
-    test('cruza meses', () {
-      final first = DateTime(2026, 12, 1);
-      expect(streak((d) => d.isAfter(DateTime(2026, 11, 27)), first), 4);
-    });
-  });
-
   group('estadísticas', () {
     late TestEnv env;
     late StatsRepository stats;
@@ -122,13 +98,6 @@ void main() {
       expect(stats.readingSecondsOn(d), 480);
       expect(stats.readingSecondsForBook('a'), 1020);
       expect(stats.readingSecondsInYear(2026), 1080);
-      expect(stats.readingStreak(d), 2);
-    });
-
-    test('menos de un minuto no cuenta para la racha', () async {
-      final d = DateTime(2026, 11, 12);
-      await stats.addReadingTime('a', d, 30);
-      expect(stats.readingStreak(d), 0);
     });
 
     test('palabras por día de todas las obras', () async {
@@ -137,7 +106,6 @@ void main() {
       await env.writingLog.put('m1|2026-11-11', [80, 100]);
       await env.writingLog.put('m1|2026-11-10', [100, 80]); // borró texto
       expect(stats.wordsByDay(), {'2026-11-12': 300, '2026-11-11': 20});
-      expect(stats.writingStreak(DateTime(2026, 11, 12)), 2);
       expect(stats.wordsInYear(2026), 320);
     });
 
@@ -212,54 +180,54 @@ void main() {
     expect(formatMinutes(135), '2 h 15 min');
   });
 
-  testWidgets('la pantalla muestra rachas, meta anual y permite editar metas', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 1080 / 412;
-    addTearDown(tester.view.reset);
-    final env = (await tester.runAsync(TestEnv.create))!;
-    final now = DateTime.now();
-    await tester.runAsync(() async {
-      for (var i = 0; i < 3; i++) {
-        await env.statsRepository.addReadingTime(
+  testWidgets(
+    'la pantalla muestra lectura, meta anual y permite editar metas',
+    (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1080 / 412;
+      addTearDown(tester.view.reset);
+      final env = (await tester.runAsync(TestEnv.create))!;
+      final now = DateTime.now();
+      await tester.runAsync(() async {
+        for (var i = 0; i < 3; i++) {
+          await env.statsRepository.addReadingTime(
+            'a',
+            now.subtract(Duration(days: i)),
+            25 * 60,
+          );
+        }
+        await env.writingLog.put('m|${dayKey(now)}', [0, 420]);
+        await env.books.put(
           'a',
-          now.subtract(Duration(days: i)),
-          25 * 60,
+          testBook(
+            id: 'a',
+            title: 'Rayuela',
+            status: ReadingStatus.finished,
+          ).copyWith(finishedAt: now),
         );
-      }
-      await env.writingLog.put('m|${dayKey(now)}', [0, 420]);
-      await env.books.put(
-        'a',
-        testBook(
-          id: 'a',
-          title: 'Rayuela',
-          status: ReadingStatus.finished,
-        ).copyWith(finishedAt: now),
+      });
+      await tester.pumpWidget(
+        ProviderScope(overrides: env.overrides, child: const LitteraApp()),
       );
-    });
-    await tester.pumpWidget(
-      ProviderScope(overrides: env.overrides, child: const LitteraApp()),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Estadísticas'));
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Estadísticas'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('3 días'), findsOneWidget); // racha de lectura
-    expect(find.text('25 min'), findsOneWidget); // hoy
-    expect(find.text('1 de 12 libros terminados'), findsOneWidget);
-    expect(find.text('420 palabras'), findsOneWidget);
-    expect(find.text('1 día'), findsOneWidget); // racha de escritura
+      expect(find.text('1 h 15 min'), findsOneWidget); // esta semana
+      expect(find.text('25 min'), findsOneWidget); // hoy
+      expect(find.text('1 de 12 libros terminados'), findsOneWidget);
+      expect(find.text('420 palabras'), findsNWidgets(2)); // hoy y esta semana
 
-    await tester.tap(find.byTooltip('Metas'));
-    await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Libros al año'),
-      '1',
-    );
-    await tester.tap(find.text('Guardar'));
-    await tester.pumpAndSettle();
-    expect(find.text('¡Meta cumplida! 1 de 1 libros'), findsOneWidget);
-    expect(env.settings.get(HiveKeys.appSettings)!.annualBookGoal, 1);
-  });
+      await tester.tap(find.byTooltip('Metas'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Libros al año'),
+        '1',
+      );
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      expect(find.text('¡Meta cumplida! 1 de 1 libros'), findsOneWidget);
+      expect(env.settings.get(HiveKeys.appSettings)!.annualBookGoal, 1);
+    },
+  );
 }

@@ -153,7 +153,7 @@ void main() {
 
         // Estadísticas.
         await tap(find.byTooltip('Estadísticas'));
-        expect(find.text('Racha de lectura'), findsOneWidget);
+        expect(find.text('Leído esta semana'), findsOneWidget);
         await tester.drag(
           find.byType(Scrollable).first,
           const Offset(0, -2000),
