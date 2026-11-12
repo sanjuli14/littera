@@ -109,8 +109,6 @@ Map<String, Object?> settingsToJson(AppSettings s) => {
   'readerFontSize': s.readerFontSize,
   'readerLineHeight': s.readerLineHeight,
   'readerJustify': s.readerJustify,
-  'annualBookGoal': s.annualBookGoal,
-  'dailyReadingMinutes': s.dailyReadingMinutes,
   'onboardingDone': s.onboardingDone,
   'readerSerif': s.readerSerif,
 };
@@ -135,12 +133,6 @@ AppSettings settingsFromJson(Map<String, Object?> j) {
       d.readerLineHeight,
     ).clamp(ReaderLimits.minLineHeight, ReaderLimits.maxLineHeight),
     readerJustify: (j['readerJustify'] as bool?) ?? d.readerJustify,
-    annualBookGoal:
-        (j['annualBookGoal'] as num?)?.toInt().clamp(0, 1000) ??
-        d.annualBookGoal,
-    dailyReadingMinutes:
-        (j['dailyReadingMinutes'] as num?)?.toInt().clamp(0, 1440) ??
-        d.dailyReadingMinutes,
     // Si se restaura una copia, ya no hace falta la bienvenida.
     onboardingDone: true,
     readerSerif: (j['readerSerif'] as bool?) ?? d.readerSerif,
@@ -195,7 +187,6 @@ Map<String, Object?> manuscriptToJson(Manuscript m) => {
   'synopsis': m.synopsis,
   'author': m.author,
   'coverRef': m.coverRef,
-  'dailyWordGoal': m.dailyWordGoal,
   'createdAt': m.createdAt.toIso8601String(),
   'updatedAt': m.updatedAt.toIso8601String(),
 };
@@ -206,7 +197,6 @@ Manuscript manuscriptFromJson(Map<String, Object?> j) => Manuscript(
   synopsis: (j['synopsis'] as String?) ?? '',
   author: (j['author'] as String?) ?? '',
   coverRef: j['coverRef'] as String?,
-  dailyWordGoal: (j['dailyWordGoal'] as num?)?.toInt() ?? 500,
   createdAt: _date(j['createdAt']) ?? DateTime.now(),
   updatedAt: _date(j['updatedAt']) ?? DateTime.now(),
 );

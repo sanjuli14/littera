@@ -33,10 +33,6 @@ types:
         index: 5
       readerJustify:
         index: 6
-      annualBookGoal:
-        index: 7
-      dailyReadingMinutes:
-        index: 8
       onboardingDone:
         index: 9
       readerSerif:
@@ -195,8 +191,6 @@ types:
         index: 3
       coverRef:
         index: 4
-      dailyWordGoal:
-        index: 5
       createdAt:
         index: 6
       updatedAt:

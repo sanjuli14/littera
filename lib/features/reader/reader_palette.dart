@@ -38,10 +38,10 @@ class ReaderPalette {
   );
 
   static const dark = ReaderPalette(
-    background: LitteraColors.tinta,
+    background: LitteraColors.noche,
     text: Color(0xFFE6DCC4),
     secondary: Color(0xFFA9A390),
-    chrome: LitteraColors.tintaClara,
+    chrome: LitteraColors.nocheCarta,
     brightness: Brightness.dark,
   );
 

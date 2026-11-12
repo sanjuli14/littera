@@ -24,7 +24,7 @@ class SoftCard extends StatelessWidget {
     final background =
         color ??
         (dark
-            ? LitteraColors.tintaClara
+            ? LitteraColors.nocheCarta
             : theme.colorScheme.surface == Colors.white
             ? Colors.white
             : theme.colorScheme.surfaceContainerLowest);

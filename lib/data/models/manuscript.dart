@@ -7,7 +7,6 @@ class Manuscript {
     required this.updatedAt,
     this.synopsis = '',
     this.coverRef,
-    this.dailyWordGoal = 500,
     this.author = '',
   });
 
@@ -19,8 +18,6 @@ class Manuscript {
   final String author;
   final String? coverRef;
 
-  /// Meta diaria de palabras (0 = sin meta).
-  final int dailyWordGoal;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -30,7 +27,6 @@ class Manuscript {
     String? author,
     String? coverRef,
     bool clearCover = false,
-    int? dailyWordGoal,
     DateTime? updatedAt,
   }) => Manuscript(
     id: id,
@@ -38,7 +34,6 @@ class Manuscript {
     synopsis: synopsis ?? this.synopsis,
     author: author ?? this.author,
     coverRef: clearCover ? null : (coverRef ?? this.coverRef),
-    dailyWordGoal: dailyWordGoal ?? this.dailyWordGoal,
     createdAt: createdAt,
     updatedAt: updatedAt ?? DateTime.now(),
   );

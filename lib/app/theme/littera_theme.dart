@@ -91,16 +91,16 @@ abstract final class LitteraTheme {
     onTertiary: LitteraColors.tinta,
     error: LitteraColors.errorClaro,
     onError: Color(0xFF601410),
-    surface: LitteraColors.tinta,
+    surface: LitteraColors.noche,
     onSurface: LitteraColors.pergamino,
-    onSurfaceVariant: Color(0xFFB9B4A4),
-    surfaceContainerLowest: Color(0xFF151C31),
-    surfaceContainerLow: Color(0xFF222C4B),
-    surfaceContainer: LitteraColors.tintaClara,
-    surfaceContainerHigh: LitteraColors.tintaMedia,
-    surfaceContainerHighest: LitteraColors.tintaAlta,
-    outline: Color(0xFF8A8FA6),
-    outlineVariant: Color(0xFF34406A),
+    onSurfaceVariant: Color(0xFFB8B0A0),
+    surfaceContainerLowest: Color(0xFF0C0B0A),
+    surfaceContainerLow: LitteraColors.nocheCarta,
+    surfaceContainer: LitteraColors.nocheMedia,
+    surfaceContainerHigh: LitteraColors.nocheAlta,
+    surfaceContainerHighest: LitteraColors.nocheBorde,
+    outline: Color(0xFF8C857A),
+    outlineVariant: LitteraColors.nocheBorde,
     shadow: Colors.black,
   );
 
@@ -113,7 +113,7 @@ abstract final class LitteraTheme {
       scaffoldBackgroundColor: scheme.surface,
     );
     final text = base.textTheme;
-    final cardColor = isDark ? LitteraColors.tintaClara : Colors.white;
+    final cardColor = isDark ? LitteraColors.nocheCarta : Colors.white;
     const stadium = StadiumBorder();
 
     return base.copyWith(

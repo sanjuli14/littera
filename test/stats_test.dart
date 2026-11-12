@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:littera/app/app.dart';
-import 'package:littera/data/hive/hive_setup.dart';
 import 'package:littera/data/models/book.dart';
 import 'package:littera/data/repositories/stats_repository.dart';
 import 'package:littera/features/backup/backup_service.dart';
@@ -181,7 +180,7 @@ void main() {
   });
 
   testWidgets(
-    'la pantalla muestra lectura, meta anual y permite editar metas',
+    'la pantalla muestra lectura, escritura y libros del año, sin metas',
     (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1080 / 412;
@@ -215,19 +214,11 @@ void main() {
 
       expect(find.text('1 h 15 min'), findsOneWidget); // esta semana
       expect(find.text('25 min'), findsOneWidget); // hoy
-      expect(find.text('1 de 12 libros terminados'), findsOneWidget);
+      expect(find.text('1 libro terminado'), findsOneWidget);
       expect(find.text('420 palabras'), findsNWidgets(2)); // hoy y esta semana
 
-      await tester.tap(find.byTooltip('Metas'));
-      await tester.pumpAndSettle();
-      await tester.enterText(
-        find.widgetWithText(TextField, 'Libros al año'),
-        '1',
-      );
-      await tester.tap(find.text('Guardar'));
-      await tester.pumpAndSettle();
-      expect(find.text('¡Meta cumplida! 1 de 1 libros'), findsOneWidget);
-      expect(env.settings.get(HiveKeys.appSettings)!.annualBookGoal, 1);
+      expect(find.text('Tu ${now.year}'), findsOneWidget);
+      expect(find.textContaining('Meta'), findsNothing);
     },
   );
 }

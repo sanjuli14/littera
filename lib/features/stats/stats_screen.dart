@@ -6,9 +6,7 @@ import '../../core/widgets/soft_card.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
-import '../../app/theme/littera_colors.dart';
 import '../../data/repositories/library_repository.dart';
-import '../../data/repositories/settings_repository.dart';
 import '../../data/repositories/stats_repository.dart';
 import '../../data/repositories/writing_repository.dart';
 import '../library/widgets/book_cover.dart';
@@ -34,7 +32,6 @@ class StatsScreen extends ConsumerWidget {
     ref.watch(readingLogProvider);
     ref.watch(writingLogProvider);
     ref.watch(booksProvider);
-    final settings = ref.watch(settingsProvider);
     final stats = ref.read(statsRepositoryProvider);
 
     final now = DateTime.now();
@@ -48,8 +45,6 @@ class StatsScreen extends ConsumerWidget {
     final todayMinutes = minutes.last;
     final todayWords = words.last;
     final finished = stats.finishedInYear(now.year);
-    final goal = settings.annualBookGoal;
-    final dailyGoal = settings.dailyReadingMinutes;
 
     final theme = Theme.of(context);
     Widget section(String title) => Padding(
@@ -63,19 +58,7 @@ class StatsScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Estadísticas'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.flag_outlined),
-            tooltip: 'Metas',
-            onPressed: () => showDialog<void>(
-              context: context,
-              builder: (_) => const _GoalsDialog(),
-            ),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Estadísticas')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
         children: [
@@ -98,10 +81,7 @@ class StatsScreen extends ConsumerWidget {
                   child: _StatTile(
                     icon: Icons.schedule,
                     value: formatMinutes(todayMinutes),
-                    label: dailyGoal > 0
-                        ? 'Hoy · meta ${formatMinutes(dailyGoal)}'
-                        : 'Leído hoy',
-                    progress: dailyGoal > 0 ? todayMinutes / dailyGoal : null,
+                    label: 'Leído hoy',
                   ),
                 ),
               ],
@@ -121,9 +101,8 @@ class StatsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _YearGoalCard(
+          _YearCard(
             year: now.year,
-            goal: goal,
             finished: finished.length,
             covers: [
               for (final b in finished.take(12))
@@ -192,13 +171,11 @@ class _StatTile extends StatelessWidget {
     required this.icon,
     required this.value,
     required this.label,
-    this.progress,
   });
 
   final IconData icon;
   final String value;
   final String label;
-  final double? progress;
 
   @override
   Widget build(BuildContext context) {
@@ -226,18 +203,6 @@ class _StatTile extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            if (progress != null) ...[
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: LinearProgressIndicator(
-                  value: progress!.clamp(0, 1),
-                  minHeight: 5,
-                  color: LitteraColors.oro,
-                  backgroundColor: theme.colorScheme.outlineVariant,
-                ),
-              ),
-            ],
           ],
         ),
       ),
@@ -274,17 +239,15 @@ class _ChartCard extends StatelessWidget {
   }
 }
 
-class _YearGoalCard extends StatelessWidget {
-  const _YearGoalCard({
+class _YearCard extends StatelessWidget {
+  const _YearCard({
     required this.year,
-    required this.goal,
     required this.finished,
     required this.covers,
     required this.hoursThisYear,
   });
 
   final int year;
-  final int goal;
   final int finished;
   final List<Widget> covers;
   final int hoursThisYear;
@@ -292,7 +255,6 @@ class _YearGoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final reached = goal > 0 && finished >= goal;
     return SoftCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -300,34 +262,18 @@ class _YearGoalCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Meta de $year',
+              'Tu $year',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              goal > 0
-                  ? (reached
-                        ? '¡Meta cumplida! $finished de $goal libros'
-                        : '$finished de $goal libros terminados')
-                  : '$finished ${finished == 1 ? 'libro terminado' : 'libros terminados'}',
+              '$finished ${finished == 1 ? 'libro terminado' : 'libros terminados'}',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
-            if (goal > 0) ...[
-              const SizedBox(height: 10),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: (finished / goal).clamp(0, 1),
-                  minHeight: 8,
-                  color: LitteraColors.oro,
-                  backgroundColor: theme.colorScheme.outlineVariant,
-                ),
-              ),
-            ],
             const SizedBox(height: 8),
             Text(
               hoursThisYear == 0
@@ -345,78 +291,6 @@ class _YearGoalCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _GoalsDialog extends ConsumerStatefulWidget {
-  const _GoalsDialog();
-
-  @override
-  ConsumerState<_GoalsDialog> createState() => _GoalsDialogState();
-}
-
-class _GoalsDialogState extends ConsumerState<_GoalsDialog> {
-  late final _books = TextEditingController(
-    text: ref.read(settingsProvider).annualBookGoal.toString(),
-  );
-  late final _minutes = TextEditingController(
-    text: ref.read(settingsProvider).dailyReadingMinutes.toString(),
-  );
-
-  @override
-  void dispose() {
-    _books.dispose();
-    _minutes.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Metas'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _books,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Libros al año',
-                helperText: '0 = sin meta',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _minutes,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Minutos de lectura al día',
-                helperText: 'La meta de palabras se fija en cada obra',
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-        TextButton(
-          onPressed: () {
-            ref
-                .read(settingsProvider.notifier)
-                .setGoals(
-                  annualBookGoal: int.tryParse(_books.text.trim()),
-                  dailyReadingMinutes: int.tryParse(_minutes.text.trim()),
-                );
-            Navigator.pop(context);
-          },
-          child: const Text('Guardar'),
-        ),
-      ],
     );
   }
 }

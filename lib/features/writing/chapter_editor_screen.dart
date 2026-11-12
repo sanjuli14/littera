@@ -255,9 +255,6 @@ class _ChapterEditorScreenState extends ConsumerState<ChapterEditorScreen> {
       );
     }
     final theme = Theme.of(context);
-    final manuscript = ref.watch(manuscriptProvider(chapter.manuscriptId));
-    final today = ref.watch(wordsTodayProvider(chapter.manuscriptId));
-    final goal = manuscript?.dailyWordGoal ?? 0;
 
     final statusText = switch (_status) {
       _SaveStatus.saved => 'Guardado',
@@ -416,28 +413,6 @@ class _ChapterEditorScreenState extends ConsumerState<ChapterEditorScreen> {
                         style: theme.textTheme.labelMedium,
                       ),
                     ),
-                    if (goal > 0) ...[
-                      Text(
-                        'Hoy $today / $goal',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: today >= goal
-                              ? LitteraColors.oroOscuro
-                              : theme.colorScheme.onSurfaceVariant,
-                          fontWeight: today >= goal ? FontWeight.w700 : null,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          value: (today / goal).clamp(0, 1),
-                          strokeWidth: 3,
-                          color: LitteraColors.oro,
-                          backgroundColor: theme.colorScheme.outlineVariant,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),

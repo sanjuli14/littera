@@ -20,6 +20,14 @@ abstract final class LitteraColors {
   static const pergaminoOscuro = Color(0xFFDDCFAE);
   static const oroOscuro = Color(0xFF8A6A2C);
 
+  /// Modo oscuro: casi negro cálido (no azul), como una sala de lectura de
+  /// noche. El texto va en pergamino y los acentos en oro.
+  static const noche = Color(0xFF121110);
+  static const nocheCarta = Color(0xFF1D1B19);
+  static const nocheMedia = Color(0xFF262421);
+  static const nocheAlta = Color(0xFF312E2A);
+  static const nocheBorde = Color(0xFF3B3833);
+
   /// Oro para gráficas: validado (contraste ≥ 3:1, luminosidad y croma)
   /// sobre los fondos claro/sepia y oscuro respectivamente.
   static const oroGrafica = Color(0xFFA47E2E);

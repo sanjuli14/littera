@@ -187,8 +187,8 @@ class _ThemeSwatch extends StatelessWidget {
                         colors: [
                           LitteraColors.pergaminoClaro,
                           LitteraColors.pergaminoClaro,
-                          LitteraColors.tinta,
-                          LitteraColors.tinta,
+                          LitteraColors.noche,
+                          LitteraColors.noche,
                         ],
                         stops: [0, 0.5, 0.5, 1],
                         begin: Alignment.topLeft,

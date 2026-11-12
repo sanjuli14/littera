@@ -83,7 +83,7 @@ void main() {
     await createManuscript(tester, 'El faro');
     expect(find.text('El faro'), findsWidgets);
     expect(find.text('Capítulo 1'), findsOneWidget);
-    expect(find.text('Hoy: 0 / 500 palabras'), findsOneWidget);
+    expect(find.textContaining('/ 500'), findsNothing); // sin metas
     expect(env.manuscripts.length, 1);
   });
 
@@ -111,7 +111,6 @@ void main() {
     final chapter = env.chapters.values.single;
     expect(plainTextFromDelta(chapter.content).trim(), 'Había una vez un faro');
     expect(chapter.wordCount, 5);
-    expect(find.text('Hoy 5 / 500'), findsOneWidget);
   });
 
   testWidgets('al salir del editor se guarda lo pendiente', (tester) async {

@@ -81,7 +81,6 @@ class _ManuscriptCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final chapters = ref.watch(chaptersOfProvider(manuscript.id));
     final words = chapters.fold<int>(0, (sum, c) => sum + c.wordCount);
-    final today = ref.watch(wordsTodayProvider(manuscript.id));
 
     return SoftCard(
       child: InkWell(
@@ -123,14 +122,9 @@ class _ManuscriptCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      today > 0
-                          ? 'Hoy: ${formatWordCount(today)}'
-                          : 'Editado el ${formatDate(manuscript.updatedAt)}',
+                      'Editado el ${formatDate(manuscript.updatedAt)}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: today > 0
-                            ? theme.colorScheme.secondary
-                            : theme.colorScheme.onSurfaceVariant,
-                        fontWeight: today > 0 ? FontWeight.w600 : null,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],

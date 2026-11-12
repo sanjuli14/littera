@@ -253,7 +253,6 @@ class _LibraryHomeState extends ConsumerState<_LibraryHome> {
         if (showHome) ...[
           if (hero != null)
             SliverToBoxAdapter(child: ContinueReadingCard(book: hero)),
-          const SliverToBoxAdapter(child: QuoteOfTheDayCard()),
           if (reading.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: SectionHeader(

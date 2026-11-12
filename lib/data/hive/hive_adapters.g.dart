@@ -75,8 +75,6 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       readerFontSize: fields[4] == null ? 18 : (fields[4] as num).toDouble(),
       readerLineHeight: fields[5] == null ? 1.6 : (fields[5] as num).toDouble(),
       readerJustify: fields[6] == null ? true : fields[6] as bool,
-      annualBookGoal: fields[7] == null ? 12 : (fields[7] as num).toInt(),
-      dailyReadingMinutes: fields[8] == null ? 20 : (fields[8] as num).toInt(),
       onboardingDone: fields[9] == null ? false : fields[9] as bool,
       readerSerif: fields[10] == null ? true : fields[10] as bool,
     );
@@ -85,7 +83,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.themePreference)
       ..writeByte(1)
@@ -100,10 +98,6 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..write(obj.readerLineHeight)
       ..writeByte(6)
       ..write(obj.readerJustify)
-      ..writeByte(7)
-      ..write(obj.annualBookGoal)
-      ..writeByte(8)
-      ..write(obj.dailyReadingMinutes)
       ..writeByte(9)
       ..write(obj.onboardingDone)
       ..writeByte(10)
@@ -562,7 +556,6 @@ class ManuscriptAdapter extends TypeAdapter<Manuscript> {
       updatedAt: fields[7] as DateTime,
       synopsis: fields[2] == null ? '' : fields[2] as String,
       coverRef: fields[4] as String?,
-      dailyWordGoal: fields[5] == null ? 500 : (fields[5] as num).toInt(),
       author: fields[3] == null ? '' : fields[3] as String,
     );
   }
@@ -570,7 +563,7 @@ class ManuscriptAdapter extends TypeAdapter<Manuscript> {
   @override
   void write(BinaryWriter writer, Manuscript obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -581,8 +574,6 @@ class ManuscriptAdapter extends TypeAdapter<Manuscript> {
       ..write(obj.author)
       ..writeByte(4)
       ..write(obj.coverRef)
-      ..writeByte(5)
-      ..write(obj.dailyWordGoal)
       ..writeByte(6)
       ..write(obj.createdAt)
       ..writeByte(7)

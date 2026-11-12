@@ -56,7 +56,7 @@ class _PillNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
-    final background = dark ? LitteraColors.tintaClara : Colors.white;
+    final background = dark ? LitteraColors.nocheCarta : Colors.white;
 
     return SafeArea(
       minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),

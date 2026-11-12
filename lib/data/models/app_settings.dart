@@ -49,8 +49,6 @@ class AppSettings {
     this.readerFontSize = 18,
     this.readerLineHeight = 1.6,
     this.readerJustify = true,
-    this.annualBookGoal = 12,
-    this.dailyReadingMinutes = 20,
     this.onboardingDone = false,
     this.readerSerif = true,
   });
@@ -62,12 +60,6 @@ class AppSettings {
   final double readerFontSize;
   final double readerLineHeight;
   final bool readerJustify;
-
-  /// Meta de libros terminados al año (0 = sin meta).
-  final int annualBookGoal;
-
-  /// Meta de minutos de lectura al día (0 = sin meta).
-  final int dailyReadingMinutes;
 
   /// `true` cuando ya se vio la pantalla de bienvenida.
   final bool onboardingDone;
@@ -83,8 +75,6 @@ class AppSettings {
     double? readerFontSize,
     double? readerLineHeight,
     bool? readerJustify,
-    int? annualBookGoal,
-    int? dailyReadingMinutes,
     bool? onboardingDone,
     bool? readerSerif,
   }) => AppSettings(
@@ -95,8 +85,6 @@ class AppSettings {
     readerFontSize: readerFontSize ?? this.readerFontSize,
     readerLineHeight: readerLineHeight ?? this.readerLineHeight,
     readerJustify: readerJustify ?? this.readerJustify,
-    annualBookGoal: annualBookGoal ?? this.annualBookGoal,
-    dailyReadingMinutes: dailyReadingMinutes ?? this.dailyReadingMinutes,
     onboardingDone: onboardingDone ?? this.onboardingDone,
     readerSerif: readerSerif ?? this.readerSerif,
   );

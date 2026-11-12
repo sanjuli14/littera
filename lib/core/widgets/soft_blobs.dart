@@ -15,9 +15,13 @@ class SoftBlobs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    return CustomPaint(
-      painter: _BlobPainter(dark: dark, variant: variant),
-      child: child,
+    // Recortadas a su zona: nunca se dibujan encima de lo que hay al lado
+    // (buscador, filtros…), solo detrás de su propio contenido.
+    return ClipRect(
+      child: CustomPaint(
+        painter: _BlobPainter(dark: dark, variant: variant),
+        child: child,
+      ),
     );
   }
 }
@@ -57,7 +61,7 @@ class _BlobPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final warm = dark
-        ? LitteraColors.tintaClara
+        ? LitteraColors.nocheMedia
         : LitteraColors.pergamino.withValues(alpha: 0.75);
     final gold = LitteraColors.oro.withValues(alpha: dark ? 0.16 : 0.22);
     final w = size.width, h = size.height;

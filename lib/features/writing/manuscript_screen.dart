@@ -14,7 +14,7 @@ import '../export/export_sheet.dart';
 import 'entity_widgets.dart';
 import 'writing_screen.dart';
 
-/// Ficha de una obra: datos, meta diaria, capítulos y fichas.
+/// Ficha de una obra: datos, capítulos y fichas.
 class ManuscriptScreen extends ConsumerWidget {
   const ManuscriptScreen({super.key, required this.manuscriptId});
 
@@ -204,8 +204,6 @@ class _Header extends ConsumerWidget {
     final m = manuscript;
     final chapters = ref.watch(chaptersOfProvider(m.id));
     final words = chapters.fold<int>(0, (sum, c) => sum + c.wordCount);
-    final today = ref.watch(wordsTodayProvider(m.id));
-    final goal = m.dailyWordGoal;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -241,31 +239,6 @@ class _Header extends ConsumerWidget {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 12),
-                if (goal > 0) ...[
-                  Text(
-                    today >= goal
-                        ? '¡Meta de hoy cumplida! $today / $goal'
-                        : 'Hoy: $today / $goal palabras',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: (today / goal).clamp(0, 1),
-                      minHeight: 6,
-                      color: LitteraColors.oro,
-                      backgroundColor: theme.colorScheme.outlineVariant,
-                    ),
-                  ),
-                ] else
-                  Text(
-                    'Hoy: ${formatWordCount(today)}',
-                    style: theme.textTheme.bodyMedium,
-                  ),
                 if (m.synopsis.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -415,16 +388,12 @@ class _EditManuscriptDialogState extends State<_EditManuscriptDialog> {
   late final _synopsis = TextEditingController(
     text: widget.manuscript.synopsis,
   );
-  late final _goal = TextEditingController(
-    text: widget.manuscript.dailyWordGoal.toString(),
-  );
 
   @override
   void dispose() {
     _title.dispose();
     _author.dispose();
     _synopsis.dispose();
-    _goal.dispose();
     super.dispose();
   }
 
@@ -455,15 +424,6 @@ class _EditManuscriptDialogState extends State<_EditManuscriptDialog> {
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(labelText: 'Sinopsis'),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _goal,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Meta diaria de palabras',
-                helperText: '0 = sin meta',
-              ),
-            ),
           ],
         ),
       ),
@@ -475,7 +435,6 @@ class _EditManuscriptDialogState extends State<_EditManuscriptDialog> {
         TextButton(
           onPressed: () {
             final m = widget.manuscript;
-            final goal = int.tryParse(_goal.text.trim());
             Navigator.pop(
               context,
               m.copyWith(
@@ -484,9 +443,6 @@ class _EditManuscriptDialogState extends State<_EditManuscriptDialog> {
                     : _title.text.trim(),
                 author: _author.text.trim(),
                 synopsis: _synopsis.text.trim(),
-                dailyWordGoal: goal == null || goal < 0
-                    ? m.dailyWordGoal
-                    : goal,
               ),
             );
           },

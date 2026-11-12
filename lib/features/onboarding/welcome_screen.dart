@@ -128,7 +128,7 @@ class _LogoComposition extends StatelessWidget {
                 height: 210,
                 decoration: BoxDecoration(
                   color: dark
-                      ? LitteraColors.tintaClara
+                      ? LitteraColors.nocheMedia
                       : LitteraColors.pergamino,
                   shape: BoxShape.circle,
                 ),
