@@ -65,15 +65,23 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       themePreference: fields[0] == null
           ? AppThemePreference.system
           : fields[0] as AppThemePreference,
+      libraryGridView: fields[1] == null ? true : fields[1] as bool,
+      librarySort: fields[2] == null
+          ? LibrarySort.recentlyAdded
+          : fields[2] as LibrarySort,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.themePreference);
+      ..write(obj.themePreference)
+      ..writeByte(1)
+      ..write(obj.libraryGridView)
+      ..writeByte(2)
+      ..write(obj.librarySort);
   }
 
   @override
@@ -83,6 +91,262 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is AppSettingsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class LibrarySortAdapter extends TypeAdapter<LibrarySort> {
+  @override
+  final typeId = 2;
+
+  @override
+  LibrarySort read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return LibrarySort.recentlyAdded;
+      case 1:
+        return LibrarySort.recentlyOpened;
+      case 2:
+        return LibrarySort.title;
+      case 3:
+        return LibrarySort.author;
+      default:
+        return LibrarySort.recentlyAdded;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, LibrarySort obj) {
+    switch (obj) {
+      case LibrarySort.recentlyAdded:
+        writer.writeByte(0);
+      case LibrarySort.recentlyOpened:
+        writer.writeByte(1);
+      case LibrarySort.title:
+        writer.writeByte(2);
+      case LibrarySort.author:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LibrarySortAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class BookFormatAdapter extends TypeAdapter<BookFormat> {
+  @override
+  final typeId = 3;
+
+  @override
+  BookFormat read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return BookFormat.epub;
+      case 1:
+        return BookFormat.pdf;
+      case 2:
+        return BookFormat.docx;
+      default:
+        return BookFormat.epub;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, BookFormat obj) {
+    switch (obj) {
+      case BookFormat.epub:
+        writer.writeByte(0);
+      case BookFormat.pdf:
+        writer.writeByte(1);
+      case BookFormat.docx:
+        writer.writeByte(2);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BookFormatAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ReadingStatusAdapter extends TypeAdapter<ReadingStatus> {
+  @override
+  final typeId = 4;
+
+  @override
+  ReadingStatus read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ReadingStatus.toRead;
+      case 1:
+        return ReadingStatus.reading;
+      case 2:
+        return ReadingStatus.finished;
+      default:
+        return ReadingStatus.toRead;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ReadingStatus obj) {
+    switch (obj) {
+      case ReadingStatus.toRead:
+        writer.writeByte(0);
+      case ReadingStatus.reading:
+        writer.writeByte(1);
+      case ReadingStatus.finished:
+        writer.writeByte(2);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReadingStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class BookAdapter extends TypeAdapter<Book> {
+  @override
+  final typeId = 5;
+
+  @override
+  Book read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Book(
+      id: fields[0] as String,
+      title: fields[1] as String,
+      author: fields[2] as String,
+      format: fields[3] as BookFormat,
+      fileRef: fields[4] as String,
+      originalFileName: fields[5] as String,
+      fileSize: (fields[6] as num).toInt(),
+      contentHash: fields[7] as String,
+      addedAt: fields[8] as DateTime,
+      coverRef: fields[9] as String?,
+      hasCustomCover: fields[10] == null ? false : fields[10] as bool,
+      status: fields[11] == null
+          ? ReadingStatus.toRead
+          : fields[11] as ReadingStatus,
+      shelfIds: fields[12] == null
+          ? const []
+          : (fields[12] as List).cast<String>(),
+      progress: fields[13] == null ? 0 : (fields[13] as num).toDouble(),
+      position: fields[14] as String?,
+      lastOpenedAt: fields[15] as DateTime?,
+      isOwnWork: fields[16] == null ? false : fields[16] as bool,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Book obj) {
+    writer
+      ..writeByte(17)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.title)
+      ..writeByte(2)
+      ..write(obj.author)
+      ..writeByte(3)
+      ..write(obj.format)
+      ..writeByte(4)
+      ..write(obj.fileRef)
+      ..writeByte(5)
+      ..write(obj.originalFileName)
+      ..writeByte(6)
+      ..write(obj.fileSize)
+      ..writeByte(7)
+      ..write(obj.contentHash)
+      ..writeByte(8)
+      ..write(obj.addedAt)
+      ..writeByte(9)
+      ..write(obj.coverRef)
+      ..writeByte(10)
+      ..write(obj.hasCustomCover)
+      ..writeByte(11)
+      ..write(obj.status)
+      ..writeByte(12)
+      ..write(obj.shelfIds)
+      ..writeByte(13)
+      ..write(obj.progress)
+      ..writeByte(14)
+      ..write(obj.position)
+      ..writeByte(15)
+      ..write(obj.lastOpenedAt)
+      ..writeByte(16)
+      ..write(obj.isOwnWork);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BookAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ShelfAdapter extends TypeAdapter<Shelf> {
+  @override
+  final typeId = 6;
+
+  @override
+  Shelf read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Shelf(
+      id: fields[0] as String,
+      name: fields[1] as String,
+      order: (fields[2] as num).toInt(),
+      createdAt: fields[3] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Shelf obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.order)
+      ..writeByte(3)
+      ..write(obj.createdAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShelfAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -9,6 +9,11 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(AppSettingsAdapter());
     registerAdapter(AppThemePreferenceAdapter());
+    registerAdapter(BookAdapter());
+    registerAdapter(BookFormatAdapter());
+    registerAdapter(LibrarySortAdapter());
+    registerAdapter(ReadingStatusAdapter());
+    registerAdapter(ShelfAdapter());
   }
 }
 
@@ -16,5 +21,10 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(AppSettingsAdapter());
     registerAdapter(AppThemePreferenceAdapter());
+    registerAdapter(BookAdapter());
+    registerAdapter(BookFormatAdapter());
+    registerAdapter(LibrarySortAdapter());
+    registerAdapter(ReadingStatusAdapter());
+    registerAdapter(ShelfAdapter());
   }
 }

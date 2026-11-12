@@ -24,6 +24,12 @@ class SettingsNotifier extends Notifier<AppSettings> {
   Future<void> setThemePreference(AppThemePreference value) =>
       _save(state.copyWith(themePreference: value));
 
+  Future<void> setLibraryGridView(bool value) =>
+      _save(state.copyWith(libraryGridView: value));
+
+  Future<void> setLibrarySort(LibrarySort value) =>
+      _save(state.copyWith(librarySort: value));
+
   Future<void> _save(AppSettings value) async {
     state = value;
     await _box.put(HiveKeys.appSettings, value);

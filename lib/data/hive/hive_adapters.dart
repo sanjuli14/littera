@@ -1,6 +1,8 @@
 import 'package:hive_ce/hive_ce.dart';
 
 import '../models/app_settings.dart';
+import '../models/book.dart';
+import '../models/shelf.dart';
 
 part 'hive_adapters.g.dart';
 
@@ -12,6 +14,11 @@ part 'hive_adapters.g.dart';
 @GenerateAdapters([
   AdapterSpec<AppThemePreference>(),
   AdapterSpec<AppSettings>(),
+  AdapterSpec<LibrarySort>(),
+  AdapterSpec<BookFormat>(),
+  AdapterSpec<ReadingStatus>(),
+  AdapterSpec<Book>(),
+  AdapterSpec<Shelf>(),
 ])
 // ignore: unused_element
 void _() {}

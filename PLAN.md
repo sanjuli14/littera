@@ -94,14 +94,18 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Selector de tema persistente en Ajustes; app en español (`flutter_localizations`)
 - [x] Limpiar `main.dart` y tests del ejemplo; tests de navegación, tema y persistencia
 
-### Fase 1 — Biblioteca
-- [ ] Importar EPUB, PDF y DOCX (copiar a almacenamiento interno de la app)
-- [ ] Extraer metadatos automáticamente (título/autor/carátula de EPUB; primera página de PDF como carátula)
-- [ ] **Carátula personalizada**: elegir imagen de galería/archivos, recortar y guardar miniatura
-- [ ] Editar título y autor
-- [ ] Estantes del sistema (Leyendo / Por leer / Terminados) + estantes propios
-- [ ] Vista en cuadrícula y lista, búsqueda y orden (reciente, título, autor)
-- [ ] Eliminar libro (borra archivo, carátula y notas asociadas)
+### Fase 1 — Biblioteca ✅
+- [x] Importar EPUB, PDF y DOCX (varios a la vez); `.doc` rechazado con mensaje para convertir a `.docx`
+- [x] Validación de formato por firma de archivo y detección de duplicados (SHA-1)
+- [x] Metadatos automáticos: título/autor/carátula de EPUB 2 y 3, título/autor de DOCX, primera página de PDF como carátula (`pdfrx`)
+- [x] **Carátula personalizada** desde archivos/galería (recorte automático 2:3, JPEG 600×900); volver a carátula generada
+- [x] Carátula generada con la paleta cuando no hay imagen
+- [x] Editar título y autor
+- [x] Estados (Leyendo / Por leer / Terminados) + estantes propios (crear, renombrar, eliminar con pulsación larga)
+- [x] Cuadrícula y lista, búsqueda sin tildes, orden (añadidos, leídos, título, autor) — preferencias guardadas
+- [x] Eliminar libro (borra archivo y carátula)
+- [x] Almacenamiento: disco en Android, IndexedDB (Hive) en Web; referencias relativas para el backup
+- [ ] Pendiente menor: recorte manual de carátula (hoy es automático al centro)
 
 ### Fase 2 — Lector
 - [ ] Lector EPUB

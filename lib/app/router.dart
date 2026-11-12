@@ -1,16 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/writing/writing_screen.dart';
 import 'home_shell.dart';
-
-abstract final class Routes {
-  static const library = '/biblioteca';
-  static const writing = '/escribir';
-  static const settings = '/ajustes';
-}
+import 'routes.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -24,6 +20,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.library,
                 builder: (context, state) => const LibraryScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'libro/:id',
+                    builder: (context, state) =>
+                        BookDetailScreen(bookId: state.pathParameters['id']!),
+                  ),
+                ],
               ),
             ],
           ),
