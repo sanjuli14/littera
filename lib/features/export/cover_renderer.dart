@@ -36,7 +36,7 @@ Future<Uint8List> renderGeneratedCover(String title, String author) async {
   final titlePainter = painter(
     title.isEmpty ? 'Sin título' : title,
     const TextStyle(
-      fontFamily: 'Inter',
+      fontFamily: 'Lora',
       fontSize: 54,
       height: 1.2,
       fontWeight: FontWeight.w600,
@@ -49,7 +49,7 @@ Future<Uint8List> renderGeneratedCover(String title, String author) async {
       : painter(
           author,
           const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Montserrat',
             fontSize: 30,
             color: LitteraColors.oro,
           ),

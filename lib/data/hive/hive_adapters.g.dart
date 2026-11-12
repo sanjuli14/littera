@@ -78,13 +78,14 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       annualBookGoal: fields[7] == null ? 12 : (fields[7] as num).toInt(),
       dailyReadingMinutes: fields[8] == null ? 20 : (fields[8] as num).toInt(),
       onboardingDone: fields[9] == null ? false : fields[9] as bool,
+      readerSerif: fields[10] == null ? true : fields[10] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.themePreference)
       ..writeByte(1)
@@ -104,7 +105,9 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(8)
       ..write(obj.dailyReadingMinutes)
       ..writeByte(9)
-      ..write(obj.onboardingDone);
+      ..write(obj.onboardingDone)
+      ..writeByte(10)
+      ..write(obj.readerSerif);
   }
 
   @override

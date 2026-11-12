@@ -8,7 +8,13 @@ import '../../../app/routes.dart';
 import '../../../app/theme/littera_colors.dart';
 import '../../../app/theme/littera_theme.dart';
 import '../../../core/storage/file_store.dart';
+import '../../../core/widgets/soft_blobs.dart';
 import '../../../core/widgets/soft_card.dart';
+import '../../../data/repositories/highlights_repository.dart';
+import '../../../data/repositories/library_repository.dart';
+import '../../../data/repositories/settings_repository.dart';
+import '../../../data/repositories/stats_repository.dart';
+import '../daily_quote.dart';
 import '../../../data/models/book.dart';
 import 'book_cover.dart';
 import 'book_tiles.dart';
@@ -131,7 +137,7 @@ class ContinueReadingCard extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'CONTINÚA LEYENDO',
+                              'SIGUE LEYENDO',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: LitteraColors.oro,
                                 letterSpacing: 1.2,
@@ -292,6 +298,235 @@ class BookCarousel extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Cabecera de Inicio: saludo, invitación a leer, racha y meta del día,
+/// sobre manchas suaves de la paleta.
+class GreetingHeader extends ConsumerWidget {
+  const GreetingHeader({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    ref.watch(readingLogProvider);
+    final stats = ref.read(statsRepositoryProvider);
+    final now = DateTime.now();
+    final streak = stats.readingStreak(now);
+    final minutes = stats.readingSecondsOn(now) ~/ 60;
+    final goal = ref.watch(
+      settingsProvider.select((s) => s.dailyReadingMinutes),
+    );
+    final dark = theme.brightness == Brightness.dark;
+
+    return SoftBlobs(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              greeting(now),
+              style: theme.textTheme.headlineMedium?.copyWith(height: 1.1),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              invitation(now),
+              style: TextStyle(
+                fontFamily: LitteraTheme.serif,
+                fontStyle: FontStyle.italic,
+                fontSize: 17,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                _InfoPill(
+                  icon: Icons.local_fire_department_rounded,
+                  iconColor: LitteraColors.oro,
+                  text: streak == 0
+                      ? 'Empieza tu racha hoy'
+                      : streak == 1
+                      ? '1 día leyendo'
+                      : '$streak días seguidos',
+                  dark: dark,
+                ),
+                if (goal > 0)
+                  _InfoPill(
+                    leading: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        value: (minutes / goal).clamp(0, 1),
+                        strokeWidth: 3,
+                        color: LitteraColors.oro,
+                        backgroundColor: theme.colorScheme.outlineVariant,
+                      ),
+                    ),
+                    text: minutes >= goal
+                        ? '¡Meta de hoy cumplida!'
+                        : '$minutes de $goal min hoy',
+                    dark: dark,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  const _InfoPill({
+    required this.text,
+    required this.dark,
+    this.icon,
+    this.iconColor,
+    this.leading,
+  });
+
+  final String text;
+  final bool dark;
+  final IconData? icon;
+  final Color? iconColor;
+  final Widget? leading;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: dark ? LitteraColors.tintaClara : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: dark
+            ? null
+            : [
+                BoxShadow(
+                  color: LitteraColors.tinta.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ?leading,
+          if (icon != null) Icon(icon, size: 18, color: iconColor),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cita del día en serif sobre pergamino, con comillas grandes en oro.
+class QuoteOfTheDayCard extends ConsumerWidget {
+  const QuoteOfTheDayCard({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    final highlights = ref.watch(allHighlightsProvider).value ?? const [];
+    final books = {
+      for (final b in ref.watch(booksProvider).value ?? const <Book>[]) b.id: b,
+    };
+    final quote = quoteOfTheDay(
+      highlights,
+      (id) => books[id]?.title ?? 'Tus citas',
+    );
+    final h = quote.highlight;
+    final canOpen = h != null && books.containsKey(h.bookId);
+    void open() =>
+        context.push(Routes.reader(h!.bookId, target: h.blockIndex ?? h.page));
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Semantics(
+        container: true,
+        label: 'Cita del día: ${quote.text}. ${quote.source}',
+        button: canOpen,
+        onTap: canOpen ? open : null,
+        excludeSemantics: true,
+        child: SoftCard(
+          radius: LitteraTheme.radiusHero,
+          color: dark ? LitteraColors.tintaClara : LitteraColors.pergamino,
+          child: InkWell(
+            onTap: canOpen ? open : null,
+            child: Stack(
+              children: [
+                Positioned(
+                  right: 14,
+                  top: -18,
+                  child: Text(
+                    '”',
+                    style: TextStyle(
+                      fontFamily: LitteraTheme.serif,
+                      fontSize: 120,
+                      height: 1,
+                      color: LitteraColors.oro.withValues(alpha: 0.35),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        h == null ? 'CITA DEL DÍA' : 'DE TUS SUBRAYADOS',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: dark
+                              ? LitteraColors.oro
+                              : LitteraColors.oroOscuro,
+                          letterSpacing: 1.4,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        quote.text,
+                        maxLines: 6,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: LitteraTheme.serif,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 19,
+                          height: 1.45,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '— ${quote.source}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

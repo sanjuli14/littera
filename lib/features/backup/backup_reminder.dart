@@ -47,7 +47,7 @@ class BackupReminder extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: Material(
         color: LitteraColors.oro.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 6, 4, 6),
           child: Row(

@@ -248,10 +248,10 @@ void main() {
         PdfJob(
           book,
           PdfFontData(
-            regular: font('Inter-Regular.ttf'),
-            bold: font('Inter-Bold.ttf'),
-            italic: font('Inter-Italic.ttf'),
-            boldItalic: font('Inter-Bold.ttf'),
+            regular: font('Lora-Regular.ttf'),
+            bold: font('Lora-Bold.ttf'),
+            italic: font('Lora-Italic.ttf'),
+            boldItalic: font('Lora-BoldItalic.ttf'),
           ),
           pngBytes(width: 60, height: 90),
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'soft_blobs.dart';
+
 /// Estado vacío reutilizable: icono, título, texto y acción opcional.
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -26,7 +28,11 @@ class EmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              icon,
+              SizedBox(
+                width: 220,
+                height: 170,
+                child: SoftBlobs(variant: 1, child: Center(child: icon)),
+              ),
               const SizedBox(height: 24),
               Text(
                 title,

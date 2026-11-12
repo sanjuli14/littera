@@ -52,6 +52,7 @@ class AppSettings {
     this.annualBookGoal = 12,
     this.dailyReadingMinutes = 20,
     this.onboardingDone = false,
+    this.readerSerif = true,
   });
 
   final AppThemePreference themePreference;
@@ -71,6 +72,9 @@ class AppSettings {
   /// `true` cuando ya se vio la pantalla de bienvenida.
   final bool onboardingDone;
 
+  /// Letra del lector: serif clásica (Lora) o sans moderna (Montserrat).
+  final bool readerSerif;
+
   AppSettings copyWith({
     AppThemePreference? themePreference,
     bool? libraryGridView,
@@ -82,6 +86,7 @@ class AppSettings {
     int? annualBookGoal,
     int? dailyReadingMinutes,
     bool? onboardingDone,
+    bool? readerSerif,
   }) => AppSettings(
     themePreference: themePreference ?? this.themePreference,
     libraryGridView: libraryGridView ?? this.libraryGridView,
@@ -93,5 +98,6 @@ class AppSettings {
     annualBookGoal: annualBookGoal ?? this.annualBookGoal,
     dailyReadingMinutes: dailyReadingMinutes ?? this.dailyReadingMinutes,
     onboardingDone: onboardingDone ?? this.onboardingDone,
+    readerSerif: readerSerif ?? this.readerSerif,
   );
 }

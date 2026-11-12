@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
 import '../../../app/theme/littera_colors.dart';
+import '../../../app/theme/littera_theme.dart';
 import '../../../data/models/highlight.dart';
 import '../document/reader_document.dart';
 import '../reader_palette.dart';
@@ -13,15 +14,21 @@ class ReaderTextStyle {
     required this.fontSize,
     required this.lineHeight,
     required this.justify,
+    this.serif = true,
   });
 
+  final bool serif;
   final ReaderPalette palette;
   final double fontSize;
   final double lineHeight;
   final bool justify;
 
-  TextStyle get body =>
-      TextStyle(color: palette.text, fontSize: fontSize, height: lineHeight);
+  TextStyle get body => TextStyle(
+    color: palette.text,
+    fontSize: fontSize,
+    height: lineHeight,
+    fontFamily: serif ? LitteraTheme.serif : LitteraTheme.fontFamily,
+  );
 }
 
 /// Acciones sobre el texto de un bloque.

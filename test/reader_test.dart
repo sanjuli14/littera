@@ -92,8 +92,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Libro largo').last);
-    await tester.pumpAndSettle();
+    await openBookFromLibrary(tester, 'b1');
     await tester.tap(find.text('Leer'));
     await tester.pumpAndSettle();
     return env;

@@ -3,7 +3,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:image/image.dart' as img;
@@ -257,3 +258,33 @@ Uint8List buildDocx({String? title = 'Mi novela', String? author = 'Ana'}) =>
     });
 
 final pdfBytes = Uint8List.fromList(utf8.encode('%PDF-1.4\n%fake pdf\n'));
+
+/// Abre la ficha de un libro desde la biblioteca, desplazándose hasta su
+/// tarjeta (la cabecera de Inicio puede dejarla fuera de la pantalla).
+Future<void> openBookFromLibrary(WidgetTester tester, String bookId) async {
+  final tile = find.byWidgetPredicate(
+    (w) =>
+        w.runtimeType.toString() == 'BookGridTile' &&
+        (w as dynamic).book.id == bookId,
+  );
+  await tester.scrollUntilVisible(
+    tile,
+    250,
+    scrollable: find
+        .descendant(
+          of: find.byType(CustomScrollView),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.ensureVisible(tile);
+  await tester.pumpAndSettle();
+  await tester.tap(tile);
+  await tester.pumpAndSettle();
+}
+
+/// Cierra la hoja inferior abierta.
+Future<void> closeBottomSheet(WidgetTester tester) async {
+  Navigator.of(tester.element(find.byType(BottomSheet).last)).pop();
+  await tester.pumpAndSettle();
+}

@@ -145,11 +145,9 @@ void main() {
         );
         await tap(find.textContaining('Continuar'));
         await tap(find.byTooltip('Ajustes de lectura'));
-        await tester.tapAt(const Offset(180, 40)); // cerrar la hoja
-        await tester.pumpAndSettle();
+        await closeBottomSheet(tester);
         await tap(find.byTooltip('Notas'));
-        await tester.tapAt(const Offset(180, 40));
-        await tester.pumpAndSettle();
+        await closeBottomSheet(tester);
         await tap(find.byTooltip('Volver'));
         await back();
 

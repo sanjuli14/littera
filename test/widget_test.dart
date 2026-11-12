@@ -258,10 +258,10 @@ void main() {
         ).copyWith(lastOpenedAt: DateTime(2026, 11, 1), progress: 0.3),
       ],
     );
-    expect(find.text('CONTINÚA LEYENDO'), findsOneWidget);
+    expect(find.text('SIGUE LEYENDO'), findsOneWidget);
     expect(find.text('Seguir leyendo'), findsOneWidget);
     expect(find.text('30 %'), findsOneWidget);
-    expect(find.text('Leyendo ahora'), findsOneWidget);
+    expect(find.text('Sigue donde lo dejaste'), findsOneWidget);
   });
 
   testWidgets(

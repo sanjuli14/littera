@@ -62,6 +62,9 @@ class SettingsNotifier extends Notifier<AppSettings> {
         ),
       );
 
+  Future<void> setReaderSerif(bool value) =>
+      _save(state.copyWith(readerSerif: value));
+
   Future<void> completeOnboarding() =>
       _save(state.copyWith(onboardingDone: true));
 

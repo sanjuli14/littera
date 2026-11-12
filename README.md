@@ -16,7 +16,7 @@ Biblioteca y taller de escritura **100 % local**. Lee EPUB, PDF y DOCX, subraya 
 
 Flutter (Android y Web) · Hive CE para el almacenamiento local · Riverpod · go_router · pdfrx · flutter_quill · pdf.
 
-Paleta: tinta `#1C2540`, pergamino `#F2E8D2`, oro `#C9A45C`. Tipografía: Inter (incluida, funciona sin conexión).
+Paleta: tinta `#1C2540`, pergamino `#F2E8D2`, oro `#C9A45C`. Tipografías: Montserrat (interfaz) y Lora (lectura y citas), incluidas y sin conexión.
 
 ## Desarrollo
 

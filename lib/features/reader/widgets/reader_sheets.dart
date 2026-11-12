@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/littera_colors.dart';
+import '../../../app/theme/littera_theme.dart';
 import '../../../data/models/app_settings.dart';
 import '../../../data/repositories/settings_repository.dart';
 import '../reader_palette.dart';
@@ -110,6 +111,27 @@ class _ReaderSettingsSheet extends ConsumerWidget {
                 inactiveColor: palette.secondary.withValues(alpha: 0.3),
                 label: settings.readerLineHeight.toStringAsFixed(1),
                 onChanged: notifier.setReaderLineHeight,
+              ),
+              const SizedBox(height: 8),
+              Text('Letra', style: label),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text(
+                      'Clásica',
+                      style: TextStyle(fontFamily: LitteraTheme.serif),
+                    ),
+                    selected: settings.readerSerif,
+                    onSelected: (_) => notifier.setReaderSerif(true),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Moderna'),
+                    selected: !settings.readerSerif,
+                    onSelected: (_) => notifier.setReaderSerif(false),
+                  ),
+                ],
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,

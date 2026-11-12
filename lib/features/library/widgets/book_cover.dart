@@ -56,7 +56,11 @@ class CoverImage extends ConsumerWidget {
       label: label,
       compact: compact,
     );
-    final radius = BorderRadius.circular(compact ? 4 : 8);
+    // Como un libro: esquinas pequeñas del lado del lomo, grandes del otro.
+    final radius = BorderRadius.horizontal(
+      left: Radius.circular(compact ? 2 : 4),
+      right: Radius.circular(compact ? 6 : 12),
+    );
     final dark = Theme.of(context).brightness == Brightness.dark;
 
     return AspectRatio(
@@ -75,42 +79,71 @@ class CoverImage extends ConsumerWidget {
             borderRadius: radius,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: compact ? 3 : 8,
-                offset: Offset(0, compact ? 1 : 3),
+                color: LitteraColors.tinta.withValues(alpha: 0.22),
+                blurRadius: compact ? 4 : 16,
+                offset: Offset(compact ? 1 : 3, compact ? 2 : 8),
               ),
             ],
           ),
           child: ClipRRect(
             borderRadius: radius,
-            child: provider == null
-                ? generated
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      // Se decodifica al tamaño en pantalla, no a 600×900:
-                      // con muchos libros ahorra mucha memoria.
-                      final dpr = MediaQuery.devicePixelRatioOf(context);
-                      final width = constraints.maxWidth.isFinite
-                          ? (constraints.maxWidth * dpr).ceil()
-                          : null;
-                      return Image(
-                        image: ResizeImage.resizeIfNeeded(
-                          width,
-                          null,
-                          provider,
-                        ),
-                        fit: BoxFit.cover,
-                        gaplessPlayback: true,
-                        semanticLabel: semanticLabel,
-                        errorBuilder: (_, _, _) => generated,
-                      );
-                    },
-                  ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                (provider == null
+                    ? generated
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Se decodifica al tamaño en pantalla, no a 600×900:
+                          // con muchos libros ahorra mucha memoria.
+                          final dpr = MediaQuery.devicePixelRatioOf(context);
+                          final width = constraints.maxWidth.isFinite
+                              ? (constraints.maxWidth * dpr).ceil()
+                              : null;
+                          return Image(
+                            image: ResizeImage.resizeIfNeeded(
+                              width,
+                              null,
+                              provider,
+                            ),
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
+                            semanticLabel: semanticLabel,
+                            errorBuilder: (_, _, _) => generated,
+                          );
+                        },
+                      )),
+                const _BookSpine(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Sombra del lomo y brillo: hacen que la carátula parezca un libro.
+class _BookSpine extends StatelessWidget {
+  const _BookSpine();
+
+  @override
+  Widget build(BuildContext context) => const IgnorePointer(
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0x55000000),
+            Color(0x22FFFFFF),
+            Color(0x00000000),
+            Color(0x00000000),
+            Color(0x14000000),
+          ],
+          stops: [0, 0.035, 0.09, 0.93, 1],
+        ),
+      ),
+    ),
+  );
 }
 
 /// Carátula dibujada con la paleta de Littera: tinta, marco oro y título.

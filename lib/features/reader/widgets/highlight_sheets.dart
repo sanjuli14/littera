@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/littera_colors.dart';
+import '../../../app/theme/littera_theme.dart';
 import '../../../core/utils/text_utils.dart';
 import '../../../data/models/highlight.dart';
 import '../reader_palette.dart';
@@ -355,8 +356,10 @@ class HighlightTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: textColor,
+                        fontFamily: LitteraTheme.serif,
                         fontStyle: FontStyle.italic,
-                        height: 1.4,
+                        fontSize: 16,
+                        height: 1.45,
                       ),
                     ),
                   if (h.hasNote)

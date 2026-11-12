@@ -270,6 +270,7 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
       fontSize: settings.readerFontSize,
       lineHeight: settings.readerLineHeight,
       justify: settings.readerJustify,
+      serif: settings.readerSerif,
     );
 
     final shownIndex = _seekPreview != null

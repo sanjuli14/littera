@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../app/theme/littera_colors.dart';
+import '../../app/theme/littera_theme.dart';
 import '../../core/widgets/littera_logo.dart';
+import '../../core/widgets/soft_blobs.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../library/library_actions.dart';
 
@@ -49,7 +51,11 @@ class WelcomeScreen extends ConsumerWidget {
                         'Lee, subraya y escribe tus propias historias. '
                         'Todo se queda en este dispositivo.',
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyLarge?.copyWith(
+                        style: TextStyle(
+                          fontFamily: LitteraTheme.serif,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 18,
+                          height: 1.45,
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -110,42 +116,45 @@ class _LogoComposition extends StatelessWidget {
 
     return ExcludeSemantics(
       child: SizedBox(
-        width: 260,
-        height: 240,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 210,
-              height: 210,
-              decoration: BoxDecoration(
-                color: dark
-                    ? LitteraColors.tintaClara
-                    : LitteraColors.pergamino,
-                shape: BoxShape.circle,
+        width: 300,
+        height: 260,
+        child: SoftBlobs(
+          variant: 1,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 210,
+                height: 210,
+                decoration: BoxDecoration(
+                  color: dark
+                      ? LitteraColors.tintaClara
+                      : LitteraColors.pergamino,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            Positioned(
-              bottom: 22,
-              left: 18,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  spine(70, LitteraColors.oro),
-                  spine(92, LitteraColors.tintaMedia),
-                  spine(58, LitteraColors.pergaminoOscuro),
-                ],
+              Positioned(
+                bottom: 22,
+                left: 18,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    spine(70, LitteraColors.oro),
+                    spine(92, LitteraColors.tintaMedia),
+                    spine(58, LitteraColors.pergaminoOscuro),
+                  ],
+                ),
               ),
-            ),
-            const LitteraLogo(size: 120),
-            Positioned(top: 18, right: 40, child: dot(14, LitteraColors.oro)),
-            Positioned(top: 52, left: 26, child: dot(9, LitteraColors.tinta)),
-            Positioned(
-              bottom: 40,
-              right: 26,
-              child: dot(18, LitteraColors.oro.withValues(alpha: 0.6)),
-            ),
-          ],
+              const LitteraLogo(size: 120),
+              Positioned(top: 18, right: 40, child: dot(14, LitteraColors.oro)),
+              Positioned(top: 52, left: 26, child: dot(9, LitteraColors.tinta)),
+              Positioned(
+                bottom: 40,
+                right: 26,
+                child: dot(18, LitteraColors.oro.withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
         ),
       ),
     );

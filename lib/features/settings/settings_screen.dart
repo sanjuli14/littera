@@ -80,8 +80,7 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icon(Icons.info_outline),
                     applicationName: AppInfo.name,
                     applicationVersion: AppInfo.appVersion,
-                    applicationLegalese:
-                        'Tipografía Inter — SIL Open Font License 1.1',
+                    applicationLegalese: 'Tipografías Montserrat y Lora — SIL Open Font License 1.1',
                   ),
                 ],
               ),

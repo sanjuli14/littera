@@ -17,7 +17,7 @@ types:
         index: 3
   AppSettings:
     typeId: 1
-    nextIndex: 10
+    nextIndex: 11
     fields:
       themePreference:
         index: 0
@@ -39,6 +39,8 @@ types:
         index: 8
       onboardingDone:
         index: 9
+      readerSerif:
+        index: 10
   LibrarySort:
     typeId: 2
     nextIndex: 4

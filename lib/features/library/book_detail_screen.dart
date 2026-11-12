@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../app/theme/littera_colors.dart';
+import '../../app/theme/littera_theme.dart';
 import '../../core/utils/text_utils.dart';
 import '../../core/widgets/dialogs.dart';
+import '../../core/widgets/soft_blobs.dart';
 import '../../core/widgets/star_rating.dart';
 import '../../data/models/book.dart';
 import '../../data/repositories/library_repository.dart';
@@ -79,35 +81,38 @@ class BookDetailScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
-          Center(
-            child: GestureDetector(
-              onTap: () => pickCustomCover(context, ref, book),
-              child: SizedBox(
-                width: 180,
-                child: Stack(
-                  children: [
-                    Hero(
-                      tag: 'cover-${book.id}',
-                      child: BookCover(book: book),
-                    ),
-                    Positioned(
-                      right: 8,
-                      bottom: 8,
-                      child: Material(
-                        color: LitteraColors.tinta.withValues(alpha: 0.85),
-                        shape: const CircleBorder(),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.photo_camera_outlined,
-                            size: 18,
-                            color: LitteraColors.pergamino,
-                            semanticLabel: 'Cambiar carátula',
+          SoftBlobs(
+            variant: 1,
+            child: Center(
+              child: GestureDetector(
+                onTap: () => pickCustomCover(context, ref, book),
+                child: SizedBox(
+                  width: 180,
+                  child: Stack(
+                    children: [
+                      Hero(
+                        tag: 'cover-${book.id}',
+                        child: BookCover(book: book),
+                      ),
+                      Positioned(
+                        right: 8,
+                        bottom: 8,
+                        child: Material(
+                          color: LitteraColors.tinta.withValues(alpha: 0.85),
+                          shape: const CircleBorder(),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.photo_camera_outlined,
+                              size: 18,
+                              color: LitteraColors.pergamino,
+                              semanticLabel: 'Cambiar carátula',
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -117,7 +122,9 @@ class BookDetailScreen extends ConsumerWidget {
             book.title,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
+              fontFamily: LitteraTheme.serif,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
             ),
           ),
           const SizedBox(height: 4),

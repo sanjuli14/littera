@@ -9,11 +9,15 @@ import 'littera_colors.dart';
 /// Tinta = lo activo (botones, pestaña e icono seleccionados);
 /// oro = progreso, estrellas y detalles.
 abstract final class LitteraTheme {
-  static const fontFamily = 'Inter';
+  /// Interfaz (la de la referencia: geométrica y redonda).
+  static const fontFamily = 'Montserrat';
+
+  /// Lectura, citas y momentos literarios.
+  static const serif = 'Lora';
 
   /// Radios del diseño.
-  static const radiusCard = 16.0;
-  static const radiusHero = 24.0;
+  static const radiusCard = 22.0;
+  static const radiusHero = 28.0;
 
   static ThemeData get light => _build(_lightScheme);
   static ThemeData get sepia => _build(_sepiaScheme);
@@ -197,11 +201,14 @@ abstract final class LitteraTheme {
         shape: stadium,
         side: BorderSide.none,
         showCheckmark: false,
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         color: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
               ? scheme.primary
-              : scheme.surfaceContainerLow,
+              // Pestañas sin elegir en tono cálido (pergamino), no gris.
+              : isDark
+              ? scheme.surfaceContainer
+              : LitteraColors.pergamino.withValues(alpha: 0.6),
         ),
         // Flutter solo resuelve por estado el color del texto del chip (no
         // el estilo entero): fuente fija y color según si está elegido.

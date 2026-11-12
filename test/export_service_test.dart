@@ -22,10 +22,10 @@ Future<PdfFontData> fontsFromDisk() async {
   ByteData font(String name) =>
       ByteData.sublistView(File('assets/fonts/$name').readAsBytesSync());
   return PdfFontData(
-    regular: font('Inter-Regular.ttf'),
-    bold: font('Inter-Bold.ttf'),
-    italic: font('Inter-Italic.ttf'),
-    boldItalic: font('Inter-Bold.ttf'),
+    regular: font('Lora-Regular.ttf'),
+    bold: font('Lora-Bold.ttf'),
+    italic: font('Lora-Italic.ttf'),
+    boldItalic: font('Lora-BoldItalic.ttf'),
   );
 }
 

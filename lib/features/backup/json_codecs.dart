@@ -112,6 +112,7 @@ Map<String, Object?> settingsToJson(AppSettings s) => {
   'annualBookGoal': s.annualBookGoal,
   'dailyReadingMinutes': s.dailyReadingMinutes,
   'onboardingDone': s.onboardingDone,
+  'readerSerif': s.readerSerif,
 };
 
 AppSettings settingsFromJson(Map<String, Object?> j) {
@@ -142,6 +143,7 @@ AppSettings settingsFromJson(Map<String, Object?> j) {
         d.dailyReadingMinutes,
     // Si se restaura una copia, ya no hace falta la bienvenida.
     onboardingDone: true,
+    readerSerif: (j['readerSerif'] as bool?) ?? d.readerSerif,
   );
 }
 

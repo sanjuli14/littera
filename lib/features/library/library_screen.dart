@@ -28,13 +28,6 @@ class LibraryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: _LibraryAppBar(showTools: hasBooks),
-      floatingActionButton: hasBooks
-          ? FloatingActionButton.extended(
-              onPressed: () => importBooks(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text('Importar'),
-            )
-          : null,
       body: allBooks.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error al cargar: $e')),
@@ -75,18 +68,23 @@ class _LibraryAppBar extends ConsumerWidget implements PreferredSizeWidget {
         children: [
           LitteraLogo(size: 34),
           SizedBox(width: 12),
-          Flexible(child: Text('Biblioteca', overflow: TextOverflow.ellipsis)),
+          Flexible(child: Text('Littera', overflow: TextOverflow.ellipsis)),
         ],
       ),
       actions: showTools
           ? [
+              IconButton.filledTonal(
+                icon: const Icon(Icons.add_rounded),
+                tooltip: 'Importar libros',
+                onPressed: () => importBooks(context, ref),
+              ),
               IconButton(
-                icon: const Icon(Icons.insights_outlined),
+                icon: const Icon(Icons.insights_rounded),
                 tooltip: 'Estadísticas',
                 onPressed: () => context.push(Routes.stats),
               ),
               PopupMenuButton<LibrarySort>(
-                icon: const Icon(Icons.sort),
+                icon: const Icon(Icons.sort_rounded),
                 tooltip: 'Ordenar',
                 initialValue: settings.librarySort,
                 onSelected: notifier.setLibrarySort,
@@ -102,8 +100,8 @@ class _LibraryAppBar extends ConsumerWidget implements PreferredSizeWidget {
               IconButton(
                 icon: Icon(
                   settings.libraryGridView
-                      ? Icons.view_list_outlined
-                      : Icons.grid_view_outlined,
+                      ? Icons.view_agenda_rounded
+                      : Icons.grid_view_rounded,
                 ),
                 tooltip: settings.libraryGridView
                     ? 'Ver como lista'
@@ -182,9 +180,9 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
               borderSide: BorderSide(color: theme.colorScheme.primary),
             ),
             suffixIcon: query.isEmpty
-                ? const Icon(Icons.search)
+                ? const Icon(Icons.search_rounded)
                 : IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close_rounded),
                     tooltip: 'Borrar búsqueda',
                     onPressed: () {
                       _controller.clear();
@@ -248,16 +246,18 @@ class _LibraryHomeState extends ConsumerState<_LibraryHome> {
 
     return CustomScrollView(
       slivers: [
+        if (showHome) const SliverToBoxAdapter(child: GreetingHeader()),
         const SliverToBoxAdapter(child: _SearchField()),
         const SliverToBoxAdapter(child: BackupReminder()),
         const SliverToBoxAdapter(child: ShelfFilterBar()),
         if (showHome) ...[
           if (hero != null)
             SliverToBoxAdapter(child: ContinueReadingCard(book: hero)),
+          const SliverToBoxAdapter(child: QuoteOfTheDayCard()),
           if (reading.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: SectionHeader(
-                title: 'Leyendo ahora',
+                title: 'Sigue donde lo dejaste',
                 onSeeAll: () => filterNotifier.select(
                   const ByStatus(ReadingStatus.reading),
                 ),
@@ -268,7 +268,7 @@ class _LibraryHomeState extends ConsumerState<_LibraryHome> {
           if (books.length > 3) ...[
             SliverToBoxAdapter(
               child: SectionHeader(
-                title: 'Añadidos recientemente',
+                title: 'Recién llegados',
                 onSeeAll: _scrollToAll,
               ),
             ),
@@ -279,7 +279,7 @@ class _LibraryHomeState extends ConsumerState<_LibraryHome> {
           if (ownWorks.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: SectionHeader(
-                title: 'Mis obras',
+                title: 'Tus obras',
                 onSeeAll: () => filterNotifier.select(const OwnWorks()),
               ),
             ),

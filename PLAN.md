@@ -189,6 +189,17 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Ficha, Estadísticas, Escribir, Ajustes y Copia de seguridad con tarjetas suaves y píldoras
 - [x] Corrige: las etiquetas de los chips perdían la fuente Inter
 
+### Rediseño 2: cálido, "esponjoso" y literario ✅
+- [x] Tipografías: **Montserrat** (la de la referencia) en la interfaz y **Lora** (serif) para leer, citas y títulos de libro; el PDF exportado usa Lora
+- [x] Saludo según la hora con una frase en Lora que cambia cada día, racha 🔥 y anillo de la meta diaria
+- [x] **Cita del día**: de tus subrayados (abre el libro en ella) o de clásicos en español de dominio público
+- [x] Carátulas con lomo (esquinas asimétricas, sombra del lomo y brillo) y sombra cálida
+- [x] Barra inferior flotante en píldora con burbuja pergamino en el icono activo
+- [x] Manchas orgánicas suaves de la paleta en Inicio, ficha, bienvenida y estados vacíos
+- [x] Pestañas sin elegir en tono pergamino; esquinas 22/28; iconos redondeados; secciones con títulos cálidos ("Sigue donde lo dejaste", "Recién llegados", "Tus obras")
+- [x] Lector: letra "Clásica" (Lora, por defecto) o "Moderna" (Montserrat)
+- [x] Importar pasa a un botón "+" en la barra superior (sin botón flotante que tape los carruseles)
+
 ### Más adelante (fuera del alcance local)
 - Asistente de IA opcional (títulos, ortografía, resúmenes) — requeriría conexión y consentimiento explícito
 - Social ligero (publicar, comentar, seguir autores) — requiere servidor

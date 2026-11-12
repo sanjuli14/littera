@@ -53,12 +53,12 @@ typedef CoverRenderer = Future<Uint8List?> Function(
   String author,
 );
 
-/// Fuentes Inter incluidas en la app (no hay Bold Italic: se usa Bold).
+/// Lora para el PDF: serif clásica, como un libro impreso.
 Future<PdfFontData> loadBundledFonts() async => PdfFontData(
-  regular: await rootBundle.load('assets/fonts/Inter-Regular.ttf'),
-  bold: await rootBundle.load('assets/fonts/Inter-Bold.ttf'),
-  italic: await rootBundle.load('assets/fonts/Inter-Italic.ttf'),
-  boldItalic: await rootBundle.load('assets/fonts/Inter-Bold.ttf'),
+  regular: await rootBundle.load('assets/fonts/Lora-Regular.ttf'),
+  bold: await rootBundle.load('assets/fonts/Lora-Bold.ttf'),
+  italic: await rootBundle.load('assets/fonts/Lora-Italic.ttf'),
+  boldItalic: await rootBundle.load('assets/fonts/Lora-BoldItalic.ttf'),
 );
 
 class ExportService {
