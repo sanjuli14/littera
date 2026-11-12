@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/soft_card.dart';
+
 import '../../app/theme/littera_colors.dart';
 import '../../core/utils/text_utils.dart';
 import '../../core/widgets/dialogs.dart';
@@ -28,7 +30,7 @@ class BackupScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          Card(
+          SoftCard(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(

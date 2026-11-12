@@ -40,6 +40,7 @@ Map<String, Object?> bookToJson(Book b) => {
   'sourceManuscriptId': b.sourceManuscriptId,
   'finishedAt': b.finishedAt?.toIso8601String(),
   'sourceVersion': b.sourceVersion?.toIso8601String(),
+  'rating': b.rating,
 };
 
 Book bookFromJson(Map<String, Object?> j) {
@@ -75,6 +76,7 @@ Book bookFromJson(Map<String, Object?> j) {
     sourceManuscriptId: j['sourceManuscriptId'] as String?,
     finishedAt: _date(j['finishedAt']),
     sourceVersion: _date(j['sourceVersion']),
+    rating: ((j['rating'] as num?)?.toInt() ?? 0).clamp(0, 5),
   );
 }
 
@@ -109,6 +111,7 @@ Map<String, Object?> settingsToJson(AppSettings s) => {
   'readerJustify': s.readerJustify,
   'annualBookGoal': s.annualBookGoal,
   'dailyReadingMinutes': s.dailyReadingMinutes,
+  'onboardingDone': s.onboardingDone,
 };
 
 AppSettings settingsFromJson(Map<String, Object?> j) {
@@ -137,6 +140,8 @@ AppSettings settingsFromJson(Map<String, Object?> j) {
     dailyReadingMinutes:
         (j['dailyReadingMinutes'] as num?)?.toInt().clamp(0, 1440) ??
         d.dailyReadingMinutes,
+    // Si se restaura una copia, ya no hace falta la bienvenida.
+    onboardingDone: true,
   );
 }
 

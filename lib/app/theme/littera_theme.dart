@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'littera_colors.dart';
 
-/// Temas de Littera: claro, sepia y oscuro.
+/// Temas de Littera: claro (blanco), sepia y oscuro.
+///
+/// Lenguaje visual: fondos limpios, tarjetas con sombra suave y esquinas
+/// grandes, botones y pestañas en forma de píldora, títulos en negrita.
+/// Tinta = lo activo (botones, pestaña e icono seleccionados);
+/// oro = progreso, estrellas y detalles.
 abstract final class LitteraTheme {
   static const fontFamily = 'Inter';
+
+  /// Radios del diseño.
+  static const radiusCard = 16.0;
+  static const radiusHero = 24.0;
 
   static ThemeData get light => _build(_lightScheme);
   static ThemeData get sepia => _build(_sepiaScheme);
@@ -13,27 +22,28 @@ abstract final class LitteraTheme {
   static const _lightScheme = ColorScheme(
     brightness: Brightness.light,
     primary: LitteraColors.tinta,
-    onPrimary: LitteraColors.pergamino,
-    primaryContainer: LitteraColors.pergaminoMedio,
+    onPrimary: Colors.white,
+    primaryContainer: Color(0xFFE8EAF2),
     onPrimaryContainer: LitteraColors.tinta,
     secondary: LitteraColors.oroOscuro,
     onSecondary: Colors.white,
-    secondaryContainer: Color(0xFFEBD9AF),
+    secondaryContainer: Color(0xFFF5ECD8),
     onSecondaryContainer: LitteraColors.tinta,
     tertiary: LitteraColors.oro,
     onTertiary: LitteraColors.tinta,
     error: LitteraColors.error,
     onError: Colors.white,
-    surface: LitteraColors.pergaminoClaro,
+    surface: Colors.white,
     onSurface: LitteraColors.tinta,
-    onSurfaceVariant: Color(0xFF4A5170),
+    onSurfaceVariant: Color(0xFF6B7084),
     surfaceContainerLowest: Colors.white,
-    surfaceContainerLow: Color(0xFFF8F3E7),
-    surfaceContainer: Color(0xFFF5EEDD),
-    surfaceContainerHigh: LitteraColors.pergamino,
-    surfaceContainerHighest: LitteraColors.pergaminoMedio,
-    outline: Color(0xFF8C8FA3),
-    outlineVariant: LitteraColors.pergaminoOscuro,
+    surfaceContainerLow: Color(0xFFF6F6F9),
+    surfaceContainer: Color(0xFFF2F2F6),
+    surfaceContainerHigh: Color(0xFFECECF1),
+    surfaceContainerHighest: Color(0xFFE6E6EC),
+    outline: Color(0xFF9A9DAE),
+    outlineVariant: Color(0xFFE6E6EC),
+    shadow: Colors.black,
   );
 
   static const _sepiaScheme = ColorScheme(
@@ -52,14 +62,15 @@ abstract final class LitteraTheme {
     onError: Colors.white,
     surface: LitteraColors.pergamino,
     onSurface: LitteraColors.tinta,
-    onSurfaceVariant: Color(0xFF4A5170),
+    onSurfaceVariant: Color(0xFF5A5A62),
     surfaceContainerLowest: LitteraColors.pergaminoClaro,
     surfaceContainerLow: Color(0xFFEEE3CB),
     surfaceContainer: LitteraColors.pergaminoMedio,
     surfaceContainerHigh: Color(0xFFE4D8BA),
     surfaceContainerHighest: LitteraColors.pergaminoOscuro,
     outline: Color(0xFF8C8670),
-    outlineVariant: Color(0xFFD2C29C),
+    outlineVariant: Color(0xFFD9CBA8),
+    shadow: Color(0xFF5A4A28),
   );
 
   static const _darkScheme = ColorScheme(
@@ -68,7 +79,7 @@ abstract final class LitteraTheme {
     onPrimary: LitteraColors.tinta,
     primaryContainer: Color(0xFF4A3D20),
     onPrimaryContainer: LitteraColors.pergamino,
-    secondary: LitteraColors.pergamino,
+    secondary: LitteraColors.oro,
     onSecondary: LitteraColors.tinta,
     secondaryContainer: Color(0xFF4A3F27),
     onSecondaryContainer: LitteraColors.pergamino,
@@ -78,73 +89,189 @@ abstract final class LitteraTheme {
     onError: Color(0xFF601410),
     surface: LitteraColors.tinta,
     onSurface: LitteraColors.pergamino,
-    onSurfaceVariant: Color(0xFFC5C0B0),
+    onSurfaceVariant: Color(0xFFB9B4A4),
     surfaceContainerLowest: Color(0xFF151C31),
-    surfaceContainerLow: Color(0xFF202A48),
+    surfaceContainerLow: Color(0xFF222C4B),
     surfaceContainer: LitteraColors.tintaClara,
     surfaceContainerHigh: LitteraColors.tintaMedia,
     surfaceContainerHighest: LitteraColors.tintaAlta,
     outline: Color(0xFF8A8FA6),
-    outlineVariant: Color(0xFF3B4870),
+    outlineVariant: Color(0xFF34406A),
+    shadow: Colors.black,
   );
 
   static ThemeData _build(ColorScheme scheme) {
+    final isDark = scheme.brightness == Brightness.dark;
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       fontFamily: fontFamily,
       scaffoldBackgroundColor: scheme.surface,
     );
+    final text = base.textTheme;
+    final cardColor = isDark ? LitteraColors.tintaClara : Colors.white;
+    const stadium = StadiumBorder();
 
     return base.copyWith(
+      textTheme: text.copyWith(
+        headlineMedium: text.headlineMedium?.copyWith(
+          fontWeight: FontWeight.w800,
+        ),
+        headlineSmall: text.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        titleLarge: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        titleMedium: text.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         centerTitle: false,
         // Tamaños explícitos: en este punto base.textTheme aún no los trae.
         titleTextStyle: TextStyle(
           fontFamily: fontFamily,
           fontSize: 22,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: scheme.onSurface,
         ),
       ),
+      // Barra inferior de solo iconos (los nombres quedan para la
+      // accesibilidad), con el activo en color.
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: scheme.surfaceContainer,
-        indicatorColor: LitteraColors.oro.withValues(alpha: 0.35),
+        backgroundColor: cardColor,
         surfaceTintColor: Colors.transparent,
-        labelTextStyle: const WidgetStatePropertyAll(
-          TextStyle(
-            fontFamily: fontFamily,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+        elevation: 0,
+        height: 64,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        indicatorColor: Colors.transparent,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            size: 26,
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.outline,
           ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: LitteraColors.oro,
-          foregroundColor: LitteraColors.tinta,
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          shape: stadium,
+          textStyle: const TextStyle(
+            fontFamily: fontFamily,
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          shape: stadium,
+          side: BorderSide(color: scheme.outlineVariant, width: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: isDark ? LitteraColors.oro : LitteraColors.tinta,
+          shape: stadium,
           textStyle: const TextStyle(
             fontFamily: fontFamily,
             fontWeight: FontWeight.w600,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
         ),
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: LitteraColors.oro,
-        foregroundColor: LitteraColors.tinta,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        shape: stadium,
+        elevation: 3,
+      ),
+      // Pestañas píldora: la elegida rellena en tinta, el resto solo texto.
+      chipTheme: ChipThemeData(
+        shape: stadium,
+        side: BorderSide.none,
+        showCheckmark: false,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        color: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? scheme.primary
+              : scheme.surfaceContainerLow,
+        ),
+        // Flutter solo resuelve por estado el color del texto del chip (no
+        // el estilo entero): fuente fija y color según si está elegido.
+        labelStyle: TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          color: WidgetStateColor.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? scheme.onPrimary
+                : scheme.onSurfaceVariant,
+          ),
+        ),
+        iconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 18),
       ),
       cardTheme: CardThemeData(
-        color: scheme.surfaceContainerLow,
+        color: cardColor,
         surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: isDark ? 0 : 3,
+        shadowColor: scheme.shadow.withValues(alpha: 0.10),
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusCard),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scheme.surfaceContainerLow,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: scheme.primary, width: 1.5),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: cardColor,
+        surfaceTintColor: Colors.transparent,
+        showDragHandle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(radiusHero)),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: cardColor,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusHero),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isDark ? LitteraColors.pergamino : LitteraColors.tinta,
+        contentTextStyle: TextStyle(
+          fontFamily: fontFamily,
+          color: isDark ? LitteraColors.tinta : Colors.white,
+        ),
+        actionTextColor: LitteraColors.oro,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: cardColor,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: LitteraColors.oro,

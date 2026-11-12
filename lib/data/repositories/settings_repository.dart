@@ -62,6 +62,9 @@ class SettingsNotifier extends Notifier<AppSettings> {
         ),
       );
 
+  Future<void> completeOnboarding() =>
+      _save(state.copyWith(onboardingDone: true));
+
   Future<void> _save(AppSettings value) async {
     state = value;
     await _box.put(HiveKeys.appSettings, value);

@@ -7,6 +7,7 @@ abstract final class Routes {
   static String book(String id) => '$library/libro/$id';
   static const quotes = '/citas';
   static const stats = '/estadisticas';
+  static const welcome = '/bienvenida';
 
   static String manuscript(String id) => '$writing/obra/$id';
   static String chapterEditor(String chapterId) => '/editor/$chapterId';

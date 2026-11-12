@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/widgets/soft_card.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
@@ -80,8 +83,7 @@ class _ManuscriptCard extends ConsumerWidget {
     final words = chapters.fold<int>(0, (sum, c) => sum + c.wordCount);
     final today = ref.watch(wordsTodayProvider(manuscript.id));
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
+    return SoftCard(
       child: InkWell(
         onTap: () => context.push(Routes.manuscript(manuscript.id)),
         child: Padding(

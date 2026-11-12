@@ -179,6 +179,16 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [ ] Limitación conocida: en **Web con lector de pantalla** no se consigue escribir en el editor (flutter_quill no conecta con el campo accesible del navegador); con ratón/teclado en Web y en el móvil funciona
 - [ ] Pendiente: probar en un Android real (no se compiló el APK en estas fases)
 
+### Rediseño visual (a partir de la captura de referencia) ✅
+- [x] Tema: fondo blanco, tarjetas con sombra difusa y radios grandes (16/24), botones y pestañas píldora, títulos en negrita; tinta para lo activo y oro para progreso y estrellas (oscuro: oro activo)
+- [x] Barra inferior de solo iconos con sombra suave (los nombres quedan como tooltip y etiqueta accesible)
+- [x] Bienvenida la primera vez con el logo: "Empieza tu viaje con los libros", "Importar mi primer libro" / "Más tarde"
+- [x] Biblioteca como Inicio: buscador píldora con sombra, pestañas píldora, tarjeta "Continúa leyendo" con la carátula difuminada, carruseles "Leyendo ahora", "Añadidos recientemente" y "Mis obras" con "Ver todo", y la colección completa
+- [x] Lista estilo "recientes": carátula con sombra, título en negrita, autor, estrellas y progreso con %
+- [x] Valoración personal de 1 a 5 estrellas (ficha editable, listas, accesible, en la copia de seguridad)
+- [x] Ficha, Estadísticas, Escribir, Ajustes y Copia de seguridad con tarjetas suaves y píldoras
+- [x] Corrige: las etiquetas de los chips perdían la fuente Inter
+
 ### Más adelante (fuera del alcance local)
 - Asistente de IA opcional (títulos, ortografía, resúmenes) — requeriría conexión y consentimiento explícito
 - Social ligero (publicar, comentar, seguir autores) — requiere servidor

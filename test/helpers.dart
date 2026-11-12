@@ -71,6 +71,13 @@ class FakePdfCoverRenderer implements PdfCoverRenderer {
   }
 }
 
+/// Ajustes de un usuario que ya vio la bienvenida.
+Future<Box<AppSettings>> _settingsBox() async {
+  final box = await memoryBox<AppSettings>();
+  await box.put(HiveKeys.appSettings, const AppSettings(onboardingDone: true));
+  return box;
+}
+
 /// Todo lo necesario para montar la app en un test.
 class TestEnv {
   TestEnv._(
@@ -102,7 +109,7 @@ class TestEnv {
   final Box<dynamic> readingLog;
 
   static Future<TestEnv> create() async => TestEnv._(
-    await memoryBox<AppSettings>(),
+    await _settingsBox(),
     await memoryBox<Book>(),
     await memoryBox<Shelf>(),
     MemoryFileStore(),

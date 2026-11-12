@@ -77,13 +77,14 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       readerJustify: fields[6] == null ? true : fields[6] as bool,
       annualBookGoal: fields[7] == null ? 12 : (fields[7] as num).toInt(),
       dailyReadingMinutes: fields[8] == null ? 20 : (fields[8] as num).toInt(),
+      onboardingDone: fields[9] == null ? false : fields[9] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.themePreference)
       ..writeByte(1)
@@ -101,7 +102,9 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(7)
       ..write(obj.annualBookGoal)
       ..writeByte(8)
-      ..write(obj.dailyReadingMinutes);
+      ..write(obj.dailyReadingMinutes)
+      ..writeByte(9)
+      ..write(obj.onboardingDone);
   }
 
   @override
@@ -277,13 +280,14 @@ class BookAdapter extends TypeAdapter<Book> {
       sourceManuscriptId: fields[17] as String?,
       finishedAt: fields[18] as DateTime?,
       sourceVersion: fields[19] as DateTime?,
+      rating: fields[20] == null ? 0 : (fields[20] as num).toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Book obj) {
     writer
-      ..writeByte(20)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -323,7 +327,9 @@ class BookAdapter extends TypeAdapter<Book> {
       ..writeByte(18)
       ..write(obj.finishedAt)
       ..writeByte(19)
-      ..write(obj.sourceVersion);
+      ..write(obj.sourceVersion)
+      ..writeByte(20)
+      ..write(obj.rating);
   }
 
   @override

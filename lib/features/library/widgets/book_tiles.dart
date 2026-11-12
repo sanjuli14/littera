@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/littera_colors.dart';
+import '../../../core/widgets/star_rating.dart';
 import '../../../data/models/book.dart';
 import 'book_cover.dart';
 
@@ -54,7 +55,7 @@ class BookGridTile extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   height: 1.25,
                 ),
               ),
@@ -87,12 +88,15 @@ String bookSemanticsLabel(Book book) {
     book.status.label,
     if (book.status == ReadingStatus.reading && book.progress > 0)
       '${(book.progress * 100).round()} % leído',
+    if (book.rating > 0)
+      '${book.rating} ${book.rating == 1 ? 'estrella' : 'estrellas'}',
     if (book.isOwnWork) 'obra propia',
   ];
   return parts.join(', ');
 }
 
-/// Libro en la vista de lista.
+/// Libro en la vista de lista (estilo "recientes"): carátula con sombra,
+/// título en negrita, autor, estrellas y progreso con porcentaje.
 class BookListTile extends StatelessWidget {
   const BookListTile({super.key, required this.book, required this.onTap});
 
@@ -102,6 +106,8 @@ class BookListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final showProgress =
+        book.status == ReadingStatus.reading || book.progress > 0;
     return Semantics(
       button: true,
       label: bookSemanticsLabel(book),
@@ -110,59 +116,86 @@ class BookListTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 52,
+                width: 72,
                 child: Hero(
                   tag: 'cover-${book.id}',
-                  child: BookCover(book: book, compact: true),
+                  child: BookCover(book: book),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 18),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      book.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (book.author.isNotEmpty)
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        book.author,
-                        maxLines: 1,
+                        book.title,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
                         ),
                       ),
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        FormatBadge(format: book.format),
-                        Text(
-                          book.status.label,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                      if (book.author.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            book.author,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ),
-                        if (book.status == ReadingStatus.reading)
-                          SizedBox(
-                            width: 96,
-                            child: ReadingProgressBar(progress: book.progress),
-                          ),
-                      ],
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      if (book.rating > 0)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: StarRating(rating: book.rating),
+                        ),
+                      if (showProgress)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ReadingProgressBar(
+                                progress: book.progress,
+                                thick: true,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${(book.progress * 100).round()} %',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            FormatBadge(format: book.format),
+                            Text(
+                              book.status.label,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -174,19 +207,24 @@ class BookListTile extends StatelessWidget {
 }
 
 class ReadingProgressBar extends StatelessWidget {
-  const ReadingProgressBar({super.key, required this.progress});
+  const ReadingProgressBar({
+    super.key,
+    required this.progress,
+    this.thick = false,
+  });
 
   final double progress;
+  final bool thick;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       label: 'Progreso ${(progress * 100).round()} %',
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(thick ? 3 : 2),
         child: LinearProgressIndicator(
           value: progress.clamp(0, 1),
-          minHeight: 3,
+          minHeight: thick ? 5 : 3,
           color: LitteraColors.oro,
           backgroundColor: Theme.of(context).colorScheme.outlineVariant,
         ),

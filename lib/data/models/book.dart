@@ -60,6 +60,7 @@ class Book {
     this.sourceManuscriptId,
     this.finishedAt,
     this.sourceVersion,
+    this.rating = 0,
   });
 
   final String id;
@@ -104,6 +105,9 @@ class Book {
   /// reexportar no toca el libro (los PDF nunca salen idénticos byte a byte).
   final DateTime? sourceVersion;
 
+  /// Valoración personal de 1 a 5 estrellas (0 = sin valorar).
+  final int rating;
+
   Book copyWith({
     String? title,
     String? author,
@@ -117,6 +121,7 @@ class Book {
     DateTime? lastOpenedAt,
     DateTime? finishedAt,
     bool clearFinishedAt = false,
+    int? rating,
   }) => Book(
     id: id,
     title: title ?? this.title,
@@ -138,5 +143,6 @@ class Book {
     sourceManuscriptId: sourceManuscriptId,
     finishedAt: clearFinishedAt ? null : (finishedAt ?? this.finishedAt),
     sourceVersion: sourceVersion,
+    rating: rating ?? this.rating,
   );
 }

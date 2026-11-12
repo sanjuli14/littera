@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/app_info.dart';
 import '../../app/routes.dart';
 import '../../app/theme/littera_colors.dart';
+import '../../core/widgets/soft_card.dart';
 import '../../data/models/app_settings.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../backup/backup_screen.dart';
@@ -52,26 +53,39 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.insights_outlined),
-            title: const Text('Estadísticas y metas'),
-            subtitle: const Text('Rachas, minutos leídos y palabras escritas'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(Routes.stats),
-          ),
-          ListTile(
-            leading: const Icon(Icons.backup_outlined),
-            title: const Text('Copia de seguridad'),
-            subtitle: Text(lastBackupLabel(ref.watch(lastBackupProvider))),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(Routes.backup),
-          ),
-          const AboutListTile(
-            icon: Icon(Icons.info_outline),
-            applicationName: AppInfo.name,
-            applicationVersion: AppInfo.appVersion,
-            applicationLegalese: 'Tipografía Inter — SIL Open Font License 1.1',
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SoftCard(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.insights_outlined),
+                    title: const Text('Estadísticas y metas'),
+                    subtitle: const Text(
+                      'Rachas, minutos leídos y palabras escritas',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push(Routes.stats),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.backup_outlined),
+                    title: const Text('Copia de seguridad'),
+                    subtitle: Text(
+                      lastBackupLabel(ref.watch(lastBackupProvider)),
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push(Routes.backup),
+                  ),
+                  const AboutListTile(
+                    icon: Icon(Icons.info_outline),
+                    applicationName: AppInfo.name,
+                    applicationVersion: AppInfo.appVersion,
+                    applicationLegalese:
+                        'Tipografía Inter — SIL Open Font License 1.1',
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -98,7 +112,7 @@ const _themeOptions = [
   _ThemeOption(
     AppThemePreference.light,
     'Claro',
-    LitteraColors.pergaminoClaro,
+    Colors.white,
     LitteraColors.tinta,
   ),
   _ThemeOption(
@@ -156,8 +170,8 @@ class _ThemeTile extends StatelessWidget {
                 gradient: isSystem
                     ? const LinearGradient(
                         colors: [
-                          LitteraColors.pergaminoClaro,
-                          LitteraColors.pergaminoClaro,
+                          Colors.white,
+                          Colors.white,
                           LitteraColors.tinta,
                           LitteraColors.tinta,
                         ],

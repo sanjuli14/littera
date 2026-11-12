@@ -51,6 +51,7 @@ class AppSettings {
     this.readerJustify = true,
     this.annualBookGoal = 12,
     this.dailyReadingMinutes = 20,
+    this.onboardingDone = false,
   });
 
   final AppThemePreference themePreference;
@@ -67,6 +68,9 @@ class AppSettings {
   /// Meta de minutos de lectura al día (0 = sin meta).
   final int dailyReadingMinutes;
 
+  /// `true` cuando ya se vio la pantalla de bienvenida.
+  final bool onboardingDone;
+
   AppSettings copyWith({
     AppThemePreference? themePreference,
     bool? libraryGridView,
@@ -77,6 +81,7 @@ class AppSettings {
     bool? readerJustify,
     int? annualBookGoal,
     int? dailyReadingMinutes,
+    bool? onboardingDone,
   }) => AppSettings(
     themePreference: themePreference ?? this.themePreference,
     libraryGridView: libraryGridView ?? this.libraryGridView,
@@ -87,5 +92,6 @@ class AppSettings {
     readerJustify: readerJustify ?? this.readerJustify,
     annualBookGoal: annualBookGoal ?? this.annualBookGoal,
     dailyReadingMinutes: dailyReadingMinutes ?? this.dailyReadingMinutes,
+    onboardingDone: onboardingDone ?? this.onboardingDone,
   );
 }

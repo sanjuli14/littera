@@ -10,6 +10,7 @@ import 'package:littera/data/models/app_settings.dart';
 import 'package:littera/data/models/book.dart';
 import 'package:littera/data/models/shelf.dart';
 import 'package:littera/data/repositories/settings_repository.dart';
+import 'package:littera/features/library/widgets/book_tiles.dart';
 import 'package:littera/features/library/widgets/shelf_filter_bar.dart';
 
 import 'helpers.dart';
@@ -50,8 +51,10 @@ void main() {
 
   /// Títulos dentro de la cuadrícula. Cada tarjeta muestra el título dos
   /// veces (debajo y en la carátula generada), por eso se usa findsWidgets.
-  Finder bookTitle(String title) =>
-      find.descendant(of: find.byType(GridView), matching: find.text(title));
+  Finder bookTitle(String title) => find.descendant(
+    of: find.byType(BookGridTile),
+    matching: find.text(title),
+  );
 
   testWidgets('biblioteca vacía muestra la invitación a importar', (
     tester,
@@ -115,8 +118,6 @@ void main() {
         testBook(id: 'b', title: 'Rayuela', author: 'Julio Cortázar'),
       ],
     );
-    await tester.tap(find.byTooltip('Buscar'));
-    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'PARAMO');
     await tester.pumpAndSettle();
     expect(bookTitle('Pedro Páramo'), findsWidgets);
@@ -131,8 +132,8 @@ void main() {
     final env = await pumpApp(tester, books: [testBook()]);
     await tester.tap(find.byTooltip('Ver como lista'));
     await tester.pumpAndSettle();
-    expect(find.byType(GridView), findsNothing);
-    expect(find.byType(ListView), findsWidgets);
+    expect(find.byType(BookGridTile), findsNothing);
+    expect(find.byType(BookListTile), findsOneWidget);
     expect(env.settings.get(HiveKeys.appSettings)?.libraryGridView, isFalse);
   });
 
@@ -225,4 +226,63 @@ void main() {
     );
     handle.dispose();
   });
+
+  testWidgets('la ficha permite valorar con estrellas', (tester) async {
+    final env = await pumpApp(tester, books: [testBook(title: 'Rayuela')]);
+    await tester.tap(bookTitle('Rayuela').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('4 estrellas'));
+    await tester.pumpAndSettle();
+    expect(env.books.get('b1')!.rating, 4);
+    expect(
+      find.bySemanticsLabel(RegExp('Valoración: 4 estrellas')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('"Continúa leyendo" muestra el último libro abierto', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      books: [
+        testBook(
+          id: 'a',
+          title: 'Viejo',
+          status: ReadingStatus.reading,
+        ).copyWith(lastOpenedAt: DateTime(2026, 1, 1)),
+        testBook(
+          id: 'b',
+          title: 'Reciente',
+          status: ReadingStatus.reading,
+        ).copyWith(lastOpenedAt: DateTime(2026, 11, 1), progress: 0.3),
+      ],
+    );
+    expect(find.text('CONTINÚA LEYENDO'), findsOneWidget);
+    expect(find.text('Seguir leyendo'), findsOneWidget);
+    expect(find.text('30 %'), findsOneWidget);
+    expect(find.text('Leyendo ahora'), findsOneWidget);
+  });
+
+  testWidgets(
+    'la primera vez se ve la bienvenida y "Más tarde" lleva a la biblioteca',
+    (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1080 / 412;
+      addTearDown(tester.view.reset);
+      final env = (await tester.runAsync(TestEnv.create))!;
+      await tester.runAsync(
+        () => env.settings.put(HiveKeys.appSettings, const AppSettings()),
+      );
+      await tester.pumpWidget(
+        ProviderScope(overrides: env.overrides, child: const LitteraApp()),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Empieza tu viaje\ncon los libros'), findsOneWidget);
+      await tester.tap(find.text('Más tarde'));
+      await tester.pumpAndSettle();
+      expect(find.text('Tu biblioteca está vacía'), findsOneWidget);
+      expect(env.settings.get(HiveKeys.appSettings)!.onboardingDone, isTrue);
+    },
+  );
 }

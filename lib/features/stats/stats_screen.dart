@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/widgets/soft_card.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
@@ -198,7 +201,7 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
+    return SoftCard(
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -248,7 +251,7 @@ class _ChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
+    return SoftCard(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
         child: Column(
@@ -288,7 +291,7 @@ class _YearGoalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final reached = goal > 0 && finished >= goal;
-    return Card(
+    return SoftCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

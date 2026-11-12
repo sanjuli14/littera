@@ -9,6 +9,7 @@ import 'package:littera/app/app.dart';
 import 'package:littera/data/models/book.dart';
 import 'package:littera/data/models/highlight.dart';
 import 'package:littera/data/models/shelf.dart';
+import 'package:littera/features/library/widgets/book_tiles.dart';
 import 'package:littera/features/reader/document/docx_parser.dart';
 import 'package:littera/features/reader/document/epub_parser.dart';
 import 'package:littera/features/reader/reader_providers.dart';
@@ -112,21 +113,20 @@ void main() {
         expect(find.text('Biblioteca'), findsWidgets);
         await tap(find.byTooltip('Ver como lista'));
         await tap(find.byTooltip('Ver como cuadrícula'));
-        final book0 = find.descendant(
-          of: find.byType(GridView),
-          matching: find.textContaining('probar el número 0'),
+        final book0 = find.byWidgetPredicate(
+          (w) => w is BookGridTile && w.book.id == 'b0',
         );
         await tester.scrollUntilVisible(
-          book0.last,
+          book0,
           200,
           scrollable: find
               .descendant(
-                of: find.byType(GridView),
+                of: find.byType(CustomScrollView),
                 matching: find.byType(Scrollable),
               )
               .first,
         );
-        await tap(book0.last);
+        await tap(book0);
         expect(find.text('Autora con nombre compuesto'), findsWidgets);
         await tester.scrollUntilVisible(
           find.textContaining('Continuar'),
@@ -164,11 +164,11 @@ void main() {
         await back();
 
         // Citas.
-        await tap(find.text('Citas'));
+        await tap(find.byTooltip('Citas'));
         expect(find.text('Mis citas'), findsOneWidget);
 
         // Escribir → obra → editor.
-        await tap(find.text('Escribir'));
+        await tap(find.byTooltip('Escribir'));
         await tap(find.text('Una novela con un título muy largo'));
         await tap(find.text('Fichas'));
         await tap(find.text('Capítulos'));
@@ -177,7 +177,7 @@ void main() {
         await back();
 
         // Ajustes → copia de seguridad.
-        await tap(find.text('Ajustes'));
+        await tap(find.byTooltip('Ajustes'));
         await tap(find.text('Copia de seguridad'));
         await tester.scrollUntilVisible(
           find.text('Exportar copia completa'),

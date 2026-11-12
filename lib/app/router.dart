@@ -6,17 +6,21 @@ import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/quotes/quotes_screen.dart';
 import '../features/reader/reader_screen.dart';
+import '../features/onboarding/welcome_screen.dart';
 import '../features/stats/stats_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/writing/chapter_editor_screen.dart';
 import '../features/writing/manuscript_screen.dart';
 import '../features/writing/writing_screen.dart';
+import '../data/repositories/settings_repository.dart';
 import 'home_shell.dart';
 import 'routes.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  // La bienvenida solo se muestra la primera vez.
+  final onboardingDone = ref.read(settingsProvider).onboardingDone;
   final router = GoRouter(
-    initialLocation: Routes.library,
+    initialLocation: onboardingDone ? Routes.library : Routes.welcome,
     routes: [
       // Lector a pantalla completa, sin barra de navegación inferior.
       GoRoute(
@@ -25,6 +29,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           bookId: state.pathParameters['id']!,
           target: int.tryParse(state.uri.queryParameters['en'] ?? ''),
         ),
+      ),
+      GoRoute(
+        path: Routes.welcome,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: Routes.stats,

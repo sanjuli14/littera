@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../app/theme/littera_colors.dart';
 import '../../core/utils/text_utils.dart';
 import '../../core/widgets/dialogs.dart';
+import '../../core/widgets/star_rating.dart';
 import '../../data/models/book.dart';
 import '../../data/repositories/library_repository.dart';
 import 'library_actions.dart';
@@ -127,7 +128,15 @@ class BookDetailScreen extends ConsumerWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
+          Center(
+            child: StarRating(
+              rating: book.rating,
+              size: 30,
+              onChanged: (stars) => repo.setRating(book, stars),
+            ),
+          ),
+          const SizedBox(height: 8),
           Wrap(
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -174,14 +183,17 @@ class BookDetailScreen extends ConsumerWidget {
           const SizedBox(height: 28),
           _SectionTitle('Estado'),
           const SizedBox(height: 8),
-          SegmentedButton<ReadingStatus>(
-            segments: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
               for (final s in ReadingStatus.values)
-                ButtonSegment(value: s, label: Text(s.label)),
+                ChoiceChip(
+                  label: Text(s.label),
+                  selected: book.status == s,
+                  onSelected: (_) => repo.setStatus(book, s),
+                ),
             ],
-            selected: {book.status},
-            showSelectedIcon: false,
-            onSelectionChanged: (s) => repo.setStatus(book, s.first),
           ),
           const SizedBox(height: 28),
           _SectionTitle('Estantes'),

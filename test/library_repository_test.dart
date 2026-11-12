@@ -115,4 +115,14 @@ void main() {
     expect(book.status, ReadingStatus.finished);
     expect(book.title, 'Nuevo');
   });
+
+  test('valoración: 1 a 5 estrellas; tocar la misma la quita', () async {
+    await repo.saveBook(testBook());
+    await repo.setRating(repo.getBook('b1')!, 4);
+    expect(repo.getBook('b1')!.rating, 4);
+    await repo.setRating(repo.getBook('b1')!, 4);
+    expect(repo.getBook('b1')!.rating, 0);
+    await repo.setRating(repo.getBook('b1')!, 9);
+    expect(repo.getBook('b1')!.rating, 5);
+  });
 }

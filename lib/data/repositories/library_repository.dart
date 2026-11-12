@@ -91,6 +91,13 @@ class LibraryRepository {
     );
   }
 
+  /// Valoración de 0 (sin valorar) a 5. Tocar la misma estrella la quita.
+  Future<void> setRating(Book book, int stars) {
+    final current = _latest(book);
+    final value = stars == current.rating ? 0 : stars.clamp(0, 5);
+    return saveBook(current.copyWith(rating: value));
+  }
+
   Future<void> toggleShelf(Book book, String shelfId) {
     final current = _latest(book);
     final ids = [...current.shelfIds];
