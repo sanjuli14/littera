@@ -10,7 +10,7 @@ App **100 % local** para leer y escribir libros. Flutter (Android primero, Web d
 | `pergamino` | `#F2E8D2` | Fondo modo claro / sepia, texto en modo oscuro |
 | `oro` | `#C9A45C` | Acentos: botones, progreso, selección, subrayados |
 
-- Fuente: Sans-Serif → **Inter** (empaquetada en `assets/fonts/`, sin descargar en tiempo de ejecución, para que funcione offline).
+- Fuentes: **Montserrat** en la interfaz y **Lora** (serif) para leer y citar, empaquetadas en `assets/fonts/` para que funcionen sin conexión.
 - Logo: `assets/littera-icono-tinta.svg` → splash, icono de la app y cabecera.
 
 ## Decisiones técnicas
