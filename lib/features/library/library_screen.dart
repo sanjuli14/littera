@@ -10,6 +10,7 @@ import '../../data/models/book.dart';
 import '../../data/repositories/library_repository.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../backup/backup_reminder.dart';
+import '../updates/update_widgets.dart';
 import 'library_actions.dart';
 import 'library_providers.dart';
 import 'widgets/book_tiles.dart';
@@ -247,6 +248,7 @@ class _LibraryHomeState extends ConsumerState<_LibraryHome> {
     return CustomScrollView(
       slivers: [
         if (showHome) const SliverToBoxAdapter(child: GreetingHeader()),
+        const SliverToBoxAdapter(child: UpdateBanner()),
         const SliverToBoxAdapter(child: _SearchField()),
         const SliverToBoxAdapter(child: BackupReminder()),
         const SliverToBoxAdapter(child: ShelfFilterBar()),

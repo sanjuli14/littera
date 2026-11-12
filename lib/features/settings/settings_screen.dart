@@ -11,6 +11,7 @@ import '../../data/repositories/settings_repository.dart';
 import '../backup/backup_screen.dart';
 import '../backup/backup_service.dart';
 import '../reminders/reminder_scheduler.dart';
+import '../updates/updates_provider.dart';
 import '../../core/widgets/dialogs.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -72,6 +73,18 @@ class SettingsScreen extends ConsumerWidget {
                     onTap: () => context.push(Routes.stats),
                   ),
                   ListTile(
+                    leading: const Icon(Icons.auto_awesome_outlined),
+                    title: const Text('Novedades'),
+                    subtitle: Text(
+                      ref.watch(updatesProvider).available != null
+                          ? 'Hay una versión nueva: '
+                                '${ref.watch(updatesProvider).available!.version}'
+                          : 'Versión ${ref.watch(currentVersionProvider)}',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push(Routes.whatsNew),
+                  ),
+                  ListTile(
                     leading: const Icon(Icons.backup_outlined),
                     title: const Text('Copia de seguridad'),
                     subtitle: Text(
@@ -80,10 +93,10 @@ class SettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => context.push(Routes.backup),
                   ),
-                  const AboutListTile(
-                    icon: Icon(Icons.info_outline),
+                  AboutListTile(
+                    icon: const Icon(Icons.info_outline),
                     applicationName: AppInfo.name,
-                    applicationVersion: AppInfo.appVersion,
+                    applicationVersion: ref.watch(currentVersionProvider),
                     applicationLegalese: 'Tipografías Montserrat y Lora — SIL Open Font License 1.1',
                   ),
                 ],

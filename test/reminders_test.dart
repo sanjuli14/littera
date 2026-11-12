@@ -24,7 +24,10 @@ class FakeScheduler implements ReminderScheduler {
   @override
   bool get isSupported => true;
   @override
-  Stream<String> get openBookRequests => const Stream.empty();
+  Stream<String> get taps => const Stream.empty();
+  final shown = <ReminderMessage>[];
+  @override
+  Future<void> showNow(ReminderMessage m) async => shown.add(m);
   @override
   Future<void> init() async {}
   @override

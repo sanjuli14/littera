@@ -3,6 +3,7 @@ abstract final class Routes {
   static const writing = '/escribir';
   static const settings = '/ajustes';
   static const backup = '$settings/copia';
+  static const whatsNew = '$settings/novedades';
 
   static String book(String id) => '$library/libro/$id';
   static const quotes = '/citas';

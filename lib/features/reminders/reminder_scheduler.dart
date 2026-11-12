@@ -15,8 +15,8 @@ abstract class ReminderScheduler {
   /// `false` en plataformas sin notificaciones programadas (Web).
   bool get isSupported;
 
-  /// Toques en notificaciones: id del libro que hay que abrir.
-  Stream<String> get openBookRequests;
+  /// Toques en notificaciones: su payload (`book:<id>`, `update`…).
+  Stream<String> get taps;
 
   Future<void> init();
 
@@ -27,6 +27,9 @@ abstract class ReminderScheduler {
   Future<void> cancelDaily();
   Future<void> scheduleNudge(DateTime when, ReminderMessage message);
   Future<void> cancelNudge();
+
+  /// Muestra un aviso ahora mismo (p. ej. "hay una versión nueva").
+  Future<void> showNow(ReminderMessage message);
 }
 
 /// Sin notificaciones (Web y tests).
@@ -34,7 +37,7 @@ class NoopReminderScheduler implements ReminderScheduler {
   @override
   bool get isSupported => false;
   @override
-  Stream<String> get openBookRequests => const Stream.empty();
+  Stream<String> get taps => const Stream.empty();
   @override
   Future<void> init() async {}
   @override
@@ -47,16 +50,19 @@ class NoopReminderScheduler implements ReminderScheduler {
   Future<void> scheduleNudge(DateTime when, ReminderMessage m) async {}
   @override
   Future<void> cancelNudge() async {}
+  @override
+  Future<void> showNow(ReminderMessage m) async {}
 }
 
 /// Implementación con flutter_local_notifications.
 class LocalReminderScheduler implements ReminderScheduler {
   final _plugin = FlutterLocalNotificationsPlugin();
   final _taps = StreamController<String>.broadcast();
-  String? _launchBookId;
+  String? _launchPayload;
 
   static const _dailyId = 1;
   static const _nudgeId = 2;
+  static const _nowId = 3;
 
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
@@ -72,11 +78,11 @@ class LocalReminderScheduler implements ReminderScheduler {
   bool get isSupported => !kIsWeb;
 
   @override
-  Stream<String> get openBookRequests async* {
-    // Si la app se abrió desde una notificación, primero ese libro.
-    final launch = _launchBookId;
+  Stream<String> get taps async* {
+    // Si la app se abrió desde una notificación, primero esa.
+    final launch = _launchPayload;
     if (launch != null) {
-      _launchBookId = null;
+      _launchPayload = null;
       yield launch;
     }
     yield* _taps.stream;
@@ -96,15 +102,13 @@ class LocalReminderScheduler implements ReminderScheduler {
         android: AndroidInitializationSettings('ic_stat_littera'),
       ),
       onDidReceiveNotificationResponse: (response) {
-        final id = ReminderMessage.bookIdFromPayload(response.payload);
-        if (id != null) _taps.add(id);
+        final payload = response.payload;
+        if (payload != null) _taps.add(payload);
       },
     );
     final launch = await _plugin.getNotificationAppLaunchDetails();
     if (launch?.didNotificationLaunchApp ?? false) {
-      _launchBookId = ReminderMessage.bookIdFromPayload(
-        launch!.notificationResponse?.payload,
-      );
+      _launchPayload = launch!.notificationResponse?.payload;
     }
   }
 
@@ -164,6 +168,15 @@ class LocalReminderScheduler implements ReminderScheduler {
 
   @override
   Future<void> cancelNudge() => _plugin.cancel(id: _nudgeId);
+
+  @override
+  Future<void> showNow(ReminderMessage m) => _plugin.show(
+    id: _nowId,
+    title: m.title,
+    body: m.body,
+    notificationDetails: _details,
+    payload: m.payload,
+  );
 }
 
 /// Se sobrescribe en `main` (real en Android, nulo en Web).

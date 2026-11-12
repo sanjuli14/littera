@@ -8,6 +8,7 @@ import '../features/quotes/quotes_screen.dart';
 import '../features/reader/reader_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
 import '../features/stats/stats_screen.dart';
+import '../features/updates/update_widgets.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/writing/chapter_editor_screen.dart';
 import '../features/writing/manuscript_screen.dart';
@@ -95,6 +96,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'copia',
                     builder: (context, state) => const BackupScreen(),
+                  ),
+                  GoRoute(
+                    path: 'novedades',
+                    builder: (context, state) => const WhatsNewScreen(),
                   ),
                 ],
               ),

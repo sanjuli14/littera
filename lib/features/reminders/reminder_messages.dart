@@ -2,13 +2,18 @@ import '../../data/models/book.dart';
 
 /// Texto de una notificación. [bookId] = libro que se abre al tocarla.
 class ReminderMessage {
-  const ReminderMessage(this.title, this.body, {this.bookId});
+  const ReminderMessage(this.title, this.body, {this.bookId, this._payload});
 
   final String title;
   final String body;
   final String? bookId;
+  final String? _payload;
 
-  String? get payload => bookId == null ? null : 'book:$bookId';
+  /// Lo que recibe la app al tocar la notificación.
+  String? get payload => _payload ?? (bookId == null ? null : 'book:$bookId');
+
+  /// Payload del aviso de versión nueva.
+  static const updatePayload = 'update';
 
   static String? bookIdFromPayload(String? payload) =>
       payload != null && payload.startsWith('book:')

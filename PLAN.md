@@ -198,6 +198,14 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Lector: letra "Clásica" (Lora, por defecto) o "Moderna" (Montserrat)
 - [x] Importar pasa a un botón "+" en la barra superior (sin botón flotante que tape los carruseles)
 
+### Recordatorios y actualizaciones ✅
+- [x] Recordatorio diario a la hora elegida, con mención del libro en curso; aviso "¡Ey, ya casi!" de libros a medias (notificaciones locales, sin Firebase)
+- [x] Al tocar una notificación se abre el libro (o las novedades)
+- [x] Actualizaciones desde GitHub Releases: comprobación al abrir (máx. una al día), tarjeta en Inicio, notificación una vez por versión
+- [x] Descarga del APK con progreso e instalador de Android; pantalla Ajustes → Novedades con el historial (también sin conexión, desde la copia guardada)
+- [x] Permisos: internet e instalar paquetes; eliminados los de fotos/vídeo/audio que añadía open_filex
+- [ ] Pendiente: crear una clave de firma propia antes de repartir la app (hoy firma con la clave de depuración)
+
 ### Más adelante (fuera del alcance local)
 - Asistente de IA opcional (títulos, ortografía, resúmenes) — requeriría conexión y consentimiento explícito
 - Social ligero (publicar, comentar, seguir autores) — requiere servidor
