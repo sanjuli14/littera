@@ -7,6 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
 import 'package:littera/app/app.dart';
 import 'package:littera/data/models/manuscript.dart';
+import 'package:littera/features/export/export_service.dart';
+import 'package:littera/features/library/import/book_importer.dart';
+import 'package:littera/features/library/widgets/shelf_filter_bar.dart';
 import 'package:littera/features/writing/word_count.dart';
 import 'package:littera/features/writing/writing_screen.dart';
 
@@ -26,7 +29,21 @@ void main() {
     addTearDown(tester.view.reset);
     final env = (await tester.runAsync(TestEnv.create))!;
     await tester.pumpWidget(
-      ProviderScope(overrides: env.overrides, child: const LitteraApp()),
+      ProviderScope(
+        overrides: [
+          ...env.overrides,
+          // Sin carátula generada (dibujarla necesita tiempo real).
+          exportServiceProvider.overrideWith(
+            (ref) => ExportService(
+              writing: env.writingRepository,
+              files: env.files,
+              importer: ref.watch(bookImporterProvider),
+              renderCover: (_, _) async => null,
+            ),
+          ),
+        ],
+        child: const LitteraApp(),
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Escribir'));
@@ -139,5 +156,58 @@ void main() {
     expect(find.text('Personajes'), findsOneWidget);
     expect(find.text('Marina'), findsOneWidget);
     expect(env.entities.values.single.kind, EntityKind.character);
+  });
+
+  testWidgets('exportar la obra la añade a la biblioteca en "Mis obras"', (
+    tester,
+  ) async {
+    final env = await pumpApp(tester);
+    final m = (await tester.runAsync(() async {
+      final repo = env.writingRepository;
+      final m = await repo.createManuscript('El faro');
+      final c = repo.chaptersOf(m.id).single;
+      await repo.saveChapterContent(c.id, '[{"insert":"Había una vez.\\n"}]');
+      return m;
+    }))!;
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('El faro'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Exportar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Exportar obra'), findsOneWidget);
+    await tester.tap(
+      find.text('Guardar el archivo'),
+    ); // sin diálogo del sistema
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Exportar EPUB'));
+    // La lectura de metadatos corre en un isolate: dejar pasar tiempo real.
+    for (var i = 0; i < 20 && env.books.isEmpty; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+
+    final book = env.books.values.single;
+    expect(book.isOwnWork, isTrue);
+    expect(book.sourceManuscriptId, m.id);
+    expect(find.text('Añadida a tu biblioteca'), findsOneWidget);
+
+    await tester.tap(find.text('Ver'));
+    await tester.pumpAndSettle();
+    expect(find.text('Obra propia'), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Mis obras  1'),
+      150,
+      scrollable: find.descendant(
+        of: find.byType(ShelfFilterBar),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    expect(find.text('Mis obras  1'), findsOneWidget);
   });
 }

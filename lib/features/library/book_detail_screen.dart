@@ -135,6 +135,23 @@ class BookDetailScreen extends ConsumerWidget {
             runSpacing: 4,
             children: [
               FormatBadge(format: book.format),
+              if (book.isOwnWork)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: LitteraColors.oro.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Obra propia',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               Text(
                 '${formatFileSize(book.fileSize)} · añadido el '
                 '${formatDate(book.addedAt)}',

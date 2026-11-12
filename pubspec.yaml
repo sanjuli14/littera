@@ -53,6 +53,7 @@ dependencies:
   html: ^0.15.7
   super_sliver_list: ^0.4.1
   flutter_quill: ^11.6.0
+  pdf: ^3.13.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

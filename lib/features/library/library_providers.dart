@@ -38,6 +38,14 @@ class ByShelf extends LibraryFilter {
   int get hashCode => shelfId.hashCode;
 }
 
+class OwnWorks extends LibraryFilter {
+  const OwnWorks();
+  @override
+  bool operator ==(Object other) => other is OwnWorks;
+  @override
+  int get hashCode => 1;
+}
+
 class LibraryFilterNotifier extends Notifier<LibraryFilter> {
   @override
   LibraryFilter build() {
@@ -80,6 +88,7 @@ bool matchesFilter(Book book, LibraryFilter filter) => switch (filter) {
   AllBooks() => true,
   ByStatus(:final status) => book.status == status,
   ByShelf(:final shelfId) => book.shelfIds.contains(shelfId),
+  OwnWorks() => book.isOwnWork,
 };
 
 /// Libros visibles tras aplicar filtro, búsqueda y orden.
@@ -130,5 +139,6 @@ final filterCountsProvider = Provider<Map<LibraryFilter, int>>((ref) {
       ByShelf(shelf.id): books
           .where((b) => b.shelfIds.contains(shelf.id))
           .length,
+    const OwnWorks(): books.where((b) => b.isOwnWork).length,
   };
 });

@@ -25,7 +25,7 @@ App **100 % local** para leer y escribir libros. Flutter (Android primero, Web d
 | EPUB | `epub_view` / `epubx` | Lectura y extracción de carátula |
 | PDF | `pdfrx` | Rápido, funciona en Android y Web |
 | DOCX | `archive` + `xml` (parser propio a texto/párrafos) | No hay lector maduro; `.docx` es un ZIP con XML |
-| Backup | `archive` + `share_plus` | Exportar/importar un `.littera` (ZIP) |
+| Backup | `archive` + `file_picker` | Exportar/importar un `.littera` (ZIP) |
 | Editor | `flutter_quill` 11 | Texto enriquecido para escritura (contenido guardado como Delta JSON) |
 
 > **Nota sobre `.doc`:** el formato antiguo de Word (binario, anterior a 2007) no tiene soporte fiable en Dart.
@@ -149,11 +149,15 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Fichas de personajes, lugares, objetos y apuntes; accesibles desde el editor
 - [x] Incluido en la copia de seguridad (completa y "solo datos"); al fusionar gana lo editado más recientemente y lo local se guarda como versión
 
-### Fase 6 — Exportar obra
-- [ ] Exportar manuscrito a **EPUB** (generado con `archive` + plantillas XHTML)
-- [ ] Exportar a **PDF** (`pdf` package) con carátula
-- [ ] Exportar a **DOCX** (opcional)
-- [ ] "Añadir a mi biblioteca": la obra exportada aparece como libro con `isOwnWork`
+### Fase 6 — Exportar obra ✅
+- [x] El texto del editor (Delta de Quill) se convierte al modelo de bloques del lector: títulos, negrita, cursiva, citas, listas (con viñetas y numeradas), centrado
+- [x] **EPUB 3** generado a mano (con toc.ncx para lectores antiguos): carátula, portada, un archivo por capítulo, índice, metadatos (título, autor, idioma, sinopsis)
+- [x] **PDF** A5 (`pdf`) con fuente Inter (tildes y ñ correctas): carátula, portada, cada capítulo en página nueva, marcadores por capítulo y número de página
+- [x] Carátula: la de la obra o una generada con la paleta (`dart:ui`)
+- [x] Guardar el archivo donde se elija y/o **añadir a la biblioteca** como "Obra propia" (filtro "Mis obras")
+- [x] Reexportar actualiza el mismo libro (conserva estado, estantes y carátula propia; reinicia la posición porque el texto cambió)
+- [x] Los capítulos sin texto se omiten
+- [ ] DOCX: descartado por ahora (EPUB y PDF cubren leer, compartir e imprimir)
 
 ### Fase 7 — Estadísticas
 - [ ] Registrar sesiones de lectura automáticamente

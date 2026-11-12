@@ -57,6 +57,7 @@ class Book {
     this.position,
     this.lastOpenedAt,
     this.isOwnWork = false,
+    this.sourceManuscriptId,
   });
 
   final String id;
@@ -91,6 +92,9 @@ class Book {
   /// `true` si es una obra escrita en Littera.
   final bool isOwnWork;
 
+  /// Manuscrito del que se exportó (para actualizarlo al reexportar).
+  final String? sourceManuscriptId;
+
   Book copyWith({
     String? title,
     String? author,
@@ -120,5 +124,6 @@ class Book {
     position: position ?? this.position,
     lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
     isOwnWork: isOwnWork,
+    sourceManuscriptId: sourceManuscriptId,
   );
 }

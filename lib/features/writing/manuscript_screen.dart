@@ -10,6 +10,7 @@ import '../../core/widgets/dialogs.dart';
 import '../../data/models/manuscript.dart';
 import '../../data/repositories/writing_repository.dart';
 import '../library/widgets/book_cover.dart';
+import '../export/export_sheet.dart';
 import 'entity_widgets.dart';
 import 'writing_screen.dart';
 
@@ -38,6 +39,11 @@ class ManuscriptScreen extends ConsumerWidget {
             appBar: AppBar(
               title: Text(m.title, overflow: TextOverflow.ellipsis),
               actions: [
+                IconButton(
+                  icon: const Icon(Icons.ios_share),
+                  tooltip: 'Exportar',
+                  onPressed: () => exportManuscript(context, ref, m.id),
+                ),
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
                   tooltip: 'Editar datos',

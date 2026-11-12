@@ -35,8 +35,92 @@ class BookImporter {
 
   /// Importa un archivo y lo guarda en la biblioteca.
   Future<Book> importBytes(String fileName, Uint8List bytes) async {
-    final ext = p.extension(fileName).toLowerCase().replaceFirst('.', '');
+    final (format, ext) = _validate(fileName, bytes);
+    final hash = sha1.convert(bytes).toString();
+    final existing = repository.findByHash(hash);
+    if (existing != null) {
+      throw ImportException(
+        'Ya está en tu biblioteca como "${existing.title}".',
+      );
+    }
+    final meta = await _readMetadata(format, bytes);
+    return _create(fileName, bytes, format, ext, hash, meta);
+  }
 
+  /// Añade a la biblioteca una obra exportada desde Escribir. Si ya se
+  /// exportó antes en el mismo formato, actualiza ese libro (conserva
+  /// estado, estantes y carátula propia; la posición se reinicia porque el
+  /// texto cambió).
+  Future<Book> importOwnWork(
+    String manuscriptId,
+    String fileName,
+    Uint8List bytes,
+  ) async {
+    final (format, ext) = _validate(fileName, bytes);
+    final hash = sha1.convert(bytes).toString();
+    final previous = repository.books.values
+        .where(
+          (b) =>
+              b.isOwnWork &&
+              b.sourceManuscriptId == manuscriptId &&
+              b.format == format,
+        )
+        .firstOrNull;
+
+    if (previous == null) {
+      final duplicate = repository.findByHash(hash);
+      if (duplicate != null) {
+        throw ImportException(
+          'Ya está en tu biblioteca como "${duplicate.title}".',
+        );
+      }
+      final meta = await _readMetadata(format, bytes);
+      return _create(
+        fileName,
+        bytes,
+        format,
+        ext,
+        hash,
+        meta,
+        manuscriptId: manuscriptId,
+      );
+    }
+
+    if (previous.contentHash == hash) return previous; // sin cambios
+    final meta = await _readMetadata(format, bytes);
+    final fileRef = await files.write(
+      FileArea.books,
+      '${previous.id}.$ext',
+      bytes,
+    );
+    final updated = Book(
+      id: previous.id,
+      title: meta.title ?? previous.title,
+      author: meta.author ?? previous.author,
+      format: format,
+      fileRef: fileRef,
+      originalFileName: fileName,
+      fileSize: bytes.length,
+      contentHash: hash,
+      addedAt: previous.addedAt,
+      coverRef: previous.coverRef,
+      hasCustomCover: previous.hasCustomCover,
+      status: previous.status,
+      shelfIds: previous.shelfIds,
+      lastOpenedAt: previous.lastOpenedAt,
+      isOwnWork: true,
+      sourceManuscriptId: manuscriptId,
+    );
+    await repository.saveBook(updated);
+    if (!previous.hasCustomCover && meta.coverBytes != null) {
+      await repository.setCover(updated, meta.coverBytes!, custom: false);
+    }
+    return repository.getBook(previous.id)!;
+  }
+
+  /// Comprueba extensión y firma. Devuelve el formato y la extensión.
+  (BookFormat, String) _validate(String fileName, Uint8List bytes) {
+    final ext = p.extension(fileName).toLowerCase().replaceFirst('.', '');
     if (ext == 'doc') {
       throw const ImportException(
         'El formato .doc antiguo no es compatible. Ábrelo en Word, '
@@ -48,7 +132,6 @@ class BookImporter {
       throw ImportException('Formato no compatible: .$ext');
     }
     if (bytes.isEmpty) throw const ImportException('El archivo está vacío.');
-
     final validSignature = format == BookFormat.pdf
         ? looksLikePdf(bytes)
         : looksLikeZip(bytes);
@@ -57,19 +140,20 @@ class BookImporter {
         'El archivo no parece un ${format.label} válido o está dañado.',
       );
     }
+    return (format, ext);
+  }
 
-    final hash = sha1.convert(bytes).toString();
-    final existing = repository.findByHash(hash);
-    if (existing != null) {
-      throw ImportException(
-        'Ya está en tu biblioteca como "${existing.title}".',
-      );
-    }
-
-    final meta = await _readMetadata(format, bytes);
+  Future<Book> _create(
+    String fileName,
+    Uint8List bytes,
+    BookFormat format,
+    String ext,
+    String hash,
+    BookMetadata meta, {
+    String? manuscriptId,
+  }) async {
     final id = _uuid.v4();
     final fileRef = await files.write(FileArea.books, '$id.$ext', bytes);
-
     final book = Book(
       id: id,
       title: meta.title ?? titleFromFileName(fileName),
@@ -80,9 +164,10 @@ class BookImporter {
       fileSize: bytes.length,
       contentHash: hash,
       addedAt: DateTime.now(),
+      isOwnWork: manuscriptId != null,
+      sourceManuscriptId: manuscriptId,
     );
     await repository.saveBook(book);
-
     final cover = meta.coverBytes;
     if (cover != null) {
       await repository.setCover(book, cover, custom: false);

@@ -268,13 +268,14 @@ class BookAdapter extends TypeAdapter<Book> {
       position: fields[14] as String?,
       lastOpenedAt: fields[15] as DateTime?,
       isOwnWork: fields[16] == null ? false : fields[16] as bool,
+      sourceManuscriptId: fields[17] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Book obj) {
     writer
-      ..writeByte(17)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -308,7 +309,9 @@ class BookAdapter extends TypeAdapter<Book> {
       ..writeByte(15)
       ..write(obj.lastOpenedAt)
       ..writeByte(16)
-      ..write(obj.isOwnWork);
+      ..write(obj.isOwnWork)
+      ..writeByte(17)
+      ..write(obj.sourceManuscriptId);
   }
 
   @override

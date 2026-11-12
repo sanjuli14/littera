@@ -67,7 +67,7 @@ types:
         index: 2
   Book:
     typeId: 5
-    nextIndex: 17
+    nextIndex: 18
     fields:
       id:
         index: 0
@@ -103,6 +103,8 @@ types:
         index: 15
       isOwnWork:
         index: 16
+      sourceManuscriptId:
+        index: 17
   Shelf:
     typeId: 6
     nextIndex: 4

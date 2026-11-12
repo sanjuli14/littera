@@ -92,6 +92,11 @@ class BlockBuilder {
     }
   }
 
+  /// Antepone texto al párrafo en curso (p. ej. el número de una lista).
+  void prependText(String text) {
+    _runs.insert(0, TextRun(text));
+  }
+
   void addAnchor(String id) => _pendingAnchors.add(id);
 
   void _assignAnchors() {

@@ -46,6 +46,8 @@ class ShelfFilterBar extends ConsumerWidget {
             ReadingStatus.finished,
           ])
             chip(ByStatus(status), status.shelfLabel),
+          if ((counts[const OwnWorks()] ?? 0) > 0)
+            chip(const OwnWorks(), 'Mis obras'),
           for (final shelf in shelves)
             chip(
               ByShelf(shelf.id),

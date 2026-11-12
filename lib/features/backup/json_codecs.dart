@@ -37,6 +37,7 @@ Map<String, Object?> bookToJson(Book b) => {
   'position': b.position,
   'lastOpenedAt': b.lastOpenedAt?.toIso8601String(),
   'isOwnWork': b.isOwnWork,
+  'sourceManuscriptId': b.sourceManuscriptId,
 };
 
 Book bookFromJson(Map<String, Object?> j) {
@@ -69,6 +70,7 @@ Book bookFromJson(Map<String, Object?> j) {
     position: j['position'] as String?,
     lastOpenedAt: _date(j['lastOpenedAt']),
     isOwnWork: j['isOwnWork'] == true,
+    sourceManuscriptId: j['sourceManuscriptId'] as String?,
   );
 }
 
