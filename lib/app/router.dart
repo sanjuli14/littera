@@ -6,6 +6,7 @@ import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/quotes/quotes_screen.dart';
 import '../features/reader/reader_screen.dart';
+import '../features/stats/stats_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/writing/chapter_editor_screen.dart';
 import '../features/writing/manuscript_screen.dart';
@@ -24,6 +25,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           bookId: state.pathParameters['id']!,
           target: int.tryParse(state.uri.queryParameters['en'] ?? ''),
         ),
+      ),
+      GoRoute(
+        path: Routes.stats,
+        builder: (context, state) => const StatsScreen(),
       ),
       // Editor de capítulo a pantalla completa.
       GoRoute(

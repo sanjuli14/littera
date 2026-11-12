@@ -16,6 +16,7 @@ import '../../data/models/shelf.dart';
 import '../../data/repositories/highlights_repository.dart';
 import '../../data/repositories/library_repository.dart';
 import '../../data/repositories/settings_repository.dart';
+import '../../data/repositories/stats_repository.dart';
 import '../../data/repositories/writing_repository.dart';
 import 'json_codecs.dart';
 
@@ -28,6 +29,7 @@ import 'json_codecs.dart';
 /// data/settings.json     ajustes
 /// data/highlights.json   subrayados y notas
 /// data/writing.json      obras: manuscritos, capítulos, versiones, fichas
+/// data/reading_log.json  minutos leídos por libro y día
 /// files/books/…          archivos de libros (solo en copia completa)
 /// files/covers/…         carátulas
 /// ```
@@ -89,7 +91,11 @@ class BackupContents {
     required this.files,
     this.highlights = const [],
     this.writing = const WritingData(),
+    this.readingLog = const {},
   });
+
+  /// `'<bookId>|<día>'` → segundos leídos.
+  final Map<String, int> readingLog;
 
   final WritingData writing;
   final BackupManifest manifest;
@@ -144,8 +150,10 @@ class BackupService {
     required this.files,
     required this.highlights,
     required this.writing,
+    required this.readingLog,
   });
 
+  final Box<dynamic> readingLog;
   final WritingRepository writing;
   final Box<Highlight> highlights;
   final Box<Book> books;
@@ -228,6 +236,11 @@ class BackupService {
           if (key is String && writing.log.get(key) is List)
             key: writing.log.get(key),
       },
+    });
+    addJson('data/reading_log.json', {
+      for (final key in readingLog.keys)
+        if (key is String && readingLog.get(key) is int)
+          key: readingLog.get(key),
     });
     addJson(
       'data/settings.json',
@@ -328,6 +341,14 @@ class BackupService {
       },
     );
 
+    final rawReading = json('data/reading_log.json');
+    final readingMap = <String, int>{
+      if (rawReading is Map)
+        for (final e in rawReading.entries)
+          if (e.key is String && e.value is int && (e.value as int) > 0)
+            e.key as String: e.value as int,
+    };
+
     final rawSettings = json('data/settings.json');
     final fileMap = <String, Uint8List>{};
     for (final entry in archive.files) {
@@ -360,6 +381,7 @@ class BackupService {
         manuscriptCount: writingData.manuscripts.length,
       ),
       writing: writingData,
+      readingLog: readingMap,
       books: bookList,
       shelves: shelfList,
       highlights: list('data/highlights.json', highlightFromJson),
@@ -427,6 +449,8 @@ class BackupService {
         .whereType<String>()
         .toList();
     final manuscriptCount = await _replaceWriting(backup, keepRefs);
+    await readingLog.clear();
+    await readingLog.putAll(backup.readingLog);
     for (final ref in oldManuscriptCovers) {
       if (!keepRefs.contains(ref)) await files.delete(ref);
     }
@@ -684,6 +708,20 @@ class BackupService {
 
     final (manuscriptsAdded, manuscriptsUpdated) = await _mergeWriting(backup);
 
+    // Lectura: por libro y día se queda el valor mayor (no se suman, porque
+    // una copia restaurada dos veces duplicaría los minutos).
+    for (final entry in backup.readingLog.entries) {
+      final sep = entry.key.indexOf('|');
+      if (sep <= 0) continue;
+      final localBook = bookIdMap[entry.key.substring(0, sep)];
+      if (localBook == null) continue;
+      final key = '$localBook${entry.key.substring(sep)}';
+      final current = readingLog.get(key);
+      if (current is! int || entry.value > current) {
+        await readingLog.put(key, entry.value);
+      }
+    }
+
     return RestoreResult(
       added: added,
       updated: updated,
@@ -715,6 +753,7 @@ final backupServiceProvider = Provider<BackupService>(
     files: ref.watch(fileStoreProvider),
     highlights: ref.watch(highlightsBoxProvider),
     writing: ref.watch(writingRepositoryProvider),
+    readingLog: ref.watch(readingLogBoxProvider),
   ),
 );
 

@@ -58,6 +58,8 @@ class Book {
     this.lastOpenedAt,
     this.isOwnWork = false,
     this.sourceManuscriptId,
+    this.finishedAt,
+    this.sourceVersion,
   });
 
   final String id;
@@ -95,6 +97,13 @@ class Book {
   /// Manuscrito del que se exportó (para actualizarlo al reexportar).
   final String? sourceManuscriptId;
 
+  /// Cuándo se marcó como terminado (para la meta anual).
+  final DateTime? finishedAt;
+
+  /// Última edición de la obra cuando se exportó este archivo. Si no cambió,
+  /// reexportar no toca el libro (los PDF nunca salen idénticos byte a byte).
+  final DateTime? sourceVersion;
+
   Book copyWith({
     String? title,
     String? author,
@@ -106,6 +115,8 @@ class Book {
     double? progress,
     String? position,
     DateTime? lastOpenedAt,
+    DateTime? finishedAt,
+    bool clearFinishedAt = false,
   }) => Book(
     id: id,
     title: title ?? this.title,
@@ -125,5 +136,7 @@ class Book {
     lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
     isOwnWork: isOwnWork,
     sourceManuscriptId: sourceManuscriptId,
+    finishedAt: clearFinishedAt ? null : (finishedAt ?? this.finishedAt),
+    sourceVersion: sourceVersion,
   );
 }

@@ -49,6 +49,8 @@ class AppSettings {
     this.readerFontSize = 18,
     this.readerLineHeight = 1.6,
     this.readerJustify = true,
+    this.annualBookGoal = 12,
+    this.dailyReadingMinutes = 20,
   });
 
   final AppThemePreference themePreference;
@@ -59,6 +61,12 @@ class AppSettings {
   final double readerLineHeight;
   final bool readerJustify;
 
+  /// Meta de libros terminados al año (0 = sin meta).
+  final int annualBookGoal;
+
+  /// Meta de minutos de lectura al día (0 = sin meta).
+  final int dailyReadingMinutes;
+
   AppSettings copyWith({
     AppThemePreference? themePreference,
     bool? libraryGridView,
@@ -67,6 +75,8 @@ class AppSettings {
     double? readerFontSize,
     double? readerLineHeight,
     bool? readerJustify,
+    int? annualBookGoal,
+    int? dailyReadingMinutes,
   }) => AppSettings(
     themePreference: themePreference ?? this.themePreference,
     libraryGridView: libraryGridView ?? this.libraryGridView,
@@ -75,5 +85,7 @@ class AppSettings {
     readerFontSize: readerFontSize ?? this.readerFontSize,
     readerLineHeight: readerLineHeight ?? this.readerLineHeight,
     readerJustify: readerJustify ?? this.readerJustify,
+    annualBookGoal: annualBookGoal ?? this.annualBookGoal,
+    dailyReadingMinutes: dailyReadingMinutes ?? this.dailyReadingMinutes,
   );
 }

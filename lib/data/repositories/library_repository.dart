@@ -50,16 +50,25 @@ class LibraryRepository {
       saveBook(_latest(book).copyWith(title: title, author: author));
 
   Future<void> setStatus(Book book, ReadingStatus status) =>
-      saveBook(_latest(book).copyWith(status: status));
+      saveBook(_withStatus(_latest(book), status));
+
+  /// Cambia el estado manteniendo la fecha de terminado coherente.
+  Book _withStatus(Book book, ReadingStatus status) {
+    if (status == book.status) return book;
+    return status == ReadingStatus.finished
+        ? book.copyWith(status: status, finishedAt: DateTime.now())
+        : book.copyWith(status: status, clearFinishedAt: true);
+  }
 
   /// Al abrir un libro: fecha de última lectura y, si estaba
   /// "Por leer", pasa a "Leyendo".
   Future<Book> markOpened(Book book) async {
-    final updated = book.copyWith(
+    final current = _latest(book);
+    final updated = current.copyWith(
       lastOpenedAt: DateTime.now(),
-      status: book.status == ReadingStatus.toRead
+      status: current.status == ReadingStatus.toRead
           ? ReadingStatus.reading
-          : book.status,
+          : current.status,
     );
     await saveBook(updated);
     return updated;
@@ -79,7 +88,7 @@ class LibraryRepository {
     final latest = getBook(bookId);
     if (latest == null) return Future.value();
     return saveBook(
-      latest.copyWith(status: ReadingStatus.finished, progress: 1),
+      _withStatus(latest, ReadingStatus.finished).copyWith(progress: 1),
     );
   }
 

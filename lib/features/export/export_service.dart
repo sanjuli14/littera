@@ -28,8 +28,16 @@ class ExportException implements Exception {
 
 /// Archivo exportado.
 class ExportedFile {
-  const ExportedFile(this.fileName, this.bytes, this.format);
+  const ExportedFile(
+    this.fileName,
+    this.bytes,
+    this.format, {
+    required this.sourceVersion,
+  });
   final String fileName;
+
+  /// Última edición de la obra que contiene este archivo.
+  final DateTime sourceVersion;
   final Uint8List bytes;
   final ExportFormat format;
 
@@ -82,18 +90,33 @@ class ExportService {
     final cover = await _cover(m.coverRef, m.title, m.author);
     final ext = format.name;
     final bytes = switch (format) {
-      ExportFormat.epub => writeEpub(book, coverJpeg: cover),
+      // Fecha = última edición: misma obra, mismo EPUB.
+      ExportFormat.epub => writeEpub(
+        book,
+        coverJpeg: cover,
+        modified: m.updatedAt,
+      ),
       ExportFormat.pdf => await compute(
         buildPdf,
         PdfJob(book, await loadFonts(), cover),
       ),
     };
-    return ExportedFile(exportFileName(m.title, ext), bytes, format);
+    return ExportedFile(
+      exportFileName(m.title, ext),
+      bytes,
+      format,
+      sourceVersion: m.updatedAt,
+    );
   }
 
   /// Añade (o actualiza) la obra exportada en la biblioteca.
   Future<Book> addToLibrary(String manuscriptId, ExportedFile file) =>
-      importer.importOwnWork(manuscriptId, file.fileName, file.bytes);
+      importer.importOwnWork(
+        manuscriptId,
+        file.fileName,
+        file.bytes,
+        sourceVersion: file.sourceVersion,
+      );
 
   /// Carátula en JPEG: la de la obra o una generada.
   Future<Uint8List?> _cover(

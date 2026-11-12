@@ -159,10 +159,15 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Los capítulos sin texto se omiten
 - [ ] DOCX: descartado por ahora (EPUB y PDF cubren leer, compartir e imprimir)
 
-### Fase 7 — Estadísticas
-- [ ] Registrar sesiones de lectura automáticamente
-- [ ] Páginas/minutos por día, racha, meta anual de libros
-- [ ] Palabras escritas por día y racha de escritura
+### Fase 7 — Estadísticas ✅
+- [x] Tiempo de lectura real: cuenta mientras el lector está visible; se detiene tras 5 min sin actividad y en segundo plano; se anota cada minuto
+- [x] Fecha de terminado en cada libro (se borra si se vuelve a leer)
+- [x] Pantalla de estadísticas (desde Biblioteca y Ajustes): racha de lectura, minutos de hoy frente a la meta diaria, gráfica de 14 días, meta anual de libros con carátulas, horas del año
+- [x] Escritura: racha, palabras de hoy, gráfica de 14 días, palabras del año
+- [x] Metas editables: libros al año y minutos al día (la de palabras va en cada obra)
+- [x] Gráficas con color validado (contraste ≥ 3:1) en claro, sepia y oscuro; resumen accesible para lectores de pantalla
+- [x] Registro de lectura en la copia de seguridad (al fusionar no se duplican minutos)
+- [x] Corrige: reexportar una obra sin cambios ya no reinicia la posición (EPUB determinista y versión de la obra guardada en el libro)
 
 ### Fase 8 — Pulido y Web
 - [ ] Validar todo en Web (almacenamiento en IndexedDB, límites de tamaño)

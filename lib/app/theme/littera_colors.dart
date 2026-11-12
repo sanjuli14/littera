@@ -19,6 +19,11 @@ abstract final class LitteraColors {
   static const pergaminoMedio = Color(0xFFEADFC4);
   static const pergaminoOscuro = Color(0xFFDDCFAE);
   static const oroOscuro = Color(0xFF8A6A2C);
+
+  /// Oro para gráficas: validado (contraste ≥ 3:1, luminosidad y croma)
+  /// sobre los fondos claro/sepia y oscuro respectivamente.
+  static const oroGrafica = Color(0xFFA47E2E);
+  static const oroGraficaOscuro = Color(0xFFB98A2C);
   static const error = Color(0xFFB3261E);
   static const errorClaro = Color(0xFFF2B8B5);
 }

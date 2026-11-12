@@ -156,6 +156,29 @@ void main() {
     },
   );
 
+  test('el mismo EPUB sale idéntico aunque pase el tiempo', () async {
+    final a = await service.export(manuscriptId, ExportFormat.epub);
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    final b = await service.export(manuscriptId, ExportFormat.epub);
+    expect(b.bytes, a.bytes);
+  });
+
+  test('reexportar un PDF sin cambios no toca el libro', () async {
+    final first = await service.addToLibrary(
+      manuscriptId,
+      await service.export(manuscriptId, ExportFormat.pdf),
+    );
+    await env.repository.saveProgress(first.id, 'p:7', 0.5);
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    final again = await service.addToLibrary(
+      manuscriptId,
+      await service.export(manuscriptId, ExportFormat.pdf),
+    );
+    expect(again.id, first.id);
+    expect(again.position, 'p:7');
+    expect(again.contentHash, first.contentHash);
+  });
+
   test('EPUB y PDF de la misma obra son libros distintos', () async {
     await service.addToLibrary(
       manuscriptId,

@@ -234,5 +234,10 @@ Uint8List writeEpub(
         '</package>',
   );
 
-  return ZipEncoder().encodeBytes(archive);
+  // Misma fecha en todas las entradas: la misma obra da el mismo archivo.
+  final seconds = when.millisecondsSinceEpoch ~/ 1000;
+  for (final f in archive.files) {
+    f.lastModTime = seconds;
+  }
+  return ZipEncoder().encodeBytes(archive, modified: when);
 }

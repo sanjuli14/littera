@@ -134,6 +134,11 @@ class _LibraryAppBarState extends ConsumerState<_LibraryAppBar> {
       actions: widget.showTools
           ? [
               IconButton(
+                icon: const Icon(Icons.insights_outlined),
+                tooltip: 'Estadísticas',
+                onPressed: () => context.push(Routes.stats),
+              ),
+              IconButton(
                 icon: const Icon(Icons.search),
                 tooltip: 'Buscar',
                 onPressed: ref.read(searchQueryProvider.notifier).open,

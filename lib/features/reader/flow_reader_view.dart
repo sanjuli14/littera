@@ -110,6 +110,7 @@ class _FlowReaderViewState extends ConsumerState<FlowReaderView>
         last >= _lastIndex &&
         _scroll.position.pixels >= _scroll.position.maxScrollExtent - 8;
     if (first != _current || atEnd != _atEnd) {
+      readingActivity();
       setState(() {
         _current = first;
         _atEnd = atEnd;

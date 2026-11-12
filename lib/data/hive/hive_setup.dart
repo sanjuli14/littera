@@ -21,6 +21,9 @@ abstract final class HiveBoxes {
   static const entities = 'story_entities';
   static const writingLog = 'writing_log';
 
+  /// `'<bookId>|<día>'` → segundos leídos.
+  static const readingLog = 'reading_log';
+
   /// Solo en Web: bytes de libros y carátulas.
   static const files = 'files';
 }
@@ -57,6 +60,7 @@ Future<void> openBoxes() async {
   await Hive.openBox<ChapterVersion>(HiveBoxes.versions);
   await Hive.openBox<StoryEntity>(HiveBoxes.entities);
   await Hive.openBox<dynamic>(HiveBoxes.writingLog);
+  await Hive.openBox<dynamic>(HiveBoxes.readingLog);
   if (kIsWeb) await Hive.openBox<Uint8List>(HiveBoxes.files);
   await _migrate(meta);
 }

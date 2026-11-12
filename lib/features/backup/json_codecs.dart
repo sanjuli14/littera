@@ -38,6 +38,8 @@ Map<String, Object?> bookToJson(Book b) => {
   'lastOpenedAt': b.lastOpenedAt?.toIso8601String(),
   'isOwnWork': b.isOwnWork,
   'sourceManuscriptId': b.sourceManuscriptId,
+  'finishedAt': b.finishedAt?.toIso8601String(),
+  'sourceVersion': b.sourceVersion?.toIso8601String(),
 };
 
 Book bookFromJson(Map<String, Object?> j) {
@@ -71,6 +73,8 @@ Book bookFromJson(Map<String, Object?> j) {
     lastOpenedAt: _date(j['lastOpenedAt']),
     isOwnWork: j['isOwnWork'] == true,
     sourceManuscriptId: j['sourceManuscriptId'] as String?,
+    finishedAt: _date(j['finishedAt']),
+    sourceVersion: _date(j['sourceVersion']),
   );
 }
 
@@ -103,6 +107,8 @@ Map<String, Object?> settingsToJson(AppSettings s) => {
   'readerFontSize': s.readerFontSize,
   'readerLineHeight': s.readerLineHeight,
   'readerJustify': s.readerJustify,
+  'annualBookGoal': s.annualBookGoal,
+  'dailyReadingMinutes': s.dailyReadingMinutes,
 };
 
 AppSettings settingsFromJson(Map<String, Object?> j) {
@@ -125,6 +131,12 @@ AppSettings settingsFromJson(Map<String, Object?> j) {
       d.readerLineHeight,
     ).clamp(ReaderLimits.minLineHeight, ReaderLimits.maxLineHeight),
     readerJustify: (j['readerJustify'] as bool?) ?? d.readerJustify,
+    annualBookGoal:
+        (j['annualBookGoal'] as num?)?.toInt().clamp(0, 1000) ??
+        d.annualBookGoal,
+    dailyReadingMinutes:
+        (j['dailyReadingMinutes'] as num?)?.toInt().clamp(0, 1440) ??
+        d.dailyReadingMinutes,
   );
 }
 

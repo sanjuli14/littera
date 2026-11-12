@@ -54,6 +54,14 @@ class SettingsNotifier extends Notifier<AppSettings> {
   Future<void> setReaderJustify(bool value) =>
       _save(state.copyWith(readerJustify: value));
 
+  Future<void> setGoals({int? annualBookGoal, int? dailyReadingMinutes}) =>
+      _save(
+        state.copyWith(
+          annualBookGoal: annualBookGoal?.clamp(0, 1000),
+          dailyReadingMinutes: dailyReadingMinutes?.clamp(0, 24 * 60),
+        ),
+      );
+
   Future<void> _save(AppSettings value) async {
     state = value;
     await _box.put(HiveKeys.appSettings, value);

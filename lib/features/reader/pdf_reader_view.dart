@@ -95,6 +95,7 @@ class _PdfReaderViewState extends ConsumerState<PdfReaderView>
 
   void _onPageChanged(int? page) {
     if (page == null || page == _page) return;
+    readingActivity();
     setState(() => _page = page);
     if (chromeVisible) setChromeVisible(false);
     _saveTimer?.cancel();

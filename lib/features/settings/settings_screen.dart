@@ -54,6 +54,13 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.insights_outlined),
+            title: const Text('Estadísticas y metas'),
+            subtitle: const Text('Rachas, minutos leídos y palabras escritas'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.stats),
+          ),
+          ListTile(
             leading: const Icon(Icons.backup_outlined),
             title: const Text('Copia de seguridad'),
             subtitle: Text(lastBackupLabel(ref.watch(lastBackupProvider))),

@@ -30,6 +30,7 @@ class Device {
     files: env.files,
     highlights: env.highlights,
     writing: env.writingRepository,
+    readingLog: env.readingLog,
   );
 
   Future<void> addBook(Book book, {bool withCover = false}) async {

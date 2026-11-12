@@ -17,7 +17,7 @@ types:
         index: 3
   AppSettings:
     typeId: 1
-    nextIndex: 7
+    nextIndex: 9
     fields:
       themePreference:
         index: 0
@@ -33,6 +33,10 @@ types:
         index: 5
       readerJustify:
         index: 6
+      annualBookGoal:
+        index: 7
+      dailyReadingMinutes:
+        index: 8
   LibrarySort:
     typeId: 2
     nextIndex: 4
@@ -67,7 +71,7 @@ types:
         index: 2
   Book:
     typeId: 5
-    nextIndex: 18
+    nextIndex: 20
     fields:
       id:
         index: 0
@@ -105,6 +109,10 @@ types:
         index: 16
       sourceManuscriptId:
         index: 17
+      finishedAt:
+        index: 18
+      sourceVersion:
+        index: 19
   Shelf:
     typeId: 6
     nextIndex: 4

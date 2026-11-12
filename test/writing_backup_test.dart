@@ -20,6 +20,7 @@ BackupService service(TestEnv e) => BackupService(
   files: e.files,
   highlights: e.highlights,
   writing: e.writingRepository,
+  readingLog: e.readingLog,
 );
 
 void main() {

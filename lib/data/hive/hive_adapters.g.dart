@@ -75,13 +75,15 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       readerFontSize: fields[4] == null ? 18 : (fields[4] as num).toDouble(),
       readerLineHeight: fields[5] == null ? 1.6 : (fields[5] as num).toDouble(),
       readerJustify: fields[6] == null ? true : fields[6] as bool,
+      annualBookGoal: fields[7] == null ? 12 : (fields[7] as num).toInt(),
+      dailyReadingMinutes: fields[8] == null ? 20 : (fields[8] as num).toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.themePreference)
       ..writeByte(1)
@@ -95,7 +97,11 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(5)
       ..write(obj.readerLineHeight)
       ..writeByte(6)
-      ..write(obj.readerJustify);
+      ..write(obj.readerJustify)
+      ..writeByte(7)
+      ..write(obj.annualBookGoal)
+      ..writeByte(8)
+      ..write(obj.dailyReadingMinutes);
   }
 
   @override
@@ -269,13 +275,15 @@ class BookAdapter extends TypeAdapter<Book> {
       lastOpenedAt: fields[15] as DateTime?,
       isOwnWork: fields[16] == null ? false : fields[16] as bool,
       sourceManuscriptId: fields[17] as String?,
+      finishedAt: fields[18] as DateTime?,
+      sourceVersion: fields[19] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Book obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -311,7 +319,11 @@ class BookAdapter extends TypeAdapter<Book> {
       ..writeByte(16)
       ..write(obj.isOwnWork)
       ..writeByte(17)
-      ..write(obj.sourceManuscriptId);
+      ..write(obj.sourceManuscriptId)
+      ..writeByte(18)
+      ..write(obj.finishedAt)
+      ..writeByte(19)
+      ..write(obj.sourceVersion);
   }
 
   @override

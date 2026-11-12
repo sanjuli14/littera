@@ -54,8 +54,9 @@ class BookImporter {
   Future<Book> importOwnWork(
     String manuscriptId,
     String fileName,
-    Uint8List bytes,
-  ) async {
+    Uint8List bytes, {
+    DateTime? sourceVersion,
+  }) async {
     final (format, ext) = _validate(fileName, bytes);
     final hash = sha1.convert(bytes).toString();
     final previous = repository.books.values
@@ -83,10 +84,13 @@ class BookImporter {
         hash,
         meta,
         manuscriptId: manuscriptId,
+        sourceVersion: sourceVersion,
       );
     }
 
-    if (previous.contentHash == hash) return previous; // sin cambios
+    final sameVersion =
+        sourceVersion != null && previous.sourceVersion == sourceVersion;
+    if (sameVersion || previous.contentHash == hash) return previous;
     final meta = await _readMetadata(format, bytes);
     final fileRef = await files.write(
       FileArea.books,
@@ -110,6 +114,7 @@ class BookImporter {
       lastOpenedAt: previous.lastOpenedAt,
       isOwnWork: true,
       sourceManuscriptId: manuscriptId,
+      sourceVersion: sourceVersion,
     );
     await repository.saveBook(updated);
     if (!previous.hasCustomCover && meta.coverBytes != null) {
@@ -151,6 +156,7 @@ class BookImporter {
     String hash,
     BookMetadata meta, {
     String? manuscriptId,
+    DateTime? sourceVersion,
   }) async {
     final id = _uuid.v4();
     final fileRef = await files.write(FileArea.books, '$id.$ext', bytes);
@@ -166,6 +172,7 @@ class BookImporter {
       addedAt: DateTime.now(),
       isOwnWork: manuscriptId != null,
       sourceManuscriptId: manuscriptId,
+      sourceVersion: sourceVersion,
     );
     await repository.saveBook(book);
     final cover = meta.coverBytes;

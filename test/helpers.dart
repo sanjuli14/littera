@@ -17,6 +17,7 @@ import 'package:littera/data/models/shelf.dart';
 import 'package:littera/data/repositories/highlights_repository.dart';
 import 'package:littera/data/repositories/library_repository.dart';
 import 'package:littera/data/repositories/settings_repository.dart';
+import 'package:littera/data/repositories/stats_repository.dart';
 import 'package:littera/data/repositories/writing_repository.dart';
 import 'package:littera/features/backup/backup_service.dart';
 import 'package:littera/features/library/import/pdf_cover_renderer.dart';
@@ -84,6 +85,7 @@ class TestEnv {
     this.versions,
     this.entities,
     this.writingLog,
+    this.readingLog,
   );
 
   final Box<AppSettings> settings;
@@ -97,6 +99,7 @@ class TestEnv {
   final Box<ChapterVersion> versions;
   final Box<StoryEntity> entities;
   final Box<dynamic> writingLog;
+  final Box<dynamic> readingLog;
 
   static Future<TestEnv> create() async => TestEnv._(
     await memoryBox<AppSettings>(),
@@ -110,6 +113,13 @@ class TestEnv {
     await memoryBox<ChapterVersion>(),
     await memoryBox<StoryEntity>(),
     await memoryBox<dynamic>(),
+    await memoryBox<dynamic>(),
+  );
+
+  StatsRepository get statsRepository => StatsRepository(
+    readingLog: readingLog,
+    writingLog: writingLog,
+    books: books,
   );
 
   WritingRepository get writingRepository => WritingRepository(
@@ -143,6 +153,7 @@ class TestEnv {
     versionsBoxProvider.overrideWithValue(versions),
     entitiesBoxProvider.overrideWithValue(entities),
     writingLogBoxProvider.overrideWithValue(writingLog),
+    readingLogBoxProvider.overrideWithValue(readingLog),
     pdfCoverRendererProvider.overrideWithValue(FakePdfCoverRenderer()),
   ];
 }

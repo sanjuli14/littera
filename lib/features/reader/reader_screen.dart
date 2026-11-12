@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/book.dart';
 import '../../data/repositories/library_repository.dart';
 import '../../data/repositories/settings_repository.dart';
+import '../../data/repositories/stats_repository.dart';
+import '../stats/reading_tracker.dart';
 import 'flow_reader_view.dart';
 import 'pdf_reader_view.dart';
 import 'reader_palette.dart';
@@ -155,6 +159,8 @@ class _Message extends StatelessWidget {
 mixin ReaderStateMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   /// Se lee en initState: en dispose ya no se puede usar `ref`.
   late final LibraryRepository repo;
+  late final ReadingTracker _tracker;
+  Timer? _trackerTimer;
   bool chromeVisible = true;
   bool _finishPrompted = false;
   late final AppLifecycleListener _lifecycle;
@@ -168,19 +174,40 @@ mixin ReaderStateMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   void initState() {
     super.initState();
     repo = ref.read(libraryRepositoryProvider);
-    _lifecycle = AppLifecycleListener(
-      onHide: saveNow,
-      onPause: saveNow,
-      onDetach: saveNow,
+    final stats = ref.read(statsRepositoryProvider);
+    _tracker = ReadingTracker(
+      onFlush: (seconds, at) => stats.addReadingTime(bookId, at, seconds),
     );
+    // Se anota cada minuto para no perder tiempo si la app se cierra de golpe.
+    _trackerTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _tracker.flush(),
+    );
+    _lifecycle = AppLifecycleListener(
+      onHide: _onBackground,
+      onPause: _onBackground,
+      onDetach: _onBackground,
+      onShow: _tracker.resume,
+      onResume: _tracker.resume,
+    );
+  }
+
+  void _onBackground() {
+    _tracker.pause();
+    saveNow();
   }
 
   @override
   void dispose() {
     _lifecycle.dispose();
+    _trackerTimer?.cancel();
+    _tracker.pause();
     saveNow();
     super.dispose();
   }
+
+  /// Avisa de actividad (pasar página, desplazarse) al contador de lectura.
+  void readingActivity() => _tracker.activity();
 
   void setChromeVisible(bool visible) {
     if (visible == chromeVisible) return;
@@ -190,7 +217,10 @@ mixin ReaderStateMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     );
   }
 
-  void toggleChrome() => setChromeVisible(!chromeVisible);
+  void toggleChrome() {
+    readingActivity();
+    setChromeVisible(!chromeVisible);
+  }
 
   String? _lastSaved;
 
