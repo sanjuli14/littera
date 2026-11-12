@@ -17,7 +17,7 @@ types:
         index: 3
   AppSettings:
     typeId: 1
-    nextIndex: 11
+    nextIndex: 15
     fields:
       themePreference:
         index: 0
@@ -37,6 +37,14 @@ types:
         index: 9
       readerSerif:
         index: 10
+      reminderEnabled:
+        index: 11
+      reminderHour:
+        index: 12
+      reminderMinute:
+        index: 13
+      nudgesEnabled:
+        index: 14
   LibrarySort:
     typeId: 2
     nextIndex: 4

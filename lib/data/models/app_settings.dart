@@ -51,6 +51,10 @@ class AppSettings {
     this.readerJustify = true,
     this.onboardingDone = false,
     this.readerSerif = true,
+    this.reminderEnabled = false,
+    this.reminderHour = 21,
+    this.reminderMinute = 0,
+    this.nudgesEnabled = false,
   });
 
   final AppThemePreference themePreference;
@@ -67,6 +71,14 @@ class AppSettings {
   /// Letra del lector: serif clásica (Lora) o sans moderna (Montserrat).
   final bool readerSerif;
 
+  /// Recordatorio diario de lectura a [reminderHour]:[reminderMinute].
+  final bool reminderEnabled;
+  final int reminderHour;
+  final int reminderMinute;
+
+  /// Avisar de libros a medias ("¡Ey, ya casi!").
+  final bool nudgesEnabled;
+
   AppSettings copyWith({
     AppThemePreference? themePreference,
     bool? libraryGridView,
@@ -77,6 +89,10 @@ class AppSettings {
     bool? readerJustify,
     bool? onboardingDone,
     bool? readerSerif,
+    bool? reminderEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    bool? nudgesEnabled,
   }) => AppSettings(
     themePreference: themePreference ?? this.themePreference,
     libraryGridView: libraryGridView ?? this.libraryGridView,
@@ -87,5 +103,9 @@ class AppSettings {
     readerJustify: readerJustify ?? this.readerJustify,
     onboardingDone: onboardingDone ?? this.onboardingDone,
     readerSerif: readerSerif ?? this.readerSerif,
+    reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+    reminderHour: reminderHour ?? this.reminderHour,
+    reminderMinute: reminderMinute ?? this.reminderMinute,
+    nudgesEnabled: nudgesEnabled ?? this.nudgesEnabled,
   );
 }

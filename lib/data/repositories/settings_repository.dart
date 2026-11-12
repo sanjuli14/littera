@@ -57,6 +57,17 @@ class SettingsNotifier extends Notifier<AppSettings> {
   Future<void> setReaderSerif(bool value) =>
       _save(state.copyWith(readerSerif: value));
 
+  Future<void> setReminder({bool? enabled, int? hour, int? minute}) => _save(
+    state.copyWith(
+      reminderEnabled: enabled,
+      reminderHour: hour?.clamp(0, 23),
+      reminderMinute: minute?.clamp(0, 59),
+    ),
+  );
+
+  Future<void> setNudgesEnabled(bool value) =>
+      _save(state.copyWith(nudgesEnabled: value));
+
   Future<void> completeOnboarding() =>
       _save(state.copyWith(onboardingDone: true));
 

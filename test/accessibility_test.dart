@@ -176,6 +176,11 @@ void main() {
 
         // Ajustes → copia de seguridad.
         await tap(find.byTooltip('Ajustes'));
+        await tester.scrollUntilVisible(
+          find.text('Copia de seguridad'),
+          200,
+          scrollable: find.byType(Scrollable).last,
+        );
         await tap(find.text('Copia de seguridad'));
         await tester.scrollUntilVisible(
           find.text('Exportar copia completa'),

@@ -7,6 +7,7 @@ import 'app/app.dart';
 import 'core/storage/app_storage.dart';
 import 'core/storage/file_store.dart';
 import 'data/hive/hive_setup.dart';
+import 'features/reminders/reminder_scheduler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,11 +17,24 @@ Future<void> main() async {
       ? HiveFileStore(Hive.box<Uint8List>(HiveBoxes.files))
       : IoFileStore(storage);
 
+  // Recordatorios de lectura: notificaciones locales (no en Web).
+  ReminderScheduler reminders = NoopReminderScheduler();
+  if (!kIsWeb) {
+    try {
+      final local = LocalReminderScheduler();
+      await local.init();
+      reminders = local;
+    } catch (e) {
+      debugPrint('Notificaciones no disponibles: $e');
+    }
+  }
+
   runApp(
     ProviderScope(
       overrides: [
         appStorageProvider.overrideWithValue(storage),
         fileStoreProvider.overrideWithValue(fileStore),
+        reminderSchedulerProvider.overrideWithValue(reminders),
       ],
       child: const LitteraApp(),
     ),

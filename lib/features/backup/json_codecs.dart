@@ -111,6 +111,10 @@ Map<String, Object?> settingsToJson(AppSettings s) => {
   'readerJustify': s.readerJustify,
   'onboardingDone': s.onboardingDone,
   'readerSerif': s.readerSerif,
+  'reminderEnabled': s.reminderEnabled,
+  'reminderHour': s.reminderHour,
+  'reminderMinute': s.reminderMinute,
+  'nudgesEnabled': s.nudgesEnabled,
 };
 
 AppSettings settingsFromJson(Map<String, Object?> j) {
@@ -136,6 +140,12 @@ AppSettings settingsFromJson(Map<String, Object?> j) {
     // Si se restaura una copia, ya no hace falta la bienvenida.
     onboardingDone: true,
     readerSerif: (j['readerSerif'] as bool?) ?? d.readerSerif,
+    reminderEnabled: (j['reminderEnabled'] as bool?) ?? d.reminderEnabled,
+    reminderHour: ((j['reminderHour'] as num?)?.toInt() ?? d.reminderHour)
+        .clamp(0, 23),
+    reminderMinute: ((j['reminderMinute'] as num?)?.toInt() ?? d.reminderMinute)
+        .clamp(0, 59),
+    nudgesEnabled: (j['nudgesEnabled'] as bool?) ?? d.nudgesEnabled,
   );
 }
 

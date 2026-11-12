@@ -10,6 +10,8 @@ import '../../data/models/app_settings.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../backup/backup_screen.dart';
 import '../backup/backup_service.dart';
+import '../reminders/reminder_scheduler.dart';
+import '../../core/widgets/dialogs.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -52,6 +54,8 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+          const _RemindersSection(),
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -205,6 +209,120 @@ class _ThemeTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Recordatorios: un aviso diario para leer y otro para libros a medias.
+class _RemindersSection extends ConsumerWidget {
+  const _RemindersSection();
+
+  String _time(int h, int m) =>
+      '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}';
+
+  /// Pide permiso de notificaciones; si se niega, lo explica.
+  Future<bool> _allow(BuildContext context, WidgetRef ref) async {
+    final granted = await ref
+        .read(reminderSchedulerProvider)
+        .requestPermission();
+    if (!granted && context.mounted) {
+      showMessage(
+        context,
+        'Activa las notificaciones de Littera en los ajustes del móvil',
+      );
+    }
+    return granted;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final settings = ref.watch(settingsProvider);
+    final notifier = ref.read(settingsProvider.notifier);
+    final supported = ref.watch(reminderSchedulerProvider).isSupported;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Text(
+            'Recordatorios',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: theme.colorScheme.secondary,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SoftCard(
+            child: !supported
+                ? const ListTile(
+                    leading: Icon(Icons.notifications_off_outlined),
+                    title: Text('Recordatorios'),
+                    subtitle: Text('Disponibles en la app para Android'),
+                    enabled: false,
+                  )
+                : Column(
+                    children: [
+                      SwitchListTile(
+                        secondary: const Icon(Icons.notifications_none_rounded),
+                        title: const Text('Recordarme leer cada día'),
+                        subtitle: const Text(
+                          'Un aviso suave a la hora que elijas',
+                        ),
+                        value: settings.reminderEnabled,
+                        activeThumbColor: LitteraColors.oro,
+                        onChanged: (on) async {
+                          if (on && !await _allow(context, ref)) return;
+                          await notifier.setReminder(enabled: on);
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.schedule_rounded),
+                        title: const Text('Hora'),
+                        enabled:
+                            settings.reminderEnabled || settings.nudgesEnabled,
+                        trailing: Text(
+                          _time(settings.reminderHour, settings.reminderMinute),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onTap: () async {
+                          final picked = await showTimePicker(
+                            context: context,
+                            helpText: 'Hora de leer',
+                            initialTime: TimeOfDay(
+                              hour: settings.reminderHour,
+                              minute: settings.reminderMinute,
+                            ),
+                          );
+                          if (picked == null) return;
+                          await notifier.setReminder(
+                            hour: picked.hour,
+                            minute: picked.minute,
+                          );
+                        },
+                      ),
+                      SwitchListTile(
+                        secondary: const Icon(Icons.bookmark_border_rounded),
+                        title: const Text('Avisarme de libros a medias'),
+                        subtitle: const Text(
+                          '«¡Ey, ya casi! Te falta poco para terminar…»',
+                        ),
+                        value: settings.nudgesEnabled,
+                        activeThumbColor: LitteraColors.oro,
+                        onChanged: (on) async {
+                          if (on && !await _allow(context, ref)) return;
+                          await notifier.setNudgesEnabled(on);
+                        },
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Firebase (no se usa: Littera es 100 % local)
+google-services*.json

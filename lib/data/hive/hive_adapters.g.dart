@@ -77,13 +77,17 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       readerJustify: fields[6] == null ? true : fields[6] as bool,
       onboardingDone: fields[9] == null ? false : fields[9] as bool,
       readerSerif: fields[10] == null ? true : fields[10] as bool,
+      reminderEnabled: fields[11] == null ? false : fields[11] as bool,
+      reminderHour: fields[12] == null ? 21 : (fields[12] as num).toInt(),
+      reminderMinute: fields[13] == null ? 0 : (fields[13] as num).toInt(),
+      nudgesEnabled: fields[14] == null ? false : fields[14] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.themePreference)
       ..writeByte(1)
@@ -101,7 +105,15 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(9)
       ..write(obj.onboardingDone)
       ..writeByte(10)
-      ..write(obj.readerSerif);
+      ..write(obj.readerSerif)
+      ..writeByte(11)
+      ..write(obj.reminderEnabled)
+      ..writeByte(12)
+      ..write(obj.reminderHour)
+      ..writeByte(13)
+      ..write(obj.reminderMinute)
+      ..writeByte(14)
+      ..write(obj.nudgesEnabled);
   }
 
   @override
