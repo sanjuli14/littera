@@ -19,6 +19,7 @@ part 'hive_adapters.g.dart';
   AdapterSpec<ReadingStatus>(),
   AdapterSpec<Book>(),
   AdapterSpec<Shelf>(),
+  AdapterSpec<ReaderTheme>(),
 ])
 // ignore: unused_element
 void _() {}

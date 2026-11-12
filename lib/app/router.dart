@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
+import '../features/reader/reader_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/writing/writing_screen.dart';
 import 'home_shell.dart';
@@ -12,6 +13,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: Routes.library,
     routes: [
+      // Lector a pantalla completa, sin barra de navegación inferior.
+      GoRoute(
+        path: '/leer/:id',
+        builder: (context, state) =>
+            ReaderScreen(bookId: state.pathParameters['id']!),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => HomeShell(navigationShell: shell),
         branches: [

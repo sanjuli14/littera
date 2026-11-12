@@ -123,7 +123,7 @@ Uint8List pngBytes({int width = 300, int height = 300}) {
   return img.encodePng(image);
 }
 
-Uint8List _zip(
+Uint8List buildZip(
   Map<String, String> textFiles, {
   Map<String, Uint8List>? binary,
 }) {
@@ -153,7 +153,7 @@ Uint8List buildEpub({
   final meta = withCover && !epub3
       ? '<meta name="cover" content="cover-img"/>'
       : '';
-  return _zip({
+  return buildZip({
     'mimetype': 'application/epub+zip',
     'META-INF/container.xml':
         '<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">'
@@ -171,7 +171,7 @@ Uint8List buildEpub({
 }
 
 Uint8List buildDocx({String? title = 'Mi novela', String? author = 'Ana'}) =>
-    _zip({
+    buildZip({
       '[Content_Types].xml': '<Types/>',
       'word/document.xml': '<w:document/>',
       'docProps/core.xml':

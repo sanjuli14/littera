@@ -30,6 +30,30 @@ class SettingsNotifier extends Notifier<AppSettings> {
   Future<void> setLibrarySort(LibrarySort value) =>
       _save(state.copyWith(librarySort: value));
 
+  Future<void> setReaderTheme(ReaderTheme value) =>
+      _save(state.copyWith(readerTheme: value));
+
+  Future<void> setReaderFontSize(double value) => _save(
+    state.copyWith(
+      readerFontSize: value.clamp(
+        ReaderLimits.minFontSize,
+        ReaderLimits.maxFontSize,
+      ),
+    ),
+  );
+
+  Future<void> setReaderLineHeight(double value) => _save(
+    state.copyWith(
+      readerLineHeight: value.clamp(
+        ReaderLimits.minLineHeight,
+        ReaderLimits.maxLineHeight,
+      ),
+    ),
+  );
+
+  Future<void> setReaderJustify(bool value) =>
+      _save(state.copyWith(readerJustify: value));
+
   Future<void> _save(AppSettings value) async {
     state = value;
     await _box.put(HiveKeys.appSettings, value);

@@ -107,13 +107,15 @@ Cada fase termina con algo usable. Marca `[x]` al completar.
 - [x] Almacenamiento: disco en Android, IndexedDB (Hive) en Web; referencias relativas para el backup
 - [ ] Pendiente menor: recorte manual de carátula (hoy es automático al centro)
 
-### Fase 2 — Lector
-- [ ] Lector EPUB
-- [ ] Lector PDF
-- [ ] Lector DOCX (convertir a párrafos con estilos básicos: títulos, negrita, cursiva)
-- [ ] Recordar posición exacta al salir y reabrir
-- [ ] Ajustes: modo claro / sepia / oscuro, tamaño de letra, interlineado
-- [ ] Mover automáticamente a "Leyendo" al abrir y ofrecer "Terminado" al llegar al final
+### Fase 2 — Lector ✅
+- [x] Lector EPUB y DOCX propio: el archivo se convierte en bloques (títulos, párrafos, citas, listas, imágenes, separadores) en un isolate
+- [x] Lector PDF (`pdfrx`) con índice del PDF si lo trae
+- [x] Índice: nav (EPUB 3), toc.ncx (EPUB 2), títulos de Word (DOCX) o títulos del texto como respaldo
+- [x] Posición exacta guardada (bloque o página) con retardo, al salir y al pasar la app a segundo plano; se restaura al abrir
+- [x] Ajustes: tema Auto/Claro/Sepia/Oscuro, tamaño de letra, interlineado, justificar — guardados
+- [x] Barras que se ocultan al leer (toque para mostrarlas), modo inmersivo, barra de progreso para saltar
+- [x] "Por leer" → "Leyendo" al abrir; al llegar al final, ofrece marcar como terminado
+- [ ] Pendiente menor: probar el visor PDF en un dispositivo real (no se compiló la app en esta fase)
 
 ### Fase 3 — Backup y restauración (prioritaria: protege los datos)
 - [ ] Exportar todo a un archivo `littera-backup-AAAA-MM-DD.littera` (ZIP con):

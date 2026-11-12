@@ -43,6 +43,37 @@ class LibraryRepository {
   Future<void> setStatus(Book book, ReadingStatus status) =>
       saveBook(book.copyWith(status: status));
 
+  /// Al abrir un libro: fecha de última lectura y, si estaba
+  /// "Por leer", pasa a "Leyendo".
+  Future<Book> markOpened(Book book) async {
+    final updated = book.copyWith(
+      lastOpenedAt: DateTime.now(),
+      status: book.status == ReadingStatus.toRead
+          ? ReadingStatus.reading
+          : book.status,
+    );
+    await saveBook(updated);
+    return updated;
+  }
+
+  /// Guarda la posición exacta y el progreso (0–1). Lee la versión más
+  /// reciente del libro para no pisar cambios hechos en otra pantalla.
+  Future<void> saveProgress(String bookId, String position, double progress) {
+    final latest = getBook(bookId);
+    if (latest == null) return Future.value();
+    return saveBook(
+      latest.copyWith(position: position, progress: progress.clamp(0, 1)),
+    );
+  }
+
+  Future<void> markFinished(String bookId) {
+    final latest = getBook(bookId);
+    if (latest == null) return Future.value();
+    return saveBook(
+      latest.copyWith(status: ReadingStatus.finished, progress: 1),
+    );
+  }
+
   Future<void> toggleShelf(Book book, String shelfId) {
     final ids = [...book.shelfIds];
     ids.contains(shelfId) ? ids.remove(shelfId) : ids.add(shelfId);

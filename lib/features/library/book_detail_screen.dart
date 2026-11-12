@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/routes.dart';
 import '../../app/theme/littera_colors.dart';
 import '../../core/utils/text_utils.dart';
 import '../../core/widgets/dialogs.dart';
@@ -144,8 +146,7 @@ class BookDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () =>
-                showMessage(context, 'El lector llega en la próxima fase'),
+            onPressed: () => context.push(Routes.reader(book.id)),
             icon: const Icon(Icons.menu_book),
             label: Text(
               book.progress > 0

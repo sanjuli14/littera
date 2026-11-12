@@ -69,19 +69,33 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       librarySort: fields[2] == null
           ? LibrarySort.recentlyAdded
           : fields[2] as LibrarySort,
+      readerTheme: fields[3] == null
+          ? ReaderTheme.auto
+          : fields[3] as ReaderTheme,
+      readerFontSize: fields[4] == null ? 18 : (fields[4] as num).toDouble(),
+      readerLineHeight: fields[5] == null ? 1.6 : (fields[5] as num).toDouble(),
+      readerJustify: fields[6] == null ? true : fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.themePreference)
       ..writeByte(1)
       ..write(obj.libraryGridView)
       ..writeByte(2)
-      ..write(obj.librarySort);
+      ..write(obj.librarySort)
+      ..writeByte(3)
+      ..write(obj.readerTheme)
+      ..writeByte(4)
+      ..write(obj.readerFontSize)
+      ..writeByte(5)
+      ..write(obj.readerLineHeight)
+      ..writeByte(6)
+      ..write(obj.readerJustify);
   }
 
   @override
@@ -347,6 +361,51 @@ class ShelfAdapter extends TypeAdapter<Shelf> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ShelfAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ReaderThemeAdapter extends TypeAdapter<ReaderTheme> {
+  @override
+  final typeId = 7;
+
+  @override
+  ReaderTheme read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ReaderTheme.auto;
+      case 1:
+        return ReaderTheme.light;
+      case 2:
+        return ReaderTheme.sepia;
+      case 3:
+        return ReaderTheme.dark;
+      default:
+        return ReaderTheme.auto;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ReaderTheme obj) {
+    switch (obj) {
+      case ReaderTheme.auto:
+        writer.writeByte(0);
+      case ReaderTheme.light:
+        writer.writeByte(1);
+      case ReaderTheme.sepia:
+        writer.writeByte(2);
+      case ReaderTheme.dark:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReaderThemeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

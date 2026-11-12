@@ -12,6 +12,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(BookAdapter());
     registerAdapter(BookFormatAdapter());
     registerAdapter(LibrarySortAdapter());
+    registerAdapter(ReaderThemeAdapter());
     registerAdapter(ReadingStatusAdapter());
     registerAdapter(ShelfAdapter());
   }
@@ -24,6 +25,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(BookAdapter());
     registerAdapter(BookFormatAdapter());
     registerAdapter(LibrarySortAdapter());
+    registerAdapter(ReaderThemeAdapter());
     registerAdapter(ReadingStatusAdapter());
     registerAdapter(ShelfAdapter());
   }
