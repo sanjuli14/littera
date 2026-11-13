@@ -172,10 +172,6 @@
     .privacy p { margin: 0; color: var(--muted); }
     .privacy strong { color: var(--text); }
 
-    .meta-alt { margin-top: 6px; font-size: 13px; color: var(--muted); }
-    .meta-alt[hidden] { display: none; }
-    .install .meta-alt { color: #D9D1BE; margin-top: 12px; }
-    .install .meta-alt a { color: var(--pergamino); }
     .install .hint { font-size: 14px; color: #D9D1BE; margin: 4px 0 0; }
 
     /* ---------- Desarrollador ---------- */
@@ -252,7 +248,6 @@
             <span class="js-label">Descargar para Android</span>
           </a>
           <div class="meta js-meta">Archivo APK · se actualiza desde la propia app</div>
-          <div class="meta-alt js-alt" hidden></div>
         </div>
         <div class="phones" aria-hidden="true">
           <div class="phone back"><img src="img/home_dark.webp" alt="" width="600" height="1298"></div>
@@ -316,8 +311,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
               <span class="js-label">Descargar para Android</span>
             </a>
-            <div class="meta-alt js-alt" hidden></div>
-          </div>
+            </div>
           <ol>
             <li><span><strong>Descarga el APK</strong> desde el móvil con el botón.</span></li>
             <li><span><strong>Ábrelo</strong> desde las notificaciones o la carpeta de descargas.</span></li>
@@ -366,32 +360,9 @@
         });
         if (!res.ok) return;
         const release = await res.json();
-        const apks = (release.assets || []).filter(a => a.name.toLowerCase().endsWith('.apk'));
-        const byAbi = abi => apks.find(a => a.name.toLowerCase().includes(abi));
-        // Casi todos los móviles son de 64 bits (arm64). Si el navegador dice
-        // que es de 32, se ofrece el APK para móviles antiguos.
-        let bits = '';
-        try {
-          if (navigator.userAgentData?.getHighEntropyValues) {
-            bits = (await navigator.userAgentData.getHighEntropyValues(['bitness'])).bitness || '';
-          }
-        } catch (_) {}
-        const main = bits === '32' ? 'armeabi-v7a' : 'arm64-v8a';
-        const other = main === 'arm64-v8a' ? 'armeabi-v7a' : 'arm64-v8a';
-        const apk = byAbi(main) || apks[0];
+        // Un único APK para todos los móviles Android (ARM de 32 y 64 bits).
+        const apk = (release.assets || []).find(a => a.name.toLowerCase().endsWith('.apk'));
         if (!apk) return;
-        const alt = byAbi(other);
-        if (alt) {
-          document.querySelectorAll('.js-alt').forEach(el => {
-            el.textContent = other === 'armeabi-v7a' ? '¿Móvil antiguo de 32 bits o no se instala? ' : '¿Tu móvil es de 64 bits? ';
-            const a = document.createElement('a');
-            a.href = alt.browser_download_url;
-            a.setAttribute('download', '');
-            a.textContent = `Descarga esta otra versión (${(alt.size / 1048576).toFixed(1).replace('.', ',')} MB)`;
-            el.append(a);
-            el.hidden = false;
-          });
-        }
         const version = release.tag_name.replace(/^v/i, '');
         const mb = (apk.size / 1048576).toFixed(1).replace('.', ',');
         document.querySelectorAll('.js-download').forEach(a => {

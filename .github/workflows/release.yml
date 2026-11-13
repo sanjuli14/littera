@@ -62,30 +62,25 @@ jobs:
           LITTERA_KEYSTORE_PASSWORD: ${{ secrets.LITTERA_KEYSTORE_PASSWORD }}
           LITTERA_KEY_ALIAS: ${{ secrets.LITTERA_KEY_ALIAS }}
           LITTERA_KEY_PASSWORD: ${{ secrets.LITTERA_KEY_PASSWORD }}
-        # Un APK por arquitectura (cada móvil solo descarga la suya) y código
-        # ofuscado sin símbolos de depuración: mucho más ligero.
+        # Un único APK con ARM de 32 y 64 bits: se instala en cualquier móvil
+        # Android (incluidos los económicos con sistema de 32 bits). Código
+        # ofuscado y sin símbolos de depuración para que pese menos.
         run: |
-          flutter build apk --release --split-per-abi \
+          flutter build apk --release \
+            --target-platform android-arm,android-arm64 \
             --obfuscate --split-debug-info="$RUNNER_TEMP/symbols"
-          V="${{ steps.version.outputs.version }}"
-          OUT=build/app/outputs/flutter-apk
-          cp "$OUT/app-arm64-v8a-release.apk"   "littera-$V-arm64-v8a.apk"
-          cp "$OUT/app-armeabi-v7a-release.apk" "littera-$V-armeabi-v7a.apk"
-          cp "$OUT/app-x86_64-release.apk"      "littera-$V-x86_64.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            "littera-${{ steps.version.outputs.version }}.apk"
           ls -lh littera-*.apk
 
       - name: Crear la Release en GitHub
         env:
           GH_TOKEN: ${{ github.token }}
-        # arm64 va primero: es el que toman la web y las versiones antiguas
-        # de la app, que eligen el primer APK de la lista.
         run: |
-          V="${{ steps.version.outputs.version }}"
-          gh release create "$GITHUB_REF_NAME" "littera-$V-arm64-v8a.apk" \
-            --title "Littera $V" \
+          gh release create "$GITHUB_REF_NAME" \
+            "littera-${{ steps.version.outputs.version }}.apk" \
+            --title "Littera ${{ steps.version.outputs.version }}" \
             --notes-file "$RUNNER_TEMP/notes.md"
-          gh release upload "$GITHUB_REF_NAME" "littera-$V-armeabi-v7a.apk"
-          gh release upload "$GITHUB_REF_NAME" "littera-$V-x86_64.apk"
 
       - name: Borrar la clave
         if: always()

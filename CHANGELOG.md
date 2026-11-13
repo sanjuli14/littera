@@ -4,6 +4,11 @@ Cada versión publicada toma su texto de aquí: la sección `## [X.Y.Z]` aparece
 en GitHub Releases y en Ajustes → Novedades dentro de la app.
 Formato: `### títulos`, `- viñetas` y `**negrita**`.
 
+## [1.0.2] - 2026-11-12
+
+### Para todos los móviles
+- Un solo APK de unos 30 MB que se instala en **cualquier móvil Android**, también en los económicos que decían "no compatible".
+
 ## [1.0.1] - 2026-11-12
 
 ### Más ligera
