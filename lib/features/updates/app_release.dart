@@ -45,10 +45,29 @@ int compareVersions(String a, String b) {
   return 0;
 }
 
+/// Arquitecturas para las que se publica un APK propio.
+const apkAbis = ['arm64-v8a', 'armeabi-v7a', 'x86_64'];
+
+/// Elige el APK para el móvil: el de su arquitectura [abi]; si no hay, uno
+/// universal (sin arquitectura en el nombre); si tampoco, el primero.
+Map<dynamic, dynamic>? pickApk(List<Map<dynamic, dynamic>> apks, String? abi) {
+  if (apks.isEmpty) return null;
+  String name(Map<dynamic, dynamic> a) => (a['name'] as String).toLowerCase();
+  if (abi != null) {
+    for (final a in apks) {
+      if (name(a).contains(abi)) return a;
+    }
+  }
+  for (final a in apks) {
+    if (!apkAbis.any(name(a).contains)) return a;
+  }
+  return apks.first;
+}
+
 /// Convierte la respuesta de `GET /repos/{owner}/{repo}/releases`.
 /// Ignora borradores, versiones previas y entradas mal formadas; ordena de
-/// la más nueva a la más antigua.
-List<AppRelease> parseReleases(Object? json) {
+/// la más nueva a la más antigua. [abi] elige el APK de esa arquitectura.
+List<AppRelease> parseReleases(Object? json, {String? abi}) {
   if (json is! List) return const [];
   final out = <AppRelease>[];
   for (final item in json) {
@@ -57,20 +76,18 @@ List<AppRelease> parseReleases(Object? json) {
     final tag = item['tag_name'];
     if (tag is! String || tag.isEmpty) continue;
 
-    String? apkUrl;
-    var apkSize = 0;
     final assets = item['assets'];
-    if (assets is List) {
-      for (final a in assets) {
-        if (a is Map &&
-            (a['name'] as String? ?? '').toLowerCase().endsWith('.apk') &&
-            a['browser_download_url'] is String) {
-          apkUrl = a['browser_download_url'] as String;
-          apkSize = (a['size'] as num?)?.toInt() ?? 0;
-          break;
-        }
-      }
-    }
+    final apk = pickApk([
+      if (assets is List)
+        for (final a in assets)
+          if (a is Map &&
+              a['name'] is String &&
+              (a['name'] as String).toLowerCase().endsWith('.apk') &&
+              a['browser_download_url'] is String)
+            a,
+    ], abi);
+    final apkUrl = apk?['browser_download_url'] as String?;
+    final apkSize = (apk?['size'] as num?)?.toInt() ?? 0;
 
     final version = parseVersion(tag).join('.');
     out.add(

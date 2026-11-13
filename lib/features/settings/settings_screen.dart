@@ -12,6 +12,7 @@ import '../backup/backup_screen.dart';
 import '../backup/backup_service.dart';
 import '../reminders/reminder_scheduler.dart';
 import '../updates/updates_provider.dart';
+import 'developer_section.dart';
 import '../../core/widgets/dialogs.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -103,6 +104,17 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 28, 16, 12),
+            child: Text(
+              'Desarrollador',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.secondary,
+              ),
+            ),
+          ),
+          const DeveloperSection(),
+          const SizedBox(height: 24),
         ],
       ),
     );

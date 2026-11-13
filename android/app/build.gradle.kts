@@ -57,6 +57,14 @@ android {
         }
     }
 
+    // Comprime las librerías nativas dentro del APK (Flutter, PDFium…): la
+    // descarga ocupa menos de la mitad. Android las extrae al instalar.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     buildTypes {
         release {
             signingConfig = if (releaseStoreFile != null) {

@@ -55,10 +55,10 @@ jobs:
       # Sin la clave de firma (no se expone a pull requests): Gradle firma
       # con la de depuración. Sirve para comprobar que la app compila.
       - name: Compilar APK
-        run: flutter build apk --release
+        run: flutter build apk --release --split-per-abi
 
       - uses: actions/upload-artifact@v4
         with:
           name: littera-apk-${{ github.sha }}
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-*-release.apk
           retention-days: 7

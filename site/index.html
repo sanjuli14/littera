@@ -172,6 +172,38 @@
     .privacy p { margin: 0; color: var(--muted); }
     .privacy strong { color: var(--text); }
 
+    .meta-alt { margin-top: 6px; font-size: 13px; color: var(--muted); }
+    .meta-alt[hidden] { display: none; }
+    .install .meta-alt { color: #D9D1BE; margin-top: 12px; }
+    .install .meta-alt a { color: var(--pergamino); }
+    .install .hint { font-size: 14px; color: #D9D1BE; margin: 4px 0 0; }
+
+    /* ---------- Desarrollador ---------- */
+    .dev {
+      display: grid; grid-template-columns: auto 1fr auto; gap: 22px; align-items: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 28px; padding: 30px 32px; box-shadow: var(--shadow);
+    }
+    .dev .avatar {
+      width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--tinta); color: var(--pergamino); font-weight: 800; font-size: 26px;
+    }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dev .avatar { background: var(--oro); color: var(--tinta); } }
+    :root[data-theme="dark"] .dev .avatar { background: var(--oro); color: var(--tinta); }
+    .dev .label { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .dev h2 { margin: 2px 0 8px; font-size: 26px; }
+    .dev p { margin: 0; color: var(--muted); max-width: 34em; }
+    .whatsapp {
+      display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+      background: #1F8F4E; color: #fff; font-weight: 700; font-size: 16px;
+      padding: 14px 22px; border-radius: 999px; white-space: nowrap;
+      transition: transform .15s ease;
+    }
+    .whatsapp:hover { transform: translateY(-2px); }
+    .whatsapp:focus-visible { outline: 3px solid var(--oro); outline-offset: 3px; }
+    .whatsapp svg { width: 22px; height: 22px; flex: none; }
+    .dev .phone-num { display: block; margin-top: 8px; font-size: 13px; color: var(--muted); text-align: center; }
+
     footer { padding: 40px 0 56px; color: var(--muted); font-size: 14px; text-align: center; }
     footer a { font-weight: 600; }
 
@@ -184,6 +216,7 @@
       .grid { grid-template-columns: 1fr 1fr; }
       .install { grid-template-columns: 1fr; padding: 32px 24px; }
       .top nav { display: none; }
+      .dev { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 28px 22px; }
     }
     @media (max-width: 560px) {
       .grid { grid-template-columns: 1fr; }
@@ -203,6 +236,7 @@
         <a href="#funciones">Funciones</a>
         <a href="#capturas">Capturas</a>
         <a href="#instalar">Instalar</a>
+        <a href="#desarrollador">Contacto</a>
         <a href="https://github.com/sanjuli14/littera">GitHub</a>
       </nav>
     </header>
@@ -218,6 +252,7 @@
             <span class="js-label">Descargar para Android</span>
           </a>
           <div class="meta js-meta">Archivo APK · se actualiza desde la propia app</div>
+          <div class="meta-alt js-alt" hidden></div>
         </div>
         <div class="phones" aria-hidden="true">
           <div class="phone back"><img src="img/home_dark.webp" alt="" width="600" height="1298"></div>
@@ -281,6 +316,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
               <span class="js-label">Descargar para Android</span>
             </a>
+            <div class="meta-alt js-alt" hidden></div>
           </div>
           <ol>
             <li><span><strong>Descarga el APK</strong> desde el móvil con el botón.</span></li>
@@ -288,16 +324,35 @@
             <li><span>Si Android lo pide, <strong>permite instalar apps</strong> de tu navegador.</span></li>
             <li><span><strong>¡Listo!</strong> Importa tu primer libro y empieza a leer.</span></li>
           </ol>
+          <p class="hint" style="grid-column: 1 / -1">¿Android dice que hay un problema con el paquete? Si ya tenías Littera instalada de otra forma, desinstálala primero. Si el aviso sigue, vuelve a descargar el archivo: puede que la descarga se cortara.</p>
         </div>
         <div class="privacy">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
           <p><strong>Privada de verdad.</strong> Tus libros, subrayados y escritos nunca salen de tu móvil. Littera solo se conecta para comprobar si hay una versión nueva, sin enviar ningún dato tuyo.</p>
         </div>
       </section>
+
+      <section id="desarrollador">
+        <div class="dev">
+          <div class="avatar" aria-hidden="true">S</div>
+          <div>
+            <div class="label">Desarrollado por</div>
+            <h2>sanjuli14</h2>
+            <p>¿Quieres una app como esta para tu negocio o proyecto? Estoy disponible para contrataciones: escríbeme por WhatsApp y lo hablamos.</p>
+          </div>
+          <div>
+            <a class="whatsapp" href="https://wa.me/5354914231?text=Hola%2C%20vi%20Littera%20y%20me%20interesa%20contratarte." target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+              Escribir por WhatsApp
+            </a>
+            <span class="phone-num">+53 5491 4231</span>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>
-      Littera · Hecha con cariño para quienes leen y escriben ·
+      Littera · Desarrollada por sanjuli14 ·
       <a href="https://github.com/sanjuli14/littera/releases">Todas las versiones</a>
     </footer>
   </div>
@@ -311,8 +366,32 @@
         });
         if (!res.ok) return;
         const release = await res.json();
-        const apk = (release.assets || []).find(a => a.name.toLowerCase().endsWith('.apk'));
+        const apks = (release.assets || []).filter(a => a.name.toLowerCase().endsWith('.apk'));
+        const byAbi = abi => apks.find(a => a.name.toLowerCase().includes(abi));
+        // Casi todos los móviles son de 64 bits (arm64). Si el navegador dice
+        // que es de 32, se ofrece el APK para móviles antiguos.
+        let bits = '';
+        try {
+          if (navigator.userAgentData?.getHighEntropyValues) {
+            bits = (await navigator.userAgentData.getHighEntropyValues(['bitness'])).bitness || '';
+          }
+        } catch (_) {}
+        const main = bits === '32' ? 'armeabi-v7a' : 'arm64-v8a';
+        const other = main === 'arm64-v8a' ? 'armeabi-v7a' : 'arm64-v8a';
+        const apk = byAbi(main) || apks[0];
         if (!apk) return;
+        const alt = byAbi(other);
+        if (alt) {
+          document.querySelectorAll('.js-alt').forEach(el => {
+            el.textContent = other === 'armeabi-v7a' ? '¿Móvil antiguo de 32 bits o no se instala? ' : '¿Tu móvil es de 64 bits? ';
+            const a = document.createElement('a');
+            a.href = alt.browser_download_url;
+            a.setAttribute('download', '');
+            a.textContent = `Descarga esta otra versión (${(alt.size / 1048576).toFixed(1).replace('.', ',')} MB)`;
+            el.append(a);
+            el.hidden = false;
+          });
+        }
         const version = release.tag_name.replace(/^v/i, '');
         const mb = (apk.size / 1048576).toFixed(1).replace('.', ',');
         document.querySelectorAll('.js-download').forEach(a => {

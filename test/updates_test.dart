@@ -88,6 +88,40 @@ void main() {
       expect(list[1].hasApk, isFalse);
       expect(parseReleases('basura'), isEmpty);
     });
+
+    test('elige el APK de la arquitectura del móvil', () {
+      Map<String, Object?> asset(String name) => {
+        'name': name,
+        'browser_download_url': 'https://example.com/$name',
+        'size': 1,
+      };
+      final json = [
+        {
+          'tag_name': 'v2.0.0',
+          'published_at': '2026-11-12T10:00:00Z',
+          'assets': [
+            asset('littera-2.0.0-arm64-v8a.apk'),
+            asset('littera-2.0.0-armeabi-v7a.apk'),
+            asset('littera-2.0.0-x86_64.apk'),
+            asset('notas.txt'),
+          ],
+        },
+      ];
+      String? urlFor(String? abi) =>
+          parseReleases(json, abi: abi).single.apkUrl;
+      expect(urlFor('armeabi-v7a'), endsWith('-armeabi-v7a.apk'));
+      expect(urlFor('x86_64'), endsWith('-x86_64.apk'));
+      expect(urlFor('arm64-v8a'), endsWith('-arm64-v8a.apk'));
+      expect(urlFor(null), endsWith('-arm64-v8a.apk'));
+
+      // Versiones antiguas con un solo APK universal.
+      expect(
+        pickApk([
+          {'name': 'littera-1.0.0.apk'},
+        ], 'armeabi-v7a')?['name'],
+        'littera-1.0.0.apk',
+      );
+    });
   });
 
   group('servicio', () {

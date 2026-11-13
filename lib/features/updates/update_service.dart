@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'app_release.dart';
+import 'device_abi.dart';
 
 class UpdateException implements Exception {
   const UpdateException(this.message);
@@ -28,15 +29,20 @@ class UpdateService {
     required this.meta,
     required this.currentVersion,
     this.repository = 'sanjuli14/littera',
+    String? abi,
     Future<Directory> Function()? downloadsDir,
     Future<bool> Function(String path)? openInstaller,
-  }) : _downloadsDir = downloadsDir ?? getTemporaryDirectory,
+  }) : abi = abi ?? deviceAbi(),
+       _downloadsDir = downloadsDir ?? getTemporaryDirectory,
        _openInstaller = openInstaller ?? _openWithSystem;
 
   final http.Client client;
   final Box<dynamic> meta;
   final String currentVersion;
   final String repository;
+
+  /// Arquitectura del móvil, para descargar solo su APK.
+  final String? abi;
   final Future<Directory> Function() _downloadsDir;
   final Future<bool> Function(String path) _openInstaller;
 
@@ -57,7 +63,7 @@ class UpdateService {
     final raw = meta.get(_cacheKey);
     if (raw is! String) return const [];
     try {
-      return parseReleases(jsonDecode(raw));
+      return parseReleases(jsonDecode(raw), abi: abi);
     } catch (_) {
       return const [];
     }
@@ -92,7 +98,7 @@ class UpdateService {
       );
     }
     final text = utf8.decode(response.bodyBytes, allowMalformed: true);
-    final releases = parseReleases(jsonDecode(text));
+    final releases = parseReleases(jsonDecode(text), abi: abi);
     await meta.put(_cacheKey, text);
     await meta.put(_lastCheckKey, (now ?? DateTime.now()).toIso8601String());
     return releases;

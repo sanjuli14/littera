@@ -4,6 +4,15 @@ Cada versión publicada toma su texto de aquí: la sección `## [X.Y.Z]` aparece
 en GitHub Releases y en Ajustes → Novedades dentro de la app.
 Formato: `### títulos`, `- viñetas` y `**negrita**`.
 
+## [1.0.1] - 2026-11-12
+
+### Más ligera
+- La descarga pasa de unos 100 MB a una fracción: cada móvil baja **solo el APK de su procesador**.
+- Las actualizaciones desde la app eligen también el APK adecuado.
+
+### Contacto
+- Nueva sección **Desarrollador** en Ajustes, con contacto directo por WhatsApp para contrataciones.
+
 ## [1.0.0] - 2026-11-12
 
 ### Tu biblioteca
