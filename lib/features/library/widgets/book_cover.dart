@@ -35,9 +35,14 @@ class CoverImage extends ConsumerWidget {
     this.label = '',
     this.compact = false,
     this.semanticLabel,
+    this.image,
   });
 
   final String? coverRef;
+
+  /// Imagen de otro origen (p. ej. de internet); tiene prioridad sobre
+  /// [coverRef]. Mientras carga o si falla, se ve la carátula generada.
+  final ImageProvider? image;
   final String title;
   final String author;
   final String label;
@@ -47,9 +52,9 @@ class CoverImage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cover = coverRef;
-    final provider = cover == null
-        ? null
-        : ref.watch(fileStoreProvider).image(cover);
+    final provider =
+        image ??
+        (cover == null ? null : ref.watch(fileStoreProvider).image(cover));
     final generated = GeneratedCover(
       title: title,
       author: author,
@@ -110,6 +115,11 @@ class CoverImage extends ConsumerWidget {
                             gaplessPlayback: true,
                             semanticLabel: semanticLabel,
                             errorBuilder: (_, _, _) => generated,
+                            // De internet tarda: la generada mientras llega.
+                            frameBuilder: image == null
+                                ? null
+                                : (_, child, frame, sync) =>
+                                      sync || frame != null ? child : generated,
                           );
                         },
                       )),

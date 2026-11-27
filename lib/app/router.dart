@@ -2,6 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/backup/backup_screen.dart';
+import '../features/explore/explore_book_screen.dart';
+import '../features/explore/explore_screen.dart';
+import '../features/explore/gutenberg_book.dart';
 import '../features/library/book_detail_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/quotes/quotes_screen.dart';
@@ -58,6 +61,32 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'libro/:id',
                     builder: (context, state) =>
                         BookDetailScreen(bookId: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.explore,
+                builder: (context, state) => const ExploreScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'libro/:id',
+                    builder: (context, state) => ExploreBookScreen(
+                      id: int.tryParse(state.pathParameters['id']!) ?? 0,
+                      initial: state.extra is GutenbergBook
+                          ? state.extra! as GutenbergBook
+                          : null,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'tema',
+                    builder: (context, state) => ExploreTopicScreen(
+                      title: state.uri.queryParameters['titulo'] ?? 'Explorar',
+                      topic: state.uri.queryParameters['tema'],
+                    ),
                   ),
                 ],
               ),

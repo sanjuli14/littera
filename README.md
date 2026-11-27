@@ -1,10 +1,11 @@
 # Littera
 
-Biblioteca y taller de escritura **100 % local**. Lee EPUB, PDF y DOCX, subraya y toma notas, escribe tus propias obras por capítulos y expórtalas a EPUB o PDF. Nada sale de tu dispositivo salvo las copias de seguridad que tú guardes.
+Biblioteca y taller de escritura **local**. Lee EPUB, PDF y DOCX, subraya y toma notas, escribe tus propias obras por capítulos y expórtalas a EPUB o PDF. Tu biblioteca nunca sale del dispositivo salvo en las copias de seguridad que tú guardes; solo Explorar (lo que buscas) y la comprobación de actualizaciones usan internet.
 
 ## Qué hace
 
 - **Biblioteca**: importar EPUB, PDF y DOCX (con carátula y metadatos automáticos), carátulas personalizadas, estados (Leyendo / Por leer / Terminados), estantes propios, búsqueda y orden.
+- **Explorar**: catálogo de clásicos gratis de dominio público de [Project Gutenberg](https://www.gutenberg.org) vía [Gutendex](https://gutendex.com), con búsqueda, temas e idiomas; cada libro se descarga en EPUB a la biblioteca. Las consultas se guardan un día en caché. Si el tráfico crece, conviene alojar un Gutendex propio y cambiar `GutendexClient.defaultBaseUrl`.
 - **Lector**: lector propio para EPUB/DOCX (tema claro, sepia u oscuro, tamaño de letra, interlineado) y visor PDF; recuerda la posición exacta.
 - **Subrayados y notas**: cuatro colores, notas, panel por libro y pestaña "Mis citas" con exportación a Markdown.
 - **Escritura**: obras por capítulos, editor enriquecido sin distracciones, guardado automático, versiones, fichas de personajes y lugares.

@@ -4,6 +4,14 @@ Cada versión publicada toma su texto de aquí: la sección `## [X.Y.Z]` aparece
 en GitHub Releases y en Ajustes → Novedades dentro de la app.
 Formato: `### títulos`, `- viñetas` y `**negrita**`.
 
+## [1.1.0] - 2026-11-27
+
+### Explorar
+- Nueva pestaña **Explorar** con miles de **clásicos gratis** de dominio público de Project Gutenberg: Cervantes, Galdós, Bécquer, Dickens y muchos más.
+- Busca por título o autor, elige el **idioma** y recorre temas como novela, poesía, teatro o cuentos.
+- Cada libro tiene su ficha y se **descarga a tu biblioteca** con un toque, listo para leer.
+- Explorar es lo único que se conecta a internet: solo envía lo que buscas, nunca datos de tu biblioteca.
+
 ## [1.0.2] - 2026-11-12
 
 ### Para todos los móviles

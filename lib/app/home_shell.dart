@@ -16,6 +16,7 @@ const _destinations = [
     Icons.auto_stories_rounded,
     'Biblioteca',
   ),
+  _Destination(Icons.explore_outlined, Icons.explore_rounded, 'Explorar'),
   _Destination(
     Icons.format_quote_outlined,
     Icons.format_quote_rounded,

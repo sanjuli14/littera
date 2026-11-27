@@ -1,6 +1,15 @@
 abstract final class Routes {
   static const library = '/biblioteca';
   static const writing = '/escribir';
+  static const explore = '/explorar';
+
+  static String exploreBook(int id) => '$explore/libro/$id';
+
+  /// "Ver todo" de una sección de Explorar. [topic] `null` = más leídos.
+  static String exploreTopic({String? topic, required String title}) => Uri(
+    path: '$explore/tema',
+    queryParameters: {'titulo': title, 'tema': ?topic},
+  ).toString();
   static const settings = '/ajustes';
   static const backup = '$settings/copia';
   static const whatsNew = '$settings/novedades';
