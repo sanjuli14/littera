@@ -2,6 +2,9 @@
 /// (https://gutendex.com). Son de dominio público y se descargan gratis.
 library;
 
+/// Réplica oficial de Project Gutenberg, con los mismos archivos.
+const gutenbergMirror = 'https://gutenberg.pglaf.org';
+
 /// Autor o traductor.
 class GutenbergPerson {
   const GutenbergPerson({required this.name, this.birthYear, this.deathYear});
@@ -109,7 +112,28 @@ class GutenbergBook {
   final int downloadCount;
 
   String? get epubUrl => formats['application/epub+zip'];
-  String? get coverUrl => formats['image/jpeg'];
+
+  /// Dónde intentar la descarga, en orden: la réplica oficial de
+  /// Gutenberg (EPUB3 y EPUB2) y después el enlace original.
+  List<String> get epubUrls {
+    final original = epubUrl;
+    if (original == null) return const [];
+    return [
+      '$gutenbergMirror/cache/epub/$id/pg$id-images-3.epub',
+      '$gutenbergMirror/cache/epub/$id/pg$id-images.epub',
+      original,
+    ];
+  }
+
+  /// Carátula servida desde la réplica (gutenberg.org a veces está caído).
+  String? get coverUrl {
+    final url = formats['image/jpeg'];
+    if (url == null) return null;
+    final uri = Uri.tryParse(url);
+    if (uri == null || uri.host != 'www.gutenberg.org') return url;
+    return uri.replace(host: Uri.parse(gutenbergMirror).host).toString();
+  }
+
   bool get canDownload => epubUrl != null;
 
   /// "Miguel de Cervantes Saavedra" o "Anónimo".

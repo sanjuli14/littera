@@ -4,6 +4,14 @@ Cada versión publicada toma su texto de aquí: la sección `## [X.Y.Z]` aparece
 en GitHub Releases y en Ajustes → Novedades dentro de la app.
 Formato: `### títulos`, `- viñetas` y `**negrita**`.
 
+## [1.1.1] - 2026-11-27
+
+### Explorar más rápido y fiable
+- Las **descargas** y las **carátulas** llegan aunque gutenberg.org esté en mantenimiento: se usa su réplica oficial.
+- Lo que ya viste se muestra **al instante** y se actualiza por detrás.
+- Las secciones cargan antes: los libros se piden en orden, sin saturar el catálogo.
+- Si el catálogo falla un momento, se reintenta solo; y si Gutenberg está caído, te lo dice claramente.
+
 ## [1.1.0] - 2026-11-27
 
 ### Explorar

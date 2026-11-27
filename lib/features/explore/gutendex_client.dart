@@ -21,8 +21,14 @@ class ExploreException implements Exception {
 /// Catálogo de Project Gutenberg a través de Gutendex.
 ///
 /// Solo se conecta cuando el usuario abre Explorar, busca o descarga: no
-/// envía nada de su biblioteca. Las respuestas se guardan un día para no
-/// repetir consultas (Gutendex es un servicio gratuito y compartido).
+/// envía nada de su biblioteca.
+///
+/// Para que cargue rápido y no sature un servicio gratuito y compartido:
+/// - como mucho [maxConcurrent] consultas a la vez (el resto espera en
+///   cola) y una misma URL nunca se pide dos veces en paralelo;
+/// - lo guardado se muestra al instante: si tiene menos de [cacheTtl] no se
+///   consulta; si es más viejo (hasta [staleTtl]) se muestra y se refresca
+///   en segundo plano, y también sirve de respaldo si el catálogo falla.
 class GutendexClient {
   GutendexClient({
     required this.client,
@@ -30,6 +36,7 @@ class GutendexClient {
     required String appVersion,
     this.baseUrl = defaultBaseUrl,
     DateTime Function()? clock,
+    this.retryDelay = const Duration(seconds: 2),
   }) : userAgent =
            'Littera/$appVersion (+https://github.com/sanjuli14/littera)',
        _clock = clock ?? DateTime.now;
@@ -44,8 +51,13 @@ class GutendexClient {
   final String userAgent;
   final DateTime Function() _clock;
 
+  /// Espera antes de reintentar un fallo del servidor.
+  final Duration retryDelay;
+
   static const cacheTtl = Duration(hours: 24);
-  static const _maxCacheEntries = 60;
+  static const staleTtl = Duration(days: 7);
+  static const maxConcurrent = 2;
+  static const _maxCacheEntries = 80;
   static const _cacheKey = 'exploreCache';
   static const _downloadsKey = 'gutenbergDownloads';
 
@@ -90,12 +102,26 @@ class GutendexClient {
     return GutenbergBook.fromJson(json);
   }
 
-  /// Descarga el EPUB del libro.
+  /// Descarga el EPUB del libro. Prueba primero la réplica oficial
+  /// (gutenberg.pglaf.org) y luego gutenberg.org, que a veces está en
+  /// mantenimiento (error 503).
   Future<Uint8List> downloadEpub(GutenbergBook book) async {
-    final url = book.epubUrl;
-    if (url == null) {
+    final urls = book.epubUrls;
+    if (urls.isEmpty) {
       throw const ExploreException('Este libro no tiene versión EPUB.');
     }
+    ExploreException? last;
+    for (final url in urls) {
+      try {
+        return await _downloadFrom(url);
+      } on ExploreException catch (e) {
+        last = e;
+      }
+    }
+    throw last!;
+  }
+
+  Future<Uint8List> _downloadFrom(String url) async {
     final http.Response response;
     try {
       response = await client
@@ -105,6 +131,12 @@ class GutendexClient {
       throw const ExploreException('La descarga tardó demasiado.');
     } catch (_) {
       throw const ExploreException('Sin conexión a internet.');
+    }
+    if (response.statusCode >= 500) {
+      throw const ExploreException(
+        'Project Gutenberg no está disponible ahora mismo. '
+        'Inténtalo en un rato.',
+      );
     }
     if (response.statusCode != 200) {
       throw ExploreException(
@@ -136,18 +168,54 @@ class GutendexClient {
 
   // ------------------------------------------------------------ Red
 
+  /// Consultas en curso o en cola, por URL (para no repetirlas).
+  final _inFlight = <String, Future<String>>{};
+  final _waiting = <Completer<void>>[];
+  var _running = 0;
+
   Future<Object?> _getJson(String url) async {
     final cached = _readCache(url);
-    if (cached != null) return jsonDecode(cached);
+    if (cached != null) {
+      if (cached.stale) {
+        // Se muestra lo guardado y se actualiza para la próxima vez.
+        unawaited(_fetch(url).then((_) {}, onError: (_) {}));
+      }
+      return jsonDecode(cached.body);
+    }
+    return jsonDecode(await _fetch(url));
+  }
 
-    final http.Response response;
+  Future<String> _fetch(String url) =>
+      _inFlight[url] ??= _queued(() => _download(url)).whenComplete(() {
+        // Sin devolver el Future: whenComplete lo esperaría a sí mismo.
+        _inFlight.remove(url);
+      });
+
+  /// Ejecuta [task] cuando haya un hueco (máximo [maxConcurrent]).
+  Future<T> _queued<T>(Future<T> Function() task) async {
+    if (_running >= maxConcurrent) {
+      final turn = Completer<void>();
+      _waiting.add(turn);
+      await turn.future;
+    }
+    _running++;
     try {
-      response = await client
-          .get(
-            Uri.parse(url),
-            headers: {'Accept': 'application/json', 'User-Agent': userAgent},
-          )
-          .timeout(_apiTimeout);
+      return await task();
+    } finally {
+      _running--;
+      if (_waiting.isNotEmpty) _waiting.removeAt(0).complete();
+    }
+  }
+
+  /// Pide la URL (un reintento si el servidor falla) y la guarda.
+  Future<String> _download(String url) async {
+    http.Response response;
+    try {
+      response = await _get(url);
+      if (response.statusCode >= 500) {
+        await Future<void>.delayed(retryDelay);
+        response = await _get(url);
+      }
     } on TimeoutException {
       throw const ExploreException(
         'El catálogo tardó demasiado en responder. Inténtalo en un rato.',
@@ -164,25 +232,34 @@ class GutendexClient {
       );
     }
     final text = utf8.decode(response.bodyBytes, allowMalformed: true);
-    final Object? json;
     try {
-      json = jsonDecode(text);
+      jsonDecode(text);
     } on FormatException {
       throw const ExploreException('Respuesta inesperada del catálogo.');
     }
     await _writeCache(url, text);
-    return json;
+    return text;
   }
+
+  Future<http.Response> _get(String url) => client
+      .get(
+        Uri.parse(url),
+        headers: {'Accept': 'application/json', 'User-Agent': userAgent},
+      )
+      .timeout(_apiTimeout);
 
   Map<String, dynamic> _cache() =>
       Map<String, dynamic>.from(meta.get(_cacheKey) as Map? ?? const {});
 
-  String? _readCache(String url) {
+  ({String body, bool stale})? _readCache(String url) {
     final entry = _cache()[url];
     if (entry is! Map) return null;
     final at = DateTime.tryParse(entry['at'] as String? ?? '');
-    if (at == null || _clock().difference(at) >= cacheTtl) return null;
-    return entry['body'] as String?;
+    final body = entry['body'];
+    if (at == null || body is! String) return null;
+    final age = _clock().difference(at);
+    if (age >= staleTtl) return null;
+    return (body: body, stale: age >= cacheTtl);
   }
 
   Future<void> _writeCache(String url, String body) {
@@ -192,7 +269,7 @@ class GutendexClient {
         final at = v is Map
             ? DateTime.tryParse(v['at'] as String? ?? '')
             : null;
-        return at == null || now.difference(at) >= cacheTtl;
+        return at == null || now.difference(at) >= staleTtl;
       });
     cache[url] = {'at': now.toIso8601String(), 'body': body};
     // Si aún hay demasiadas, fuera las más antiguas.

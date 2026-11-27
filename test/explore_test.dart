@@ -35,6 +35,8 @@ Map<String, dynamic> _bookJson({
   'copyright': false,
   'media_type': 'Text',
   'formats': {
+    'image/jpeg':
+        'https://www.gutenberg.org/cache/epub/$id/pg$id.cover.medium.jpg',
     if (epub)
       'application/epub+zip':
           'https://www.gutenberg.org/ebooks/$id.epub3.images',
@@ -67,7 +69,16 @@ void main() {
       expect(book.authors.single.lifespan, '1547–1616');
       expect(book.epubUrl, contains('2000.epub'));
       expect(book.canDownload, isTrue);
-      expect(book.coverUrl, isNull);
+      // Carátula y descargas desde la réplica, con gutenberg.org al final.
+      expect(
+        book.coverUrl,
+        'https://gutenberg.pglaf.org/cache/epub/2000/pg2000.cover.medium.jpg',
+      );
+      expect(book.epubUrls, [
+        'https://gutenberg.pglaf.org/cache/epub/2000/pg2000-images-3.epub',
+        'https://gutenberg.pglaf.org/cache/epub/2000/pg2000-images.epub',
+        'https://www.gutenberg.org/ebooks/2000.epub3.images',
+      ]);
       expect(book.fileName, 'Don Quijote.epub');
     });
 
@@ -119,25 +130,126 @@ void main() {
       expect(requests, hasLength(1));
     });
 
-    test('la caché caduca a las 24 horas', () async {
+    test('caché: fresca 24 h; luego se muestra y se refresca detrás', () async {
       var now = DateTime(2026, 11, 1);
       var calls = 0;
+      var title = 'Primera';
       final client = GutendexClient(
         client: MockClient((_) async {
           calls++;
-          return http.Response(_pageJson([]), 200);
+          return http.Response(_pageJson([_bookJson(title: title)]), 200);
         }),
         meta: meta,
         appVersion: '1',
         clock: () => now,
       );
-      await client.books(topic: 'poetry');
+      Future<String> first() async =>
+          (await client.books(topic: 'poetry')).results.single.title;
+
+      expect(await first(), 'Primera');
       now = now.add(const Duration(hours: 23));
-      await client.books(topic: 'poetry');
+      expect(await first(), 'Primera');
       expect(calls, 1);
+
+      // Pasado un día: devuelve lo guardado al instante y actualiza.
+      title = 'Segunda';
       now = now.add(const Duration(hours: 2));
-      await client.books(topic: 'poetry');
+      expect(await first(), 'Primera');
+      await pumpEventQueue();
       expect(calls, 2);
+      expect(await first(), 'Segunda');
+
+      // Con más de una semana ya no sirve: se espera a la red.
+      title = 'Tercera';
+      now = now.add(const Duration(days: 8));
+      expect(await first(), 'Tercera');
+      expect(calls, 3);
+    });
+
+    test(
+      'cola: como mucho 2 a la vez y sin pedir dos veces lo mismo',
+      () async {
+        var running = 0;
+        var peak = 0;
+        final urls = <String>[];
+        final client = GutendexClient(
+          client: MockClient((req) async {
+            urls.add(req.url.toString());
+            running++;
+            peak = running > peak ? running : peak;
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            running--;
+            return http.Response(_pageJson([]), 200);
+          }),
+          meta: meta,
+          appVersion: '1',
+        );
+        await Future.wait([
+          for (final t in ['a', 'b', 'c', 'd', 'a', 'a'])
+            client.books(topic: t),
+        ]);
+        expect(peak, 2);
+        expect(urls, hasLength(4));
+      },
+    );
+
+    test('reintenta una vez si el catálogo da error 5xx', () async {
+      var calls = 0;
+      final client = GutendexClient(
+        client: MockClient((_) async {
+          calls++;
+          return calls == 1
+              ? http.Response('', 502)
+              : http.Response(_pageJson([_bookJson()]), 200);
+        }),
+        meta: meta,
+        appVersion: '1',
+        retryDelay: Duration.zero,
+      );
+      expect((await client.books()).results, hasLength(1));
+      expect(calls, 2);
+    });
+
+    test('si la réplica falla, descarga de gutenberg.org', () async {
+      final epub = buildEpub();
+      final hosts = <String>[];
+      final client = GutendexClient(
+        client: MockClient((req) async {
+          hosts.add(req.url.host);
+          return req.url.host == 'www.gutenberg.org'
+              ? http.Response.bytes(epub, 200)
+              : http.Response('mantenimiento', 503);
+        }),
+        meta: meta,
+        appVersion: '1',
+      );
+      final bytes = await client.downloadEpub(
+        GutenbergBook.fromJson(_bookJson()),
+      );
+      expect(bytes, epub);
+      expect(hosts, [
+        'gutenberg.pglaf.org',
+        'gutenberg.pglaf.org',
+        'www.gutenberg.org',
+      ]);
+    });
+
+    test('si todo Gutenberg está caído, lo dice', () async {
+      final client = GutendexClient(
+        client: MockClient((_) async => http.Response('', 503)),
+        meta: meta,
+        appVersion: '1',
+      );
+      await expectLater(
+        client.downloadEpub(GutenbergBook.fromJson(_bookJson())),
+        throwsA(
+          isA<ExploreException>().having(
+            (e) => e.message,
+            'message',
+            contains('no está disponible'),
+          ),
+        ),
+      );
     });
 
     test('errores de red y de servidor dan mensajes claros', () async {
@@ -146,6 +258,7 @@ void main() {
             client: MockClient((_) => f()),
             meta: meta,
             appVersion: '1',
+            retryDelay: Duration.zero,
           );
 
       await expectLater(
@@ -197,7 +310,7 @@ void main() {
     final env = (await tester.runAsync(TestEnv.create))!;
     final epub = buildEpub(title: 'Don Quijote', author: 'Cervantes');
     final mock = MockClient((req) async {
-      if (req.url.host == 'www.gutenberg.org') {
+      if (req.url.host == 'gutenberg.pglaf.org') {
         return http.Response.bytes(epub, 200);
       }
       return http.Response(_pageJson([_bookJson()]), 200);
